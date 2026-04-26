@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>נויה - הדיאטנית האישית שלך</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+<!-- HEADER -->
+<header class="header">
+  <div class="avatar-wrap" id="main-avatar"></div>
+  <div class="hdr-text">
+    <h1>נויה — הדיאטנית האישית שלך</h1>
+    <p class="sub">ספר/י לי מה אכלת ואחשב עבורך את הערכים התזונתיים המדויקים</p>
+    <span class="badge">מחוברת ומוכנה לעזור</span>
+  </div>
+</header>
+
+<!-- AI RESPONSE -->
+<div class="ai-msg" id="ai-msg">
+  <div class="mini-av" id="mini-av"></div>
+  <div>
+    <div class="ai-text" id="ai-text"></div>
+    <div id="warn-box"></div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="sc cal"><div class="sc-icon">🔥</div><div class="sc-val" id="s-cal">0</div><div class="sc-lbl">קלוריות</div></div>
+  <div class="sc crb"><div class="sc-icon">🌾</div><div class="sc-val" id="s-crb">0<span class="sc-unit">g</span></div><div class="sc-lbl">פחמימות</div></div>
+  <div class="sc prt"><div class="sc-icon">💪</div><div class="sc-val" id="s-prt">0<span class="sc-unit">g</span></div><div class="sc-lbl">חלבונים</div></div>
+  <div class="sc fat"><div class="sc-icon">🥑</div><div class="sc-val" id="s-fat">0<span class="sc-unit">g</span></div><div class="sc-lbl">שומנים</div></div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-box">
+  <h3>📊 מעקב יומי</h3>
+  <div class="pi">
+    <div class="pi-hdr"><span>קלוריות</span><span id="pt-cal">0 / 2000 קל׳</span></div>
+    <div class="pi-bar"><div class="pi-fill" id="pf-cal" style="width:0%;background:linear-gradient(90deg,#f97316,#ef4444)"></div></div>
+  </div>
+  <div class="pi">
+    <div class="pi-hdr"><span>פחמימות</span><span id="pt-crb">0 / 250g</span></div>
+    <div class="pi-bar"><div class="pi-fill" id="pf-crb" style="width:0%;background:linear-gradient(90deg,#6366f1,#8b5cf6)"></div></div>
+  </div>
+  <div class="pi">
+    <div class="pi-hdr"><span>חלבונים</span><span id="pt-prt">0 / 60g</span></div>
+    <div class="pi-bar"><div class="pi-fill" id="pf-prt" style="width:0%;background:linear-gradient(90deg,#10b981,#059669)"></div></div>
+  </div>
+  <div class="pi">
+    <div class="pi-hdr"><span>שומנים</span><span id="pt-fat">0 / 65g</span></div>
+    <div class="pi-bar"><div class="pi-fill" id="pf-fat" style="width:0%;background:linear-gradient(90deg,#f59e0b,#d97706)"></div></div>
+  </div>
+</div>
+
+<!-- FOOD LOG -->
+<div class="food-log">
+  <div class="log-hdr">
+    <h3>🍽️ יומן האכילה שלי</h3>
+    <button class="btn-clear" onclick="clearAll()">🗑 נקה הכל</button>
+  </div>
+  <div class="food-list" id="food-list">
+    <div class="empty" id="empty-state">
+      <p>🥗</p>
+      <p>עדיין לא הוספת אוכל היום</p>
+      <p style="font-size:.78rem;margin-top:4px;color:var(--txt3)">הקלד/הקלט מה אכלת למטה</p>
+    </div>
+  </div>
+</div>
+
+<!-- INPUT -->
+<div class="input-area">
+  <label>מה אכלת? (ניתן להקליט בעברית עם 🎤)</label>
+  <div class="input-row">
+    <input type="text" class="food-input" id="food-input"
+      placeholder="לדוגמה: 100 גרם חזה עוף, כוס אורז, 2 ביצים, כף שמן זית..."
+      onkeydown="if(event.key==='Enter')addFood()">
+    <button class="btn-mic" id="mic-btn" onclick="toggleVoice()" title="הקלטה בעברית">🎤</button>
+    <button class="btn-go" onclick="addFood()">חשבי ✓</button>
+  </div>
+  <div class="chips">
+    <span class="chip-lbl">מהיר:</span>
+    <button class="chip" onclick="qi('ביצה אחת')">ביצה</button>
+    <button class="chip" onclick="qi('100 גרם חזה עוף')">חזה עוף 100g</button>
+    <button class="chip" onclick="qi('כוס אורז מבושל')">כוס אורז</button>
+    <button class="chip" onclick="qi('פרוסת לחם')">פרוסת לחם</button>
+    <button class="chip" onclick="qi('תפוח')">תפוח</button>
+    <button class="chip" onclick="qi('כוס קפה שחור')">קפה שחור</button>
+    <button class="chip" onclick="qi('קוטג')">קוטג׳</button>
+    <button class="chip" onclick="qi('אבוקדו')">אבוקדו</button>
+    <button class="chip" onclick="qi('כף שמן זית')">כף שמן זית</button>
+    <button class="chip" onclick="qi('בננה')">בננה</button>
+    <button class="chip" onclick="qi('יוגורט')">יוגורט</button>
+    <button class="chip" onclick="qi('100 גרם סלמון')">סלמון 100g</button>
+    <button class="chip chip-browse" onclick="fpOpen()">📋 עיין במאכלים</button>
+  </div>
+</div>
+
+<!-- FOOD PICKER -->
+<div class="food-picker" id="food-picker" style="display:none">
+  <div class="fp-head">
+    <div class="fp-foodname" id="fp-foodname">בחר מאכל</div>
+    <span class="fp-catbadge" id="fp-catbadge"></span>
+  </div>
+  <div class="fp-row">
+    <select class="fp-sel" id="fp-sel" onchange="fpFoodChange()">
+      <option value="">-- בחר מאכל מהרשימה --</option>
+    </select>
+    <div class="fp-qty-box">
+      <span class="fp-qty-lbl">כמות:</span>
+      <input type="number" class="fp-qty-in" id="fp-qty" value="100" min="1" max="2000" oninput="fpUpdate()">
+      <span class="fp-qty-lbl">ג׳</span>
+    </div>
+  </div>
+  <div class="fp-preview">
+    <div class="fpn c"><div class="fpn-v" id="fpn-cal">0</div><div class="fpn-l">קלוריות</div></div>
+    <div class="fpn h"><div class="fpn-v" id="fpn-carbs">0g</div><div class="fpn-l">פחמימות</div></div>
+    <div class="fpn p"><div class="fpn-v" id="fpn-prot">0g</div><div class="fpn-l">חלבונים</div></div>
+    <div class="fpn f"><div class="fpn-v" id="fpn-fat2">0g</div><div class="fpn-l">שומנים</div></div>
+  </div>
+  <div class="fp-grams-note" id="fp-grams-note"></div>
+  <div class="fp-actions">
+    <button class="fp-add-btn" onclick="fpAdd()">הוסף ✓</button>
+    <button class="fp-cancel-btn" onclick="fpClose()">ביטול</button>
+  </div>
+</div>
+
+</div><!-- end #app -->
+
+<script src="js/avatar.js"></script>
+<script src="data/foods.js"></script>
+<script src="js/parser.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

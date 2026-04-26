@@ -1,0 +1,6 @@
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+Warning: Permanently added 'serveo.net' (RSA) to the list of known hosts.
+Authenticated to serveo.net ([5.255.123.12]:22) using "keyboard-interactive".
+Connection to serveo.net closed by remote host.
+Transferred: sent 2008, received 2220 bytes, in 619.8 seconds
+Bytes per second: sent 3.2, received 3.6
