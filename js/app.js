@@ -28,6 +28,7 @@ function save() {
 }
 
 const GOALS = {cal:2000,carbs:250,protein:60,fat:65};
+let _showRemaining = false;
 
 /* load calorie goal from onboarding; redirect if profile not set */
 (function() {
@@ -51,20 +52,38 @@ const _emptyState = document.getElementById('empty-state');
    ─────────────────────────────────────────────────────── */
 function render() {
   const t = totals();
-  document.getElementById('s-cal').innerHTML = Math.round(t.cal);
-  document.getElementById('s-crb').innerHTML = Math.round(t.carbs)+'<span class="sc-unit">g</span>';
-  document.getElementById('s-prt').innerHTML = Math.round(t.protein)+'<span class="sc-unit">g</span>';
-  document.getElementById('s-fat').innerHTML = Math.round(t.fat)+'<span class="sc-unit">g</span>';
+
+  if (_showRemaining) {
+    const r = {
+      cal:     Math.max(0, Math.round(GOALS.cal     - t.cal)),
+      carbs:   Math.max(0, Math.round(GOALS.carbs   - t.carbs)),
+      protein: Math.max(0, Math.round(GOALS.protein - t.protein)),
+      fat:     Math.max(0, Math.round(GOALS.fat     - t.fat)),
+    };
+    document.getElementById('s-cal').innerHTML = r.cal;
+    document.getElementById('s-crb').innerHTML = r.carbs+'<span class="sc-unit">g</span>';
+    document.getElementById('s-prt').innerHTML = r.protein+'<span class="sc-unit">g</span>';
+    document.getElementById('s-fat').innerHTML = r.fat+'<span class="sc-unit">g</span>';
+    document.getElementById('pt-cal').textContent = r.cal+" קל'";
+    document.getElementById('pt-crb').textContent = r.carbs+'g';
+    document.getElementById('pt-prt').textContent = r.protein+'g';
+    document.getElementById('pt-fat').textContent = r.fat+'g';
+  } else {
+    document.getElementById('s-cal').innerHTML = Math.round(t.cal);
+    document.getElementById('s-crb').innerHTML = Math.round(t.carbs)+'<span class="sc-unit">g</span>';
+    document.getElementById('s-prt').innerHTML = Math.round(t.protein)+'<span class="sc-unit">g</span>';
+    document.getElementById('s-fat').innerHTML = Math.round(t.fat)+'<span class="sc-unit">g</span>';
+    document.getElementById('pt-cal').textContent = Math.round(t.cal)+' / '+GOALS.cal+" קל'";
+    document.getElementById('pt-crb').textContent = Math.round(t.carbs)+' / '+GOALS.carbs+'g';
+    document.getElementById('pt-prt').textContent = Math.round(t.protein)+' / '+GOALS.protein+'g';
+    document.getElementById('pt-fat').textContent = Math.round(t.fat)+' / '+GOALS.fat+'g';
+  }
 
   function pct(v,g){return Math.min(Math.round(v/g*100),100)}
   document.getElementById('pf-cal').style.width = pct(t.cal,GOALS.cal)+'%';
   document.getElementById('pf-crb').style.width = pct(t.carbs,GOALS.carbs)+'%';
   document.getElementById('pf-prt').style.width = pct(t.protein,GOALS.protein)+'%';
   document.getElementById('pf-fat').style.width = pct(t.fat,GOALS.fat)+'%';
-  document.getElementById('pt-cal').textContent = Math.round(t.cal)+' / '+GOALS.cal+" קל'";
-  document.getElementById('pt-crb').textContent = Math.round(t.carbs)+' / '+GOALS.carbs+'g';
-  document.getElementById('pt-prt').textContent = Math.round(t.protein)+' / '+GOALS.protein+'g';
-  document.getElementById('pt-fat').textContent = Math.round(t.fat)+' / '+GOALS.fat+'g';
 
   const el = document.getElementById('food-list');
   if (log.length === 0) {
@@ -651,50 +670,11 @@ function fdClose() {
 /* ─────────────────────────────────────────────────────────
    REMAINING NUTRITION
    ─────────────────────────────────────────────────────── */
-function recommendFoods(r) {
-  if (r.cal <= 0) return '';
-  const pcts = {
-    protein: r.protein / GOALS.protein,
-    carbs:   r.carbs   / GOALS.carbs,
-    fat:     r.fat     / GOALS.fat,
-  };
-  const topMacro = Object.keys(pcts).reduce((a, b) => pcts[a] > pcts[b] ? a : b);
-  const macroKey = { protein: 'p', carbs: 'c', fat: 'f' }[topMacro];
-
-  const candidates = DB
-    .filter(f => f.dw && (f.cal * f.dw / 100) <= r.cal * 1.3)
-    .map(f => ({
-      name:  f.n[0],
-      grams: f.dw,
-      score: f[macroKey] * f.dw / 100,
-    }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3);
-
-  if (!candidates.length) return '';
-  const lines = candidates.map(c => `• ${c.name} ${c.grams} גרם`).join('<br>');
-  return `<div class="remaining-result" style="margin-top:8px">
-    <strong>מומלץ לך לאכול:</strong><br>${lines}
-  </div>`;
-}
-
 function showRemaining() {
-  const t = totals();
-  const r = {
-    cal:     Math.max(0, Math.round(GOALS.cal     - t.cal)),
-    carbs:   Math.max(0, Math.round(GOALS.carbs   - t.carbs)),
-    protein: Math.max(0, Math.round(GOALS.protein - t.protein)),
-    fat:     Math.max(0, Math.round(GOALS.fat     - t.fat)),
-  };
-  const box = document.getElementById('remaining-box');
-  box.innerHTML = `<div class="remaining-result">
-    <strong>נשאר לך היום:</strong><br>
-    קלוריות: ${r.cal} קל׳<br>
-    פחמימות: ${r.carbs}g<br>
-    חלבונים: ${r.protein}g<br>
-    שומנים: ${r.fat}g
-  </div>` + recommendFoods(r);
-  box.style.display = '';
+  _showRemaining = !_showRemaining;
+  const btn = document.getElementById('remaining-btn');
+  btn.textContent = _showRemaining ? 'הצג כמה אכלתי היום' : 'כמה נשאר לי לאכול היום?';
+  render();
 }
 
 /* ─────────────────────────────────────────────────────────

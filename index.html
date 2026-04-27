@@ -17,11 +17,11 @@
     <h1>מירי — הדיאטנית האישית שלך</h1>
     <p class="sub">ספר/י לי מה אכלת ואחשב עבורך את הערכים התזונתיים המדויקים</p>
     <div class="hdr-bottom">
+      <span class="user-name" id="user-name"></span>
       <span class="badge">מחוברת ומוכנה לעזור</span>
-      <div class="user-info">
-        <span class="user-name" id="user-name"></span>
-        <button class="btn-logout" onclick="logout()">התנתק</button>
-      </div>
+    </div>
+    <div class="hdr-footer">
+      <button class="btn-logout" onclick="logout()">התנתק</button>
     </div>
   </div>
 </header>
@@ -74,8 +74,7 @@
     <div class="pi-hdr"><span>שומנים</span><span id="pt-fat">0 / 65g</span></div>
     <div class="pi-bar"><div class="pi-fill" id="pf-fat" style="width:0%;background:linear-gradient(90deg,#f59e0b,#d97706)"></div></div>
   </div>
-  <button class="btn-go" style="width:100%;margin-top:8px" onclick="showRemaining()">חשב כמה נשאר לי לאכול</button>
-  <div id="remaining-box" style="display:none"></div>
+  <button id="remaining-btn" class="btn-remaining" onclick="showRemaining()">כמה נשאר לי לאכול היום?</button>
 </div>
 
 <!-- FOOD LOG -->
