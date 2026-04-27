@@ -121,6 +121,7 @@ function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').
    AUTO-COMPLETE
    ─────────────────────────────────────────────────────── */
 const _acInput = document.getElementById('food-input');
+let _acSelected = false;
 const _acList = document.createElement('div');
 _acList.id = 'ac-list';
 _acList.className = 'ac-list';
@@ -150,12 +151,13 @@ function acSearch(val) {
     item.addEventListener('mousedown', e => {
       e.preventDefault();
       _acInput.value = item.dataset.name;
+      _acSelected = true;
       _acList.style.display = 'none';
     });
   });
 }
 
-_acInput.addEventListener('input', () => acSearch(_acInput.value));
+_acInput.addEventListener('input', () => { _acSelected = false; acSearch(_acInput.value); });
 _acInput.addEventListener('blur', () => setTimeout(() => { _acList.style.display = 'none'; }, 200));
 _acInput.addEventListener('focus', () => { if (_acInput.value.trim().length >= 2) acSearch(_acInput.value); });
 
@@ -228,11 +230,23 @@ async function addFood() {
   let raw = inp.value.trim();
   if (!raw) return;
 
-  raw = applyQtyUnit(raw);
-
   const aiMsg = document.getElementById('ai-msg');
   const aiText = document.getElementById('ai-text');
   const warnBox = document.getElementById('warn-box');
+
+  if (_acSelected) {
+    const qtyNum = document.getElementById('qty-num').value.trim();
+    if (!qtyNum || isNaN(+qtyNum) || +qtyNum <= 0) {
+      aiMsg.classList.add('show');
+      aiText.textContent = 'יש להזין כמות לפני הוספת המאכל';
+      return;
+    }
+    const qtySel = document.getElementById('qty-sel').value;
+    raw = `${qtyNum} ${qtySel} ${raw}`;
+    _acSelected = false;
+  } else {
+    raw = applyQtyUnit(raw);
+  }
 
   /* multi-food meal: comma-separated or starts with a meal-intro verb */
   const isMeal = /,/.test(raw) || /^(אכלתי|אכלת|אכל|אכלה|שתיתי|שתית)\s/.test(raw);
