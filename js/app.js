@@ -674,6 +674,7 @@ function showRemaining() {
   _showRemaining = !_showRemaining;
   const btn = document.getElementById('remaining-btn');
   btn.textContent = _showRemaining ? 'כמה אכלתי היום?' : 'כמה נשאר לי לאכול היום?';
+  document.getElementById('tracker-title').textContent = _showRemaining ? 'כמה נשאר לי לאכול היום?' : 'כמה אכלתי היום?';
   render();
 }
 
