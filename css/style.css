@@ -111,6 +111,12 @@ body::before{content:'';position:fixed;inset:0;background:
 .manual-search-title{font-size:.88rem;color:var(--txt2);font-weight:700}
 .btn-help{background:rgba(99,102,241,.13);border:1px solid rgba(99,102,241,.28);color:var(--indigo);border-radius:50%;width:22px;height:22px;font-size:.8rem;font-weight:700;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .btn-help:hover{background:rgba(99,102,241,.26)}
+.help-popup{position:relative;background:var(--card);border:1px solid rgba(99,102,241,.35);border-radius:14px;padding:16px 18px 14px;margin-bottom:12px;font-size:.83rem;color:var(--txt2);line-height:1.7}
+.help-popup-title{font-weight:700;color:var(--txt);margin:0 0 6px}
+.help-popup ol{margin:0;padding-right:18px}
+.help-popup li{margin-bottom:4px}
+.help-popup-close{position:absolute;top:8px;left:10px;background:none;border:none;font-size:.9rem;color:var(--txt2);cursor:pointer;padding:2px 6px;border-radius:6px}
+.help-popup-close:hover{background:rgba(0,0,0,.07)}
 .qty-num{background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:14px 10px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:.88rem;outline:none;width:70px;flex-shrink:0;text-align:center;transition:border-color .2s,box-shadow .2s}
 .qty-num:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
 .input-row{display:flex;gap:10px}

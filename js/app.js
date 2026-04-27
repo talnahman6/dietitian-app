@@ -1,3 +1,8 @@
+function toggleHelpPopup() {
+  const p = document.getElementById('help-popup');
+  p.hidden = !p.hidden;
+}
+
 /* ─── AUTH GATE ─── */
 requireAuth();
 const _currentUser = getLoggedUser();

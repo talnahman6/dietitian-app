@@ -39,7 +39,16 @@
   <label>מה אכלת היום? 😊</label>
   <div class="manual-search-hdr">
     <span class="manual-search-title">חיפוש ידני</span>
-    <button class="btn-help" title="הקלד שם מזון, כמות ויחידה ולחצי חשבי">?</button>
+    <button class="btn-help" onclick="toggleHelpPopup()">?</button>
+  </div>
+  <div class="help-popup" id="help-popup" hidden>
+    <button class="help-popup-close" onclick="toggleHelpPopup()">✕</button>
+    <p class="help-popup-title">הוראות לחיפוש ידני:</p>
+    <ol>
+      <li>רשום את המוצר שאכלת ובחר אותו מתוך החיפוש.</li>
+      <li>הזן כמות חופשית, למשל 50 לגרם/מ"ל או 2 לכפות/כפיות/יחידות/כוסות.</li>
+      <li>בחר את סוג היחידה מהתפריט ליד שדה הכמות.</li>
+    </ol>
   </div>
   <div class="input-row">
     <input type="text" class="food-input" id="food-input"
