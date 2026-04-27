@@ -225,15 +225,152 @@ async function addMeal(raw) {
   return true;
 }
 
+/* ─────────────────────────────────────────────────────────
+   LOCAL QUANTITY DETECTION + POPUP
+   ─────────────────────────────────────────────────────── */
+function hasExplicitQty(text) {
+  const t = text.trim().toLowerCase();
+  if (/\d+(?:[.,]\d+)?\s*(?:גרם|ג'|מ"?ל|מיליליטר|מל|ליטר|ק"?ג|קילוגרם)/.test(t)) return true;
+  if (/\d+(?:[.,]\d+)?\s*(?:כפיות?|כפות?|כוסות?|כוס)/.test(t)) return true;
+  if (/(?:^|\s)(?:כפיות?|כפות?|כוסות?|כוס)(?:\s|$)/.test(t)) return true;
+  if (/(?:^|\s)כף(?:\s|$)/.test(t)) return true;
+  if (/(?:^|\s)(?:חצי|רבע|שליש)(?:\s|$)/.test(t)) return true;
+  if (/שלוש(?:\s+|-)?רבע|שני(?:\s+|-)?שלישי|כוס\s+וחצי|שתי\s+כוסות/.test(t)) return true;
+  if (/(?:^|\s)(?:אחד|אחת|שניים|שתיים|שני|שתי|שלושה|שלוש|ארבעה|ארבע|חמישה|חמש|שישה|שש)(?:\s|$)/.test(t)) return true;
+  if (/^\d+(?:[.,]\d+)?(?:\s|$)/.test(t)) return true;
+  return false;
+}
+
+let _qtyFood = null, _qtyFoodText = null;
+
+function _qtyUnitOptions(food) {
+  const name = (food.n[0] || '').toLowerCase();
+  const cat  = (food.cat || '').toLowerCase();
+  if (/משקה|שתייה/.test(cat) || /מיץ|חלב|מים|קפה|תה/.test(name))
+    return ['מ"ל', 'כוס', 'כף', 'כפית', 'גרם'];
+  if (/לחם|טוסט|בגט|חלה|לאפה|פיתה|פרוסה/.test(name))
+    return ['פרוסות', 'גרם', 'יחידות'];
+  if (/שמן|חמאת|טחינה|ממרח|מלח|קמח|סוכר|דבש|ריבה/.test(name))
+    return ['כף', 'כפית', 'כוס', 'גרם'];
+  return ['גרם', 'יחידות', 'כוס', 'כף', 'כפית'];
+}
+
+function _qtyQuestion(food) {
+  const name    = food.n[0];
+  const nameLow = name.toLowerCase();
+  const catLow  = (food.cat || '').toLowerCase();
+  if (/לחם|טוסט|בגט|חלה|לאפה/.test(nameLow)) return `כמה פרוסות ${name}?`;
+  if (/פיתה/.test(nameLow))                   return `כמה פיתות?`;
+  if (/ביצ/.test(nameLow))                    return `כמה ביצים?`;
+  if (/משקה|שתייה/.test(catLow) || /מיץ|חלב|מים|קפה|תה/.test(nameLow)) return `כמה מ"ל ${name}?`;
+  if (/ירקות|פירות/.test(catLow))             return `כמה ${name}?`;
+  return `כמה גרם ${name}?`;
+}
+
+function _ensureQtyPopup() {
+  if (document.getElementById('qty-popup')) return;
+  const style = document.createElement('style');
+  style.textContent = `
+    .qty-popup{background:#fff;border-radius:16px;padding:16px;margin:10px 0;box-shadow:0 2px 12px rgba(0,0,0,.12);direction:rtl}
+    .qty-popup-q{font-weight:700;font-size:1rem;margin-bottom:12px;color:#333}
+    .qty-popup-row{display:flex;gap:8px;margin-bottom:10px}
+    .qty-popup-row input[type=number]{flex:1;min-width:0;padding:8px 10px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:1rem;font-family:inherit;box-sizing:border-box;background:#fafafa}
+    .qty-popup-row select{padding:8px 10px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:1rem;font-family:inherit;background:#fafafa}
+    .qty-popup-btns{display:flex;gap:8px}
+    .qty-popup-btns button{flex:1;padding:9px;border:none;border-radius:10px;font-size:.95rem;cursor:pointer;font-family:inherit;font-weight:600}
+    .qty-btn-add{background:#4caf50;color:#fff}
+    .qty-btn-add:hover{background:#43a047}
+    .qty-btn-cancel{background:#f0f0f0;color:#555}
+  `;
+  document.head.appendChild(style);
+  const div = document.createElement('div');
+  div.id = 'qty-popup';
+  div.className = 'qty-popup';
+  div.style.display = 'none';
+  div.innerHTML = `
+    <div class="qty-popup-q" id="qty-popup-q"></div>
+    <div class="qty-popup-row">
+      <input type="number" id="qty-popup-num" min="0.5" step="0.5" placeholder="כמות">
+      <select id="qty-popup-unit"></select>
+    </div>
+    <div class="qty-popup-btns">
+      <button class="qty-btn-add" onclick="qtyPopupSubmit()">הוסף ✓</button>
+      <button class="qty-btn-cancel" onclick="qtyPopupClose()">ביטול</button>
+    </div>`;
+  _acList.insertAdjacentElement('afterend', div);
+}
+
+function showQtyPopup(food, foodText) {
+  _ensureQtyPopup();
+  _qtyFood = food;
+  _qtyFoodText = foodText;
+  document.getElementById('qty-popup-q').textContent = _qtyQuestion(food);
+  const sel = document.getElementById('qty-popup-unit');
+  sel.innerHTML = _qtyUnitOptions(food).map(u => `<option value="${u}">${u}</option>`).join('');
+  const numIn = document.getElementById('qty-popup-num');
+  numIn.value = '';
+  document.getElementById('qty-popup').style.display = '';
+  numIn.focus();
+  document.getElementById('qty-popup').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function qtyPopupClose() {
+  const p = document.getElementById('qty-popup');
+  if (p) p.style.display = 'none';
+  _qtyFood = null;
+  _qtyFoodText = null;
+}
+
+function qtyPopupSubmit() {
+  const numVal = parseFloat(document.getElementById('qty-popup-num').value);
+  const unit   = document.getElementById('qty-popup-unit').value;
+  if (!numVal || numVal <= 0) { document.getElementById('qty-popup-num').focus(); return; }
+  if (!_qtyFood || !_qtyFoodText) return;
+  const rawText = (unit === 'יחידות' || unit === 'פרוסות')
+    ? `${numVal} ${_qtyFoodText}`
+    : `${numVal} ${unit} ${_qtyFoodText}`;
+  const result = parseFood(rawText);
+  if (!result) {
+    document.getElementById('ai-msg').classList.add('show');
+    document.getElementById('ai-text').textContent = 'לא הצלחתי לחשב את הערכים. נסה שוב.';
+    return;
+  }
+  qtyPopupClose();
+  _commitFoodEntry(result);
+}
+
+function _commitFoodEntry(result) {
+  log.push(result);
+  save();
+  const msgs = [
+    `נרשם! ${result.food.n[0]} (${Math.round(result.grams)}g) — ${result.cal} קלוריות, ${result.carbs}g פחמימות, ${result.protein}g חלבונים, ${result.fat}g שומנים.`,
+    `מצוין! הוספתי ${result.food.n[0]}. סה"כ ${result.cal} קלוריות על ${Math.round(result.grams)} גרם. 💪`,
+    `שמרתי! ${result.food.n[0]} (${Math.round(result.grams)}g) = ${result.cal} קל׳ | 🌾${result.carbs}g | 💪${result.protein}g | 🥑${result.fat}g`,
+  ];
+  const aiMsg  = document.getElementById('ai-msg');
+  const aiText = document.getElementById('ai-text');
+  aiMsg.classList.add('show');
+  aiText.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+  const warnBox = document.getElementById('warn-box');
+  const total   = totals();
+  const warns   = [];
+  if (total.cal   > GOALS.cal)   warns.push(`⚠️ עברת את יעד הקלוריות היומי (${Math.round(total.cal)}/${GOALS.cal} קל׳)`);
+  if (total.carbs > GOALS.carbs) warns.push(`⚠️ עברת את יעד הפחמימות היומי`);
+  warnBox.innerHTML = warns.map(w => `<div class="warn-box">${w}</div>`).join('');
+  render();
+  document.getElementById('food-list').scrollTop = document.getElementById('food-list').scrollHeight;
+}
+
 async function addFood() {
   const inp = document.getElementById('food-input');
   let raw = inp.value.trim();
   if (!raw) return;
 
-  const aiMsg = document.getElementById('ai-msg');
+  const aiMsg  = document.getElementById('ai-msg');
   const aiText = document.getElementById('ai-text');
   const warnBox = document.getElementById('warn-box');
 
+  /* ── Manual search (autocomplete-selected item) ── */
   if (_acSelected) {
     const qtyNum = document.getElementById('qty-num').value.trim();
     if (!qtyNum || isNaN(+qtyNum) || +qtyNum <= 0) {
@@ -244,88 +381,41 @@ async function addFood() {
     const qtySel = document.getElementById('qty-sel').value;
     raw = `${qtyNum} ${qtySel} ${raw}`;
     _acSelected = false;
-  } else {
-    raw = applyQtyUnit(raw);
+    const result = parseFood(raw);
+    if (result) { inp.value = ''; _commitFoodEntry(result); }
+    return;
   }
 
-  /* multi-food meal: comma-separated or starts with a meal-intro verb */
+  raw = applyQtyUnit(raw);
+
+  /* ── Multi-food meal ── */
   const isMeal = /,/.test(raw) || /^(אכלתי|אכלת|אכל|אכלה|שתיתי|שתית)\s/.test(raw);
   if (isMeal) {
     const handled = await addMeal(raw);
     if (handled) return;
   }
 
-  // Strip quantity prefix to get the food name
-  const foodName = (raw
-    .replace(/^[\d.,]+\s*(גרם|ג'|ג\s|קילוגרם|קג|מ"ל|מיליליטר|מל|כפות?|כפיות?|כוסות?|ליטר)\s*/,'')
-    .replace(/^(שלוש(?:\s+)?רבע|שני(?:\s+)?שלישי|שליש|חצי|רבע|שתי)\s+כוס\s+/,'')
-    .replace(/^(\d+(?:[.,]\d+)?)\s+/,'')
-    .trim()) || raw;
+  /* ── Single food: local search only ── */
+  const foodText = raw.replace(/^(אכלתי|אכלת|אכל|אכלה|שתיתי|שתית)\s+/, '').trim();
 
-  const norm = s => s.toLowerCase().replace(/['"״׳]/g,'').replace(/\s+/g,' ').trim();
-  const isMultiWord = foodName.trim().split(/\s+/).length > 1;
-  const hasExactMatch = !isMultiWord && DB.some(f => f.n.some(n => norm(n) === norm(foodName)));
-
-  const result = hasExactMatch ? parseFood(raw) : null;
-
-  if (!result) {
+  const food = findFood(foodText);
+  if (!food) {
     warnBox.innerHTML = '';
     aiMsg.classList.add('show');
-    aiText.textContent = '🔍 מחפש מידע תזונתי...';
-
-    // Try FoodsDictionary first
-    try {
-      const fdResult = await fetchFoodsDict(foodName);
-      if (fdResult && (fdResult.per100.cal > 0 || fdResult.per100.protein > 0 || fdResult.per100.carbs > 0)) {
-        aiText.textContent = `נמצא: ${fdResult.food.n[0]}`;
-        showServingPicker(fdResult, raw);
-        inp.value = '';
-        return;
-      }
-    } catch {}
-
-    // Fallback to Claude
-    aiText.textContent = '🤖 שואל את Claude...';
-    try {
-      const entry = await fetchClaudeNutrition(raw);
-      log.push(entry);
-      save();
-      aiText.textContent = `נרשם! ${entry.food.n[0]} (${entry.grams}g) — ${entry.cal} קלוריות, ${entry.carbs}g פחמימות, ${entry.protein}g חלבונים, ${entry.fat}g שומנים.`;
-      const total = totals();
-      let warns = [];
-      if (total.cal > GOALS.cal) warns.push(`⚠️ עברת את יעד הקלוריות היומי (${Math.round(total.cal)}/${GOALS.cal} קל׳)`);
-      if (total.carbs > GOALS.carbs) warns.push(`⚠️ עברת את יעד הפחמימות היומי`);
-      warnBox.innerHTML = warns.map(w => `<div class="warn-box">${w}</div>`).join('');
-      inp.value = '';
-      render();
-      document.getElementById('food-list').scrollTop = document.getElementById('food-list').scrollHeight;
-    } catch(e) {
-      aiText.textContent = 'לא הצלחתי לזהות את המאכל "'+raw+'". נסה לכתוב בצורה אחרת, למשל: "100 גרם ___" או שם המאכל בלבד.';
-    }
+    aiText.textContent = `לא מצאתי "${foodText}" במאגר. נסה שם אחר.`;
     return;
   }
 
-  log.push(result);
-  save();
+  if (hasExplicitQty(foodText)) {
+    const result = parseFood(foodText);
+    if (result) { inp.value = ''; _commitFoodEntry(result); return; }
+  }
 
-  const msgs = [
-    `נרשם! ${result.food.n[0]} (${result.grams}g) — ${result.cal} קלוריות, ${result.carbs}g פחמימות, ${result.protein}g חלבונים, ${result.fat}g שומנים.`,
-    `מצוין! הוספתי ${result.food.n[0]}. סה"כ ${result.cal} קלוריות על ${result.grams} גרם. 💪`,
-    `שמרתי! ${result.food.n[0]} (${result.grams}g) = ${result.cal} קל׳ | 🌾${result.carbs}g | 💪${result.protein}g | 🥑${result.fat}g`,
-  ];
-  aiMsg.classList.add('show');
-  aiText.textContent = msgs[Math.floor(Math.random()*msgs.length)];
-
-  const total = totals();
-  let warns = [];
-  if(total.cal > GOALS.cal) warns.push(`⚠️ עברת את יעד הקלוריות היומי (${Math.round(total.cal)}/${GOALS.cal} קל׳)`);
-  if(total.carbs > GOALS.carbs) warns.push(`⚠️ עברת את יעד הפחמימות היומי`);
-  warnBox.innerHTML = warns.map(w=>`<div class="warn-box">${w}</div>`).join('');
-
+  /* No explicit quantity — ask */
   inp.value = '';
-  render();
-  const fl = document.getElementById('food-list');
-  fl.scrollTop = fl.scrollHeight;
+  warnBox.innerHTML = '';
+  aiMsg.classList.remove('show');
+  showQtyPopup(food, foodText);
 }
 
 function deleteItem(i) {
