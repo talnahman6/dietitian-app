@@ -53,6 +53,11 @@ const _emptyState = document.getElementById('empty-state');
 function render() {
   const t = totals();
 
+  document.getElementById('s-cal').innerHTML = Math.round(t.cal);
+  document.getElementById('s-crb').innerHTML = Math.round(t.carbs)+'<span class="sc-unit">g</span>';
+  document.getElementById('s-prt').innerHTML = Math.round(t.protein)+'<span class="sc-unit">g</span>';
+  document.getElementById('s-fat').innerHTML = Math.round(t.fat)+'<span class="sc-unit">g</span>';
+
   if (_showRemaining) {
     const r = {
       cal:     Math.max(0, Math.round(GOALS.cal     - t.cal)),
@@ -60,19 +65,11 @@ function render() {
       protein: Math.max(0, Math.round(GOALS.protein - t.protein)),
       fat:     Math.max(0, Math.round(GOALS.fat     - t.fat)),
     };
-    document.getElementById('s-cal').innerHTML = r.cal;
-    document.getElementById('s-crb').innerHTML = r.carbs+'<span class="sc-unit">g</span>';
-    document.getElementById('s-prt').innerHTML = r.protein+'<span class="sc-unit">g</span>';
-    document.getElementById('s-fat').innerHTML = r.fat+'<span class="sc-unit">g</span>';
     document.getElementById('pt-cal').textContent = r.cal+" קל'";
     document.getElementById('pt-crb').textContent = r.carbs+'g';
     document.getElementById('pt-prt').textContent = r.protein+'g';
     document.getElementById('pt-fat').textContent = r.fat+'g';
   } else {
-    document.getElementById('s-cal').innerHTML = Math.round(t.cal);
-    document.getElementById('s-crb').innerHTML = Math.round(t.carbs)+'<span class="sc-unit">g</span>';
-    document.getElementById('s-prt').innerHTML = Math.round(t.protein)+'<span class="sc-unit">g</span>';
-    document.getElementById('s-fat').innerHTML = Math.round(t.fat)+'<span class="sc-unit">g</span>';
     document.getElementById('pt-cal').textContent = Math.round(t.cal)+' / '+GOALS.cal+" קל'";
     document.getElementById('pt-crb').textContent = Math.round(t.carbs)+' / '+GOALS.carbs+'g';
     document.getElementById('pt-prt').textContent = Math.round(t.protein)+' / '+GOALS.protein+'g';
