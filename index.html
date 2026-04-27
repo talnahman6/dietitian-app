@@ -57,7 +57,10 @@
 
 <!-- PROGRESS -->
 <div class="progress-box">
-  <h3>📊 מעקב יומי</h3>
+  <div class="progress-hdr">
+    <h3>📊 מעקב יומי</h3>
+    <button id="remaining-btn" class="btn-remaining" onclick="showRemaining()">כמה נשאר לי לאכול היום?</button>
+  </div>
   <div class="pi">
     <div class="pi-hdr"><span>קלוריות</span><span id="pt-cal">0 / 2000 קל׳</span></div>
     <div class="pi-bar"><div class="pi-fill" id="pf-cal" style="width:0%;background:linear-gradient(90deg,#f97316,#ef4444)"></div></div>
@@ -74,7 +77,6 @@
     <div class="pi-hdr"><span>שומנים</span><span id="pt-fat">0 / 65g</span></div>
     <div class="pi-bar"><div class="pi-fill" id="pf-fat" style="width:0%;background:linear-gradient(90deg,#f59e0b,#d97706)"></div></div>
   </div>
-  <button id="remaining-btn" class="btn-remaining" onclick="showRemaining()">כמה נשאר לי לאכול היום?</button>
 </div>
 
 <!-- FOOD LOG -->

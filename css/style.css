@@ -69,7 +69,8 @@ body::before{content:'';position:fixed;inset:0;background:
 
 /* ─── PROGRESS ─── */
 .progress-box{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:20px 24px}
-.progress-box h3{font-size:.9rem;font-weight:700;color:var(--txt2);margin-bottom:16px;text-transform:uppercase;letter-spacing:.08em}
+.progress-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.progress-hdr h3{font-size:.9rem;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.08em;margin:0}
 .pi{margin-bottom:14px}
 .pi:last-child{margin-bottom:0}
 .pi-hdr{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:7px;font-weight:500}

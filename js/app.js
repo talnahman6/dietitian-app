@@ -673,7 +673,7 @@ function fdClose() {
 function showRemaining() {
   _showRemaining = !_showRemaining;
   const btn = document.getElementById('remaining-btn');
-  btn.textContent = _showRemaining ? 'הצג כמה אכלתי היום' : 'כמה נשאר לי לאכול היום?';
+  btn.textContent = _showRemaining ? 'כמה אכלתי היום?' : 'כמה נשאר לי לאכול היום?';
   render();
 }
 
