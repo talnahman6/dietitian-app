@@ -132,6 +132,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .btn-go{background:linear-gradient(135deg,var(--indigo),var(--purple));border:none;color:#fff;border-radius:12px;padding:14px 24px;font-family:'Heebo',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
 .btn-go:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(99,102,241,.42)}
 .btn-go:active{transform:translateY(0)}
+.auto-search-section{margin-top:18px;padding-top:18px;border-top:1px solid var(--bdr)}
 .btn-remaining{background:linear-gradient(135deg,var(--indigo),var(--purple));border:none;color:#fff;border-radius:10px;padding:8px 16px;font-family:'Heebo',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;margin-top:8px;display:inline-block}
 .btn-remaining:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(99,102,241,.38)}
 .btn-remaining:active{transform:translateY(0)}
