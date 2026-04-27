@@ -667,12 +667,33 @@ function fdClose() {
 /* ─────────────────────────────────────────────────────────
    REMAINING NUTRITION
    ─────────────────────────────────────────────────────── */
+function renderTracker() {
+  const t = totals();
+  if (_showRemaining) {
+    const r = {
+      cal:     Math.max(0, Math.round(GOALS.cal     - t.cal)),
+      carbs:   Math.max(0, Math.round(GOALS.carbs   - t.carbs)),
+      protein: Math.max(0, Math.round(GOALS.protein - t.protein)),
+      fat:     Math.max(0, Math.round(GOALS.fat     - t.fat)),
+    };
+    document.getElementById('pt-cal').textContent = r.cal+" קל'";
+    document.getElementById('pt-crb').textContent = r.carbs+'g';
+    document.getElementById('pt-prt').textContent = r.protein+'g';
+    document.getElementById('pt-fat').textContent = r.fat+'g';
+  } else {
+    document.getElementById('pt-cal').textContent = Math.round(t.cal)+' / '+GOALS.cal+" קל'";
+    document.getElementById('pt-crb').textContent = Math.round(t.carbs)+' / '+GOALS.carbs+'g';
+    document.getElementById('pt-prt').textContent = Math.round(t.protein)+' / '+GOALS.protein+'g';
+    document.getElementById('pt-fat').textContent = Math.round(t.fat)+' / '+GOALS.fat+'g';
+  }
+}
+
 function showRemaining() {
   _showRemaining = !_showRemaining;
   const btn = document.getElementById('remaining-btn');
   btn.textContent = _showRemaining ? 'כמה אכלתי היום?' : 'כמה נשאר לי לאכול היום?';
   document.getElementById('tracker-title').textContent = _showRemaining ? 'כמה נשאר לי לאכול היום?' : 'כמה אכלתי היום?';
-  render();
+  renderTracker();
 }
 
 /* ─────────────────────────────────────────────────────────
