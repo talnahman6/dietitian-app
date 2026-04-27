@@ -157,6 +157,27 @@
   </div>
 </div>
 
+
+<!-- QUANTITY POPUP -->
+<div class="qty-popup-overlay" id="qty-popup-overlay" hidden>
+  <div class="qty-popup" id="qty-popup">
+    <p class="qty-popup-title" id="qty-popup-title">כמה אכלת?</p>
+    <input type="number" class="qty-popup-input" id="qty-popup-input" min="0.1" step="0.1" placeholder="כמות">
+    <select class="qty-popup-sel" id="qty-popup-sel">
+      <option value="גרם">גרם</option>
+      <option value='מ"ל'>מ"ל</option>
+      <option value="כפית">כפית</option>
+      <option value="כף">כף</option>
+      <option value="כוס">כוס</option>
+      <option value="יחידה">יחידה</option>
+    </select>
+    <div class="qty-popup-actions">
+      <button class="qty-popup-confirm" id="qty-popup-confirm">אישור ✓</button>
+      <button class="qty-popup-cancel" id="qty-popup-cancel">ביטול</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- end #app -->
 
 <script src="js/auth.js"></script>
