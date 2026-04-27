@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הרשמה — מירי הדיאטנית</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080c14;
+  --bg2: #0e1623;
+  --card: #111827;
+  --card2: #162032;
+  --inp: #1a2640;
+  --bdr: #1e2d45;
+  --bdr2: #253550;
+  --indigo: #6366f1;
+  --purple: #8b5cf6;
+  --green: #10b981;
+  --red: #ef4444;
+  --txt: #e8edf5;
+  --txt2: #8096b4;
+  --txt3: #4a607a;
+  --r: 14px;
+  --sh: 0 8px 32px rgba(0,0,0,.5);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;direction:rtl;display:flex;align-items:center;justify-content:center;padding:20px}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse at 75% 20%,rgba(99,102,241,.07) 0%,transparent 55%),
+  radial-gradient(ellipse at 25% 80%,rgba(16,185,129,.05) 0%,transparent 55%),
+  radial-gradient(ellipse at 50% 50%,rgba(139,92,246,.04) 0%,transparent 70%);
+  pointer-events:none;z-index:0}
+
+.auth-wrap{position:relative;z-index:1;width:100%;max-width:440px}
+
+.auth-logo{text-align:center;margin-bottom:28px}
+.auth-logo .logo-icon{width:72px;height:72px;border-radius:50%;overflow:hidden;border:3px solid var(--green);box-shadow:0 0 24px rgba(16,185,129,.35),0 0 60px rgba(16,185,129,.1);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;background:var(--card2)}
+.auth-logo h1{font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#6366f1,#10b981 60%,#14b8a6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.auth-logo p{color:var(--txt2);font-size:.9rem;margin-top:5px}
+
+.auth-card{background:var(--card);border:1px solid var(--bdr);border-radius:20px;padding:32px;box-shadow:var(--sh)}
+.auth-card h2{font-size:1.25rem;font-weight:800;margin-bottom:24px;color:var(--txt)}
+
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:.85rem;color:var(--txt2);margin-bottom:8px;font-weight:600}
+.form-group input[type="text"],
+.form-group input[type="password"]{
+  width:100%;background:var(--inp);border:1px solid var(--bdr);border-radius:12px;
+  padding:14px 18px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:1rem;
+  outline:none;transition:border-color .2s,box-shadow .2s;direction:rtl}
+.form-group input:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.form-group input::placeholder{color:var(--txt3)}
+
+.hint{font-size:.75rem;color:var(--txt3);margin-top:5px}
+
+.btn-submit{
+  width:100%;background:linear-gradient(135deg,var(--indigo),var(--purple));
+  border:none;color:#fff;border-radius:12px;padding:15px;
+  font-family:'Heebo',sans-serif;font-size:1.05rem;font-weight:700;
+  cursor:pointer;transition:all .2s;margin-top:6px}
+.btn-submit:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(99,102,241,.42)}
+.btn-submit:active{transform:translateY(0)}
+
+.error-msg{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:10px 14px;font-size:.85rem;color:#fca5a5;margin-bottom:16px;display:block;min-height:0}
+.error-msg:empty{display:none}
+
+.auth-link{text-align:center;margin-top:20px;font-size:.88rem;color:var(--txt2)}
+.auth-link a{color:var(--indigo);text-decoration:none;font-weight:700}
+.auth-link a:hover{text-decoration:underline}
+
+@media(max-width:480px){
+  .auth-card{padding:22px 18px}
+  .auth-logo h1{font-size:1.5rem}
+}
+</style>
+</head>
+<body>
+<div class="auth-wrap">
+
+  <div class="auth-logo">
+    <div class="logo-icon">🥗</div>
+    <h1>מירי</h1>
+    <p>הדיאטנית האישית שלך</p>
+  </div>
+
+  <div class="auth-card">
+    <h2>יצירת חשבון חדש</h2>
+
+    <span class="error-msg" id="reg-error"></span>
+
+    <form id="reg-form" onsubmit="handleRegister(event)">
+      <div class="form-group">
+        <label for="reg-fullname">שם מלא</label>
+        <input type="text" id="reg-fullname" placeholder="הקלד שם מלא" autocomplete="name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-username">שם משתמש</label>
+        <input type="text" id="reg-username" placeholder="הקלד שם משתמש (באנגלית)" autocomplete="username" required>
+        <p class="hint">שם המשתמש חייב להיות ייחודי</p>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-password">סיסמא</label>
+        <input type="password" id="reg-password" placeholder="לפחות 6 תווים" autocomplete="new-password" required>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-confirm">אישור סיסמא</label>
+        <input type="password" id="reg-confirm" placeholder="הקלד שוב את הסיסמא" autocomplete="new-password" required>
+      </div>
+
+      <button type="submit" class="btn-submit">הרשמה ✓</button>
+    </form>
+  </div>
+
+  <div class="auth-link">
+    כבר רשום? <a href="login.html">כנס כאן</a>
+  </div>
+
+</div>
+
+<script src="js/auth.js"></script>
+<script>
+  /* redirect if already logged in */
+  if (getLoggedUser()) window.location.href = 'index.html';
+</script>
+</body>
+</html>

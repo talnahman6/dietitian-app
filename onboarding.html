@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הגדרת פרופיל — מירי</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080c14;
+  --card: #111827;
+  --card2: #162032;
+  --inp: #1a2640;
+  --bdr: #1e2d45;
+  --bdr2: #253550;
+  --indigo: #6366f1;
+  --purple: #8b5cf6;
+  --green: #10b981;
+  --teal: #14b8a6;
+  --txt: #e8edf5;
+  --txt2: #8096b4;
+  --txt3: #4a607a;
+  --sh: 0 8px 32px rgba(0,0,0,.5);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;direction:rtl;display:flex;align-items:center;justify-content:center;padding:20px}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse at 75% 20%,rgba(99,102,241,.07) 0%,transparent 55%),
+  radial-gradient(ellipse at 25% 80%,rgba(16,185,129,.05) 0%,transparent 55%),
+  radial-gradient(ellipse at 50% 50%,rgba(139,92,246,.04) 0%,transparent 70%);
+  pointer-events:none;z-index:0}
+
+.ob-wrap{position:relative;z-index:1;width:100%;max-width:520px}
+
+/* Logo */
+.auth-logo{text-align:center;margin-bottom:24px}
+.auth-logo .logo-icon{width:64px;height:64px;border-radius:50%;border:3px solid var(--green);box-shadow:0 0 24px rgba(16,185,129,.35);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:2rem;background:var(--card2)}
+.auth-logo h1{font-size:1.7rem;font-weight:900;background:linear-gradient(135deg,#6366f1,#10b981 60%,#14b8a6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.auth-logo p{color:var(--txt2);font-size:.88rem;margin-top:4px}
+
+/* Card */
+.ob-card{background:var(--card);border:1px solid var(--bdr);border-radius:20px;padding:32px;box-shadow:var(--sh)}
+
+/* Progress */
+.ob-progress{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:28px}
+.ob-dots{display:flex;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--inp);border:1px solid var(--bdr);transition:all .3s}
+.dot.active{background:var(--indigo);box-shadow:0 0 8px rgba(99,102,241,.5);transform:scale(1.2)}
+.dot.done{background:var(--green)}
+.ob-step-label{font-size:.78rem;color:var(--txt3);font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+
+/* Step content */
+.ob-step h2{font-size:1.2rem;font-weight:800;margin-bottom:22px;text-align:center}
+
+/* Gender buttons */
+.gender-btns{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.gender-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  padding:28px 20px;border-radius:16px;border:2px solid var(--bdr);
+  background:var(--inp);color:var(--txt2);cursor:pointer;
+  font-family:'Heebo',sans-serif;font-size:1.1rem;font-weight:700;transition:all .2s}
+.gender-btn:hover{border-color:var(--bdr2);color:var(--txt)}
+.gender-btn.selected{border-color:var(--indigo);background:rgba(99,102,241,.12);color:var(--txt);box-shadow:0 0 14px rgba(99,102,241,.2)}
+.gender-icon{font-size:2.4rem}
+
+/* Number input */
+.num-input-wrap{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:8px}
+.ob-num-input{width:150px;background:var(--inp);border:1px solid var(--bdr);border-radius:12px;
+  padding:16px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:2.2rem;font-weight:700;
+  text-align:center;outline:none;transition:border-color .2s,box-shadow .2s}
+.ob-num-input:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.ob-num-input::placeholder{color:var(--txt3)}
+.num-unit{font-size:1.05rem;color:var(--txt2);font-weight:600}
+
+/* Activity cards */
+.activity-cards{display:flex;flex-direction:column;gap:9px}
+.act-card{cursor:pointer;display:block}
+.act-card input[type="radio"]{display:none}
+.act-body{display:flex;align-items:center;gap:14px;padding:13px 16px;
+  border-radius:12px;border:2px solid var(--bdr);background:var(--inp);transition:all .2s}
+.act-card:hover .act-body{border-color:var(--bdr2)}
+.act-card input:checked + .act-body{border-color:var(--indigo);background:rgba(99,102,241,.1)}
+.act-icon{font-size:1.6rem;flex-shrink:0;width:36px;text-align:center}
+.act-title{font-weight:700;font-size:.93rem}
+.act-sub{font-size:.76rem;color:var(--txt2);margin-top:2px}
+
+/* Results */
+.results-header{text-align:center;margin-bottom:24px}
+.results-icon{font-size:2.8rem;margin-bottom:10px}
+.results-header h2{font-size:1.25rem;font-weight:900}
+.results-header p{color:var(--txt2);font-size:.88rem;margin-top:5px}
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:26px}
+.result-card{border-radius:14px;padding:20px 14px;text-align:center;background:var(--card2);border:1px solid var(--bdr)}
+.result-card.tdee{border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.08)}
+.result-lbl{font-size:.72rem;color:var(--txt2);font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em}
+.result-val{font-size:2rem;font-weight:900;color:var(--indigo)}
+.result-card.tdee .result-val{font-size:2.3rem;color:var(--green)}
+.result-unit{font-size:.7rem;color:var(--txt3);margin-top:4px}
+.btn-start{width:100%;background:linear-gradient(135deg,var(--indigo),var(--purple));
+  border:none;color:#fff;border-radius:12px;padding:16px;
+  font-family:'Heebo',sans-serif;font-size:1.05rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-start:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(99,102,241,.42)}
+
+/* Navigation */
+.ob-nav{display:flex;justify-content:space-between;align-items:center;margin-top:26px}
+.ob-btn-back{background:var(--inp);border:1px solid var(--bdr);color:var(--txt2);
+  border-radius:12px;padding:12px 22px;font-family:'Heebo',sans-serif;
+  font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s}
+.ob-btn-back:hover{border-color:var(--bdr2);color:var(--txt)}
+.ob-btn-next{background:linear-gradient(135deg,var(--indigo),var(--purple));
+  border:none;color:#fff;border-radius:12px;padding:12px 28px;
+  font-family:'Heebo',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s}
+.ob-btn-next:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(99,102,241,.42)}
+
+.ob-error{color:#fca5a5;font-size:.85rem;margin-top:12px;min-height:18px;text-align:center}
+
+@media(max-width:480px){
+  .ob-card{padding:22px 16px}
+  .results-grid{grid-template-columns:1fr}
+  .gender-btns{gap:10px}
+}
+</style>
+</head>
+<body>
+<div class="ob-wrap">
+
+  <div class="auth-logo">
+    <div class="logo-icon">🥗</div>
+    <h1>מירי</h1>
+    <p>בוא/י נכיר — כמה פרטים ואני מגדירה עבורך יעד אישי</p>
+  </div>
+
+  <div class="ob-card">
+
+    <!-- Progress indicator -->
+    <div class="ob-progress">
+      <div class="ob-dots">
+        <div class="dot active" id="dot-1"></div>
+        <div class="dot" id="dot-2"></div>
+        <div class="dot" id="dot-3"></div>
+        <div class="dot" id="dot-4"></div>
+        <div class="dot" id="dot-5"></div>
+      </div>
+      <div class="ob-step-label" id="step-label">שלב 1 מתוך 5</div>
+    </div>
+
+    <!-- Step 1: Gender -->
+    <div class="ob-step" id="step-1">
+      <h2>מה המין שלך?</h2>
+      <div class="gender-btns">
+        <button type="button" class="gender-btn" id="btn-male" onclick="selectGender('זכר')">
+          <span class="gender-icon">👨</span>
+          <span>זכר</span>
+        </button>
+        <button type="button" class="gender-btn" id="btn-female" onclick="selectGender('נקבה')">
+          <span class="gender-icon">👩</span>
+          <span>נקבה</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: Age -->
+    <div class="ob-step" id="step-2" style="display:none">
+      <h2>מה הגיל שלך?</h2>
+      <div class="num-input-wrap">
+        <input type="number" class="ob-num-input" id="age-input" min="1" max="120" placeholder="25">
+        <span class="num-unit">שנים</span>
+      </div>
+    </div>
+
+    <!-- Step 3: Height -->
+    <div class="ob-step" id="step-3" style="display:none">
+      <h2>מה הגובה שלך?</h2>
+      <div class="num-input-wrap">
+        <input type="number" class="ob-num-input" id="height-input" min="100" max="250" placeholder="170">
+        <span class="num-unit">ס״מ</span>
+      </div>
+    </div>
+
+    <!-- Step 4: Weight -->
+    <div class="ob-step" id="step-4" style="display:none">
+      <h2>מה המשקל שלך?</h2>
+      <div class="num-input-wrap">
+        <input type="number" class="ob-num-input" id="weight-input" min="20" max="300" placeholder="70">
+        <span class="num-unit">ק״ג</span>
+      </div>
+    </div>
+
+    <!-- Step 5: Activity level -->
+    <div class="ob-step" id="step-5" style="display:none">
+      <h2>רמת הפעילות שלך?</h2>
+      <div class="activity-cards">
+        <label class="act-card">
+          <input type="radio" name="activity" value="1.2">
+          <div class="act-body">
+            <div class="act-icon">🛋️</div>
+            <div>
+              <div class="act-title">ללא פעילות</div>
+              <div class="act-sub">עבודה בישיבה, בעיקר מנוחה</div>
+            </div>
+          </div>
+        </label>
+        <label class="act-card">
+          <input type="radio" name="activity" value="1.375">
+          <div class="act-body">
+            <div class="act-icon">🚶</div>
+            <div>
+              <div class="act-title">פעילות קלה</div>
+              <div class="act-sub">1–3 פעמים בשבוע</div>
+            </div>
+          </div>
+        </label>
+        <label class="act-card">
+          <input type="radio" name="activity" value="1.55">
+          <div class="act-body">
+            <div class="act-icon">🏋️</div>
+            <div>
+              <div class="act-title">פעילות בינונית</div>
+              <div class="act-sub">3–5 פעמים בשבוע</div>
+            </div>
+          </div>
+        </label>
+        <label class="act-card">
+          <input type="radio" name="activity" value="1.725">
+          <div class="act-body">
+            <div class="act-icon">🔥</div>
+            <div>
+              <div class="act-title">פעילות אינטנסיבית יומית</div>
+              <div class="act-sub">אימונים קשים כל יום</div>
+            </div>
+          </div>
+        </label>
+        <label class="act-card">
+          <input type="radio" name="activity" value="1.9">
+          <div class="act-body">
+            <div class="act-icon">💪</div>
+            <div>
+              <div class="act-title">אינטנסיבי + עבודה פיזית</div>
+              <div class="act-sub">פעילות קשה ועבודה פיזית</div>
+            </div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Results screen -->
+    <div class="ob-step" id="step-results" style="display:none">
+      <div class="results-header">
+        <div class="results-icon">✅</div>
+        <h2>הפרופיל שלך מוכן!</h2>
+        <p>הנה היעדים שחישבתי עבורך</p>
+      </div>
+      <div class="results-grid">
+        <div class="result-card">
+          <div class="result-lbl">BMR שלך</div>
+          <div class="result-val" id="res-bmr">—</div>
+          <div class="result-unit">קלוריות במנוחה מלאה</div>
+        </div>
+        <div class="result-card tdee">
+          <div class="result-lbl">כמות תחזוקה יומית (TDEE)</div>
+          <div class="result-val" id="res-tdee">—</div>
+          <div class="result-unit">קלוריות ביום</div>
+        </div>
+      </div>
+      <button type="button" class="btn-start" onclick="startTracking()">התחל לעקוב ✓</button>
+    </div>
+
+    <!-- Error message -->
+    <div class="ob-error" id="ob-error"></div>
+
+    <!-- Navigation buttons -->
+    <div class="ob-nav" id="ob-nav">
+      <button type="button" class="ob-btn-back" id="btn-back" onclick="goBack()" style="visibility:hidden">חזרה</button>
+      <button type="button" class="ob-btn-next" id="btn-next" onclick="goNext()">המשך</button>
+    </div>
+
+  </div>
+</div>
+
+<script src="js/auth.js"></script>
+<script>
+const _user = getLoggedUser();
+if (!_user) window.location.href = 'login.html';
+
+const answers = { gender: null, age: null, height: null, weight: null, activity: null };
+let currentStep = 1;
+const TOTAL = 5;
+
+function selectGender(g) {
+  answers.gender = g;
+  document.getElementById('btn-male').classList.toggle('selected', g === 'זכר');
+  document.getElementById('btn-female').classList.toggle('selected', g === 'נקבה');
+}
+
+function updateUI() {
+  for (let i = 1; i <= TOTAL; i++) {
+    document.getElementById('step-' + i).style.display = i === currentStep ? '' : 'none';
+    const d = document.getElementById('dot-' + i);
+    d.className = 'dot' + (i < currentStep ? ' done' : i === currentStep ? ' active' : '');
+  }
+  document.getElementById('step-results').style.display = 'none';
+  document.getElementById('step-label').textContent = 'שלב ' + currentStep + ' מתוך ' + TOTAL;
+  document.getElementById('btn-back').style.visibility = currentStep > 1 ? 'visible' : 'hidden';
+  document.getElementById('btn-next').textContent = currentStep === TOTAL ? 'חשב ✓' : 'המשך';
+  document.getElementById('ob-error').textContent = '';
+}
+
+function validate() {
+  const err = document.getElementById('ob-error');
+  if (currentStep === 1) {
+    if (!answers.gender) { err.textContent = 'יש לבחור מין'; return false; }
+  } else if (currentStep === 2) {
+    const v = parseInt(document.getElementById('age-input').value);
+    if (!v || v < 1 || v > 120) { err.textContent = 'יש להזין גיל תקין (1–120)'; return false; }
+    answers.age = v;
+  } else if (currentStep === 3) {
+    const v = parseInt(document.getElementById('height-input').value);
+    if (!v || v < 100 || v > 250) { err.textContent = 'יש להזין גובה תקין (100–250 ס״מ)'; return false; }
+    answers.height = v;
+  } else if (currentStep === 4) {
+    const v = parseFloat(document.getElementById('weight-input').value);
+    if (!v || v < 20 || v > 300) { err.textContent = 'יש להזין משקל תקין (20–300 ק״ג)'; return false; }
+    answers.weight = v;
+  } else if (currentStep === 5) {
+    const sel = document.querySelector('input[name="activity"]:checked');
+    if (!sel) { err.textContent = 'יש לבחור רמת פעילות'; return false; }
+    answers.activity = parseFloat(sel.value);
+  }
+  return true;
+}
+
+function goNext() {
+  if (!validate()) return;
+  if (currentStep < TOTAL) {
+    currentStep++;
+    updateUI();
+  } else {
+    showResults();
+  }
+}
+
+function goBack() {
+  if (currentStep > 1) { currentStep--; updateUI(); }
+}
+
+function calcBMR() {
+  const { gender, age, height, weight } = answers;
+  if (gender === 'זכר') {
+    return 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+  } else {
+    return 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+  }
+}
+
+function showResults() {
+  for (let i = 1; i <= TOTAL; i++) document.getElementById('step-' + i).style.display = 'none';
+  document.getElementById('step-results').style.display = '';
+  document.getElementById('ob-nav').style.display = 'none';
+  for (let i = 1; i <= TOTAL; i++) document.getElementById('dot-' + i).className = 'dot done';
+  document.getElementById('step-label').textContent = 'הפרופיל שלך מוכן!';
+
+  const bmr  = Math.round(calcBMR());
+  const tdee = Math.round(bmr * answers.activity);
+
+  document.getElementById('res-bmr').textContent  = bmr.toLocaleString('he-IL');
+  document.getElementById('res-tdee').textContent = tdee.toLocaleString('he-IL');
+
+  const data = JSON.parse(localStorage.getItem(dietKey(_user.username)) || '{}');
+  Object.assign(data, { ...answers, bmr, tdee });
+  localStorage.setItem(dietKey(_user.username), JSON.stringify(data));
+}
+
+function startTracking() {
+  window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>

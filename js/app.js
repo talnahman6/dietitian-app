@@ -1,27 +1,40 @@
-/* inject avatar */
-document.getElementById('main-avatar').innerHTML = AVATAR_SVG;
+/* ─── AUTH GATE ─── */
+requireAuth();
+const _currentUser = getLoggedUser();
+document.getElementById('user-name').textContent = 'שלום, ' + _currentUser.fullName;
+
+/* inject avatar into AI message mini icon only */
 document.getElementById('mini-av').innerHTML = AVATAR_SVG;
 
 /* ─────────────────────────────────────────────────────────
    STATE + STORAGE
    ─────────────────────────────────────────────────────── */
 const TODAY = new Date().toDateString();
+const _DIET_KEY = dietKey(_currentUser.username);
+
 let log = (() => {
   try {
-    const d = JSON.parse(localStorage.getItem('diet_log') || '{}');
+    const d = JSON.parse(localStorage.getItem(_DIET_KEY) || '{}');
     return d[TODAY] || [];
   } catch { return []; }
 })();
 
 function save() {
   try {
-    const d = JSON.parse(localStorage.getItem('diet_log') || '{}');
+    const d = JSON.parse(localStorage.getItem(_DIET_KEY) || '{}');
     d[TODAY] = log;
-    localStorage.setItem('diet_log', JSON.stringify(d));
+    localStorage.setItem(_DIET_KEY, JSON.stringify(d));
   } catch {}
 }
 
 const GOALS = {cal:2000,carbs:250,protein:60,fat:65};
+
+/* load calorie goal from onboarding; redirect if profile not set */
+(function() {
+  const d = JSON.parse(localStorage.getItem(_DIET_KEY) || '{}');
+  if (!d.tdee) { window.location.href = 'onboarding.html'; return; }
+  GOALS.cal = d.tdee;
+})();
 
 function totals() {
   return log.reduce((a,e)=>({
@@ -134,7 +147,7 @@ function applyQtyUnit(raw) {
   const qtySel = document.getElementById('qty-sel');
   if (!qtySel) return raw;
   const unit = qtySel.value;
-  const hasUnit = /כפית|כפיות|כף|כפות|כוסות?|מ"ל|מיליליטר|גרם/.test(raw);
+  const hasUnit = /כפית|כפיות|כף|כפות|כוסות|כוס|מ"ל|מיליליטר|גרם/.test(raw);
   if (!hasUnit && ['כפית', 'כף', 'כוס'].includes(unit)) {
     return '1 ' + unit + ' ' + raw;
   }
@@ -292,11 +305,6 @@ function clearAll() {
   save();
   document.getElementById('ai-msg').classList.remove('show');
   render();
-}
-
-function qi(text) {
-  document.getElementById('food-input').value = text;
-  addFood();
 }
 
 /* ─────────────────────────────────────────────────────────

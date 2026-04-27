@@ -6,28 +6,55 @@ const UNITS = [
 ];
 
 const SPECIAL_QTY = [
-  {r:/שלוש(?:\s+|-)?רבע\s+כוס/,g:180},
-  {r:/שני(?:\s+|-)?שלישי(?:\s+|-)?כוס/,g:160},
-  {r:/שליש\s+כוס/,g:80},
-  {r:/חצי\s+כוס/,g:120},
-  {r:/רבע\s+כוס/,g:60},
-  {r:/כוס\s+וחצי/,g:360},
-  {r:/שתי\s+כוסות/,g:480},
+  {r:/שלוש(?:\s+|-)?רבע\s+כוס/, cups:0.75},
+  {r:/שני(?:\s+|-)?שלישי(?:\s+|-)?כוס/, cups:2/3},
+  {r:/שליש\s+כוס/, cups:1/3},
+  {r:/חצי\s+כוס/, cups:0.5},
+  {r:/רבע\s+כוס/, cups:0.25},
+  {r:/כוס\s+וחצי/, cups:1.5},
+  {r:/שתי\s+כוסות/, cups:2},
 ];
+
+function unitGrams(food, unit) {
+  const name = food ? (food.n[0] || '').toLowerCase() : '';
+  const cat  = food ? (food.cat  || '').toLowerCase() : '';
+  if (/שמן/.test(name))
+    return {כפית:4.5, כף:14, כוס:218}[unit] ?? 5;
+  if (/חמאת\s*בוטנים|חמאת\s*שקדים|טחינה|ממרח/.test(name))
+    return {כפית:8, כף:16, כוס:258}[unit] ?? 8;
+  if (/מלח/.test(name))
+    return {כפית:6, כף:18, כוס:288}[unit] ?? 6;
+  if (/קמח/.test(name))
+    return {כפית:3, כף:8, כוס:120}[unit] ?? 3;
+  if (/סוכר|דבש|ריבה|סירופ/.test(name))
+    return {כפית:4, כף:12, כוס:200}[unit] ?? 4;
+  if (/מים/.test(name) || /משקה|שתייה|מיץ|חלב|יוגורט|קפה/.test(name) || /משקה|שתייה/.test(cat))
+    return {כפית:5, כף:15, כוס:240}[unit] ?? 5;
+  return {כפית:5, כף:15, כוס:240}[unit] ?? 5;
+}
 
 function extractGrams(txt, food) {
   const t = txt.trim().toLowerCase();
   for (const sq of SPECIAL_QTY) {
-    if (sq.r.test(t)) return sq.g;
+    if (sq.r.test(t)) return Math.round(sq.cups * unitGrams(food, 'כוס'));
   }
+  const volM = t.match(/(\d+(?:[.,]\d+)?)\s*(כפיות|כפית|כפות|כף|כוסות|כוס)/);
+  if (volM) {
+    const count = parseFloat(volM[1].replace(',', '.'));
+    const uw = volM[2];
+    const uk = (uw === 'כפית' || uw === 'כפיות') ? 'כפית'
+             : (uw === 'כף'   || uw === 'כפות')   ? 'כף'
+             : 'כוס';
+    return count * unitGrams(food, uk);
+  }
+  if (/כפיות|כפית/.test(t)) return unitGrams(food, 'כפית');
+  if (/כפות/.test(t) || /(?:^|\s)כף(?:\s|$)/.test(t)) return unitGrams(food, 'כף');
+  if (/כוסות|כוס/.test(t)) return unitGrams(food, 'כוס');
   for (const u of UNITS) {
     const m = t.match(new RegExp(u.r.source.replace('(\\d+(?:[.,]\\d+)?)', '(\\d+(?:[.,]\\d+)?)')));
     if (m) {
       const val = u.fn(m[1] || m[2] || m[0]);
-      if (!isNaN(val) && val > 0) {
-        if (u.r.source.includes('כוס') && food && food.cw) return (val / 240) * food.cw;
-        return val;
-      }
+      if (!isNaN(val) && val > 0) return val;
     }
   }
   const heNums = {
