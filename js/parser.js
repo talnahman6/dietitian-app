@@ -3,9 +3,6 @@ const UNITS = [
   {r:/(\d+(?:[.,]\d+)?)\s*גרם|ג'|^(\d+(?:[.,]\d+)?)\s*ג(?:\s|$)/,fn:m=>+m.replace(',','.')},
   {r:/(\d+(?:[.,]\d+)?)\s*מ"?ל|מיליליטר|מל(?:\s|$)/,fn:m=>+m.replace(',','.')},
   {r:/(\d+(?:[.,]\d+)?)\s*ליטר/,fn:m=>+m.replace(',','.')*1000},
-  {r:/(\d+(?:[.,]\d+)?)\s*כפות?/,fn:m=>+m.replace(',','.')*15},
-  {r:/(\d+(?:[.,]\d+)?)\s*כפיות?/,fn:m=>+m.replace(',','.')*5},
-  {r:/(\d+(?:[.,]\d+)?)\s*כוסות?/,fn:m=>+m.replace(',','.')*240},
 ];
 
 const SPECIAL_QTY = [
@@ -88,6 +85,138 @@ function findFood(text) {
   }
   if(bestScore>0) return best;
   return null;
+}
+
+/* ─── FoodsDictionary fetch ─── */
+const _fdCache = {};
+
+async function fetchFoodsDict(term) {
+  const key = term.trim().toLowerCase();
+  if (_fdCache[key]) return _fdCache[key];
+
+  const base = 'https://www.foodsdictionary.co.il';
+  let html = null;
+
+  // 1. Try direct product name URL
+  try {
+    const r = await fetch(`${base}/Products/1/${encodeURIComponent(term)}`);
+    if (r.ok) html = await r.text();
+  } catch {}
+
+  // 2. Search fallback
+  if (!html) {
+    try {
+      const sr = await fetch(`${base}/FoodsSearch.php?q=${encodeURIComponent(term)}`);
+      if (sr.ok) {
+        const sh = await sr.text();
+        const m = sh.match(/href="([^"]*\/Products\/[^"#?]+)"/i);
+        if (m) {
+          const url = m[1].startsWith('http') ? m[1] : base + (m[1].startsWith('/') ? '' : '/') + m[1];
+          const pr = await fetch(url);
+          if (pr.ok) html = await pr.text();
+        }
+      }
+    } catch {}
+  }
+
+  if (!html) return null;
+
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  let cal = 0, carbs = 0, protein = 0, fat = 0;
+
+  // Try JSON-LD structured data
+  for (const script of doc.querySelectorAll('script[type="application/ld+json"]')) {
+    try {
+      const d = JSON.parse(script.textContent);
+      const items = Array.isArray(d['@graph']) ? d['@graph'] : [d];
+      for (const item of items) {
+        const n = item.nutrition;
+        if (n) {
+          cal     = parseFloat(n.calories)          || cal;
+          carbs   = parseFloat(n.carbohydrateContent) || carbs;
+          protein = parseFloat(n.proteinContent)    || protein;
+          fat     = parseFloat(n.fatContent)        || fat;
+        }
+      }
+    } catch {}
+  }
+
+  // Fallback: table rows
+  if (!cal) {
+    for (const row of doc.querySelectorAll('tr')) {
+      const cells = [...row.querySelectorAll('td, th')];
+      if (cells.length < 2) continue;
+      const label = cells[0].textContent.trim();
+      const val   = parseFloat((cells[cells.length - 1].textContent.replace(',', '.').match(/[\d.]+/) || ['0'])[0]);
+      if (/קלוריה|קלוריות|אנרג|calori/i.test(label) && !cal)     cal     = val;
+      else if (/פחמימ|carbo/i.test(label)              && !carbs)   carbs   = val;
+      else if (/חלבון|protein/i.test(label)             && !protein) protein = val;
+      else if (/שומן(?!\s*רווי)|^fat/i.test(label)     && !fat)     fat     = val;
+    }
+  }
+
+  // Fallback: scan body text for Hebrew nutrition labels
+  if (!cal) {
+    const txt = doc.body?.textContent || '';
+    const pairs = [
+      [/(?:קלוריות|אנרגיה)[^\d]*(\d+(?:[.,]\d+)?)/i, 'cal'],
+      [/פחמימות[^\d]*(\d+(?:[.,]\d+)?)/i,             'carbs'],
+      [/חלבונים?[^\d]*(\d+(?:[.,]\d+)?)/i,            'protein'],
+      [/שומן[^\d]*(\d+(?:[.,]\d+)?)/i,                'fat'],
+    ];
+    for (const [re, field] of pairs) {
+      const m = txt.match(re);
+      if (m) {
+        const v = parseFloat(m[1].replace(',', '.'));
+        if (field === 'cal'     && !cal)     cal     = v;
+        if (field === 'carbs'   && !carbs)   carbs   = v;
+        if (field === 'protein' && !protein) protein = v;
+        if (field === 'fat'     && !fat)     fat     = v;
+      }
+    }
+  }
+
+  // Food display name
+  const nameEl = doc.querySelector('h1, .product-name, .food-name, [itemprop="name"]');
+  const foodName = nameEl ? nameEl.textContent.trim() : term;
+
+  // Serving sizes from <select>
+  const servingSizes = [];
+  for (const sel of doc.querySelectorAll('select')) {
+    for (const opt of sel.options) {
+      const text = opt.textContent.trim();
+      if (!text || text.length < 2) continue;
+      let grams = parseFloat(opt.value);
+      if (!grams || isNaN(grams) || grams > 5000) {
+        const m = text.match(/(\d+(?:[.,]\d+)?)\s*(?:גר|ג'|ג\b|gram|g\b)/i);
+        grams = m ? parseFloat(m[1].replace(',', '.')) : 0;
+      }
+      if (grams > 0) servingSizes.push({ label: text, grams });
+    }
+    if (servingSizes.length) break;
+  }
+
+  // Serving sizes from data attributes
+  if (!servingSizes.length) {
+    for (const el of doc.querySelectorAll('[data-weight],[data-grams],[data-amount]')) {
+      const grams = parseFloat(el.dataset.weight || el.dataset.grams || el.dataset.amount);
+      if (grams > 0 && grams < 5000)
+        servingSizes.push({ label: el.textContent.trim() || `${grams}g`, grams });
+    }
+  }
+
+  const result = {
+    food: {
+      n: [foodName],
+      cat: 'חיפוש באינטרנט',
+      cal, c: carbs, p: protein, f: fat,
+      dw: servingSizes[0]?.grams ?? 100,
+    },
+    servingSizes,
+    per100: { cal, carbs, protein, fat },
+  };
+  _fdCache[key] = result;
+  return result;
 }
 
 function parseFood(rawText) {

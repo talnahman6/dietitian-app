@@ -103,6 +103,8 @@ body::before{content:'';position:fixed;inset:0;background:
 .food-input{flex:1;background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:14px 18px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:1rem;outline:none;transition:border-color .2s,box-shadow .2s;direction:rtl}
 .food-input:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
 .food-input::placeholder{color:var(--txt3)}
+.qty-sel{background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:14px 12px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:.88rem;outline:none;cursor:pointer;direction:rtl;transition:border-color .2s,box-shadow .2s;flex-shrink:0}
+.qty-sel:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
 .btn-mic{background:rgba(99,102,241,.13);border:1px solid rgba(99,102,241,.28);color:var(--indigo);border-radius:12px;padding:0 16px;cursor:pointer;font-size:1.35rem;transition:all .2s;display:flex;align-items:center;white-space:nowrap;font-family:'Heebo',sans-serif}
 .btn-mic:hover,.btn-mic.rec{background:rgba(99,102,241,.26);box-shadow:0 0 14px rgba(99,102,241,.3)}
 .btn-mic.rec{background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.38);color:var(--red);animation:recPulse 1.2s infinite}
@@ -116,6 +118,20 @@ body::before{content:'';position:fixed;inset:0;background:
 .chip:hover{border-color:var(--indigo);color:var(--txt);background:rgba(99,102,241,.1)}
 .chip-browse{background:rgba(99,102,241,.13);border-color:rgba(99,102,241,.38);color:var(--indigo);font-weight:700}
 .chip-browse:hover{background:rgba(99,102,241,.22);border-color:var(--indigo);color:var(--txt)}
+
+/* ─── USDA PANEL ─── */
+.usda-panel{background:var(--card2);border:1px solid var(--bdr2);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);animation:slideIn .25s ease}
+.usda-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(99,102,241,.1);border-bottom:1px solid var(--bdr);font-size:.83rem;color:var(--txt2);gap:8px}
+.usda-header small{color:var(--txt3);font-weight:400}
+.usda-close-btn{background:none;border:none;color:var(--txt3);cursor:pointer;font-size:.9rem;padding:3px 7px;border-radius:6px;flex-shrink:0;font-family:'Heebo',sans-serif}
+.usda-close-btn:hover{color:var(--txt);background:var(--inp)}
+.usda-item{padding:11px 16px;border-bottom:1px solid var(--bdr);cursor:pointer;transition:background .15s}
+.usda-item:last-child{border-bottom:none}
+.usda-item:hover{background:var(--inp)}
+.usda-name{font-size:.93rem;font-weight:700;color:var(--txt)}
+.usda-desc{font-size:.75rem;color:var(--txt3);margin-top:2px;direction:ltr;text-align:right;unicode-bidi:plaintext}
+.usda-macros{font-size:.8rem;color:var(--indigo);margin-top:5px;font-weight:600}
+.usda-qty{color:var(--txt3);font-weight:400}
 
 /* ─── FOOD PICKER ─── */
 .food-picker{background:var(--card);border:1px solid rgba(99,102,241,.35);border-radius:var(--r);padding:22px;animation:slideIn .3s ease;box-shadow:0 8px 32px rgba(99,102,241,.18)}
@@ -162,3 +178,9 @@ body::before{content:'';position:fixed;inset:0;background:
   .btn-go{width:100%}
   .fi-nutrients{display:none}
 }
+
+/* ─── AUTO-COMPLETE ─── */
+.ac-list{background:var(--card2);border:1px solid var(--bdr2);border-radius:10px;overflow:hidden;box-shadow:var(--sh);margin-top:4px}
+.ac-item{padding:10px 16px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background .15s;color:var(--txt)}
+.ac-item:hover{background:var(--inp)}
+.ac-cat{font-size:.7rem;color:var(--txt3);background:var(--inp);border-radius:6px;padding:2px 7px;white-space:nowrap;flex-shrink:0}
