@@ -107,6 +107,12 @@ body::before{content:'';position:fixed;inset:0;background:
 /* ─── INPUT ─── */
 .input-area{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:22px}
 .input-area label{display:block;font-size:.88rem;color:var(--txt2);margin-bottom:10px;font-weight:600}
+.manual-search-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.manual-search-title{font-size:.88rem;color:var(--txt2);font-weight:700}
+.btn-help{background:rgba(99,102,241,.13);border:1px solid rgba(99,102,241,.28);color:var(--indigo);border-radius:50%;width:22px;height:22px;font-size:.8rem;font-weight:700;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.btn-help:hover{background:rgba(99,102,241,.26)}
+.qty-num{background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:14px 10px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:.88rem;outline:none;width:70px;flex-shrink:0;text-align:center;transition:border-color .2s,box-shadow .2s}
+.qty-num:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
 .input-row{display:flex;gap:10px}
 .food-input{flex:1;background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:14px 18px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:1rem;outline:none;transition:border-color .2s,box-shadow .2s;direction:rtl}
 .food-input:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
