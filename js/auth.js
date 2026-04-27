@@ -32,6 +32,8 @@ function handleRegister(e) {
   e.preventDefault();
   const fullName = document.getElementById('reg-fullname').value.trim();
   const username = document.getElementById('reg-username').value.trim().toLowerCase();
+  const email    = document.getElementById('reg-email').value.trim();
+  const phone    = document.getElementById('reg-phone').value.trim();
   const password = document.getElementById('reg-password').value;
   const confirm  = document.getElementById('reg-confirm').value;
   const errEl    = document.getElementById('reg-error');
@@ -40,6 +42,9 @@ function handleRegister(e) {
 
   if (!fullName) return showError(errEl, 'יש למלא שם מלא');
   if (!username) return showError(errEl, 'יש למלא שם משתמש');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError(errEl, 'יש להזין כתובת אימייל תקינה');
+  if (!phone) return showError(errEl, 'יש למלא מספר טלפון');
+  if (!password) return showError(errEl, 'יש למלא סיסמא');
   if (password.length < 6) return showError(errEl, 'הסיסמא חייבת להכיל לפחות 6 תווים');
   if (password !== confirm) return showError(errEl, 'הסיסמאות אינן תואמות');
 
@@ -48,8 +53,15 @@ function handleRegister(e) {
     return showError(errEl, 'שם המשתמש כבר קיים, בחר שם אחר');
   }
 
-  users.push({ fullName, username, password });
+  users.push({ fullName, username, email, phone, password });
   saveUsers(users);
+
+  fetch('https://hook.eu1.make.com/spfr5o7kvmyoh0ke6yphio4tiv99t61d', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: fullName, username, email, phone })
+  }).catch(err => console.error('Webhook error:', err));
+
   sessionStorage.setItem('loggedUser', JSON.stringify({ username, fullName }));
   window.location.href = 'onboarding.html';
 }
@@ -86,6 +98,16 @@ function logout() {
   sessionStorage.removeItem('loggedUser');
   localStorage.removeItem('loggedUser');
   window.location.href = 'login.html';
+}
+
+/* ─── RESET PASSWORD ─── */
+function updatePassword(username, newPassword) {
+  const users = getUsers();
+  const idx = users.findIndex(u => u.username === username);
+  if (idx === -1) return false;
+  users[idx].password = newPassword;
+  saveUsers(users);
+  return true;
 }
 
 function showError(el, msg) {

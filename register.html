@@ -45,7 +45,9 @@ body::before{content:'';position:fixed;inset:0;background:
 .form-group{margin-bottom:18px}
 .form-group label{display:block;font-size:.85rem;color:var(--txt2);margin-bottom:8px;font-weight:600}
 .form-group input[type="text"],
-.form-group input[type="password"]{
+.form-group input[type="password"],
+.form-group input[type="email"],
+.form-group input[type="tel"]{
   width:100%;background:var(--inp);border:1px solid var(--bdr);border-radius:12px;
   padding:14px 18px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:1rem;
   outline:none;transition:border-color .2s,box-shadow .2s;direction:rtl}
@@ -102,6 +104,16 @@ body::before{content:'';position:fixed;inset:0;background:
       </div>
 
       <div class="form-group">
+        <label for="reg-email">אימייל</label>
+        <input type="email" id="reg-email" placeholder="example@mail.com" autocomplete="email" required>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-phone">טלפון</label>
+        <input type="tel" id="reg-phone" placeholder="05X-XXXXXXX" autocomplete="tel" required>
+      </div>
+
+      <div class="form-group">
         <label for="reg-password">סיסמא</label>
         <input type="password" id="reg-password" placeholder="לפחות 6 תווים" autocomplete="new-password" required>
       </div>
@@ -122,9 +134,5 @@ body::before{content:'';position:fixed;inset:0;background:
 </div>
 
 <script src="js/auth.js"></script>
-<script>
-  /* redirect if already logged in */
-  if (getLoggedUser()) window.location.href = 'index.html';
-</script>
 </body>
 </html>
