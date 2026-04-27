@@ -34,6 +34,27 @@
   <div class="sc fat"><div class="sc-icon">🥑</div><div class="sc-val" id="s-fat">0<span class="sc-unit">g</span></div><div class="sc-lbl">שומנים</div></div>
 </div>
 
+<!-- INPUT -->
+<div class="input-area">
+  <label>מה אכלת? (ניתן להקליט בעברית עם 🎤)</label>
+  <div class="input-row">
+    <input type="text" class="food-input" id="food-input"
+      placeholder="לדוגמה: 100 גרם חזה עוף, כוס אורז, 2 ביצים, כף שמן זית..."
+      onkeydown="if(event.key==='Enter')addFood()">
+    <select class="qty-sel" id="qty-sel">
+      <option value="גרם">גרם</option>
+      <option value='מ"ל'>מ"ל</option>
+      <option value="כפית">כפית</option>
+      <option value="כף">כף</option>
+      <option value="כוס">כוס</option>
+      <option value="יחידה">יחידה</option>
+    </select>
+    <button class="btn-mic" id="mic-btn" onclick="toggleVoice()" title="הקלטה בעברית">🎤</button>
+    <button class="btn-mic" id="cam-btn" onclick="openCamera()" title="צלם מנה">📷</button>
+    <button class="btn-go" onclick="addFood()">חשבי ✓</button>
+  </div>
+</div>
+
 <!-- PROGRESS -->
 <div class="progress-box">
   <h3>📊 מעקב יומי</h3>
@@ -53,6 +74,8 @@
     <div class="pi-hdr"><span>שומנים</span><span id="pt-fat">0 / 65g</span></div>
     <div class="pi-bar"><div class="pi-fill" id="pf-fat" style="width:0%;background:linear-gradient(90deg,#f59e0b,#d97706)"></div></div>
   </div>
+  <button class="btn-go" style="width:100%;margin-top:8px" onclick="showRemaining()">חשב כמה נשאר לי לאכול</button>
+  <div id="remaining-box" style="display:none"></div>
 </div>
 
 <!-- FOOD LOG -->
@@ -67,27 +90,6 @@
       <p>עדיין לא הוספת אוכל היום</p>
       <p style="font-size:.78rem;margin-top:4px;color:var(--txt3)">הקלד/הקלט מה אכלת למטה</p>
     </div>
-  </div>
-</div>
-
-<!-- INPUT -->
-<div class="input-area">
-  <label>מה אכלת? (ניתן להקליט בעברית עם 🎤)</label>
-  <div class="input-row">
-    <input type="text" class="food-input" id="food-input"
-      placeholder="לדוגמה: 100 גרם חזה עוף, כוס אורז, 2 ביצים, כף שמן זית..."
-      onkeydown="if(event.key==='Enter')addFood()">
-    <select class="qty-sel" id="qty-sel">
-      <option value="גרם">גרם</option>
-      <option value='מ"ל'>מ"ל</option>
-      <option value="כפית">כפית</option>
-      <option value="כף">כף</option>
-      <option value="כוס">כוס</option>
-      <option value="יחידה">יחידה</option>
-    </select>
-    <button class="btn-mic" id="mic-btn" onclick="toggleVoice()" title="הקלטה בעברית">🎤</button>
-    <button class="btn-mic" id="cam-btn" onclick="openCamera()" title="צלם מנה">📷</button>
-    <button class="btn-go" onclick="addFood()">חשבי ✓</button>
   </div>
 </div>
 

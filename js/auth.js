@@ -110,6 +110,24 @@ function updatePassword(username, newPassword) {
   return true;
 }
 
+function updateCredentials(oldUsername, newUsername, newPassword) {
+  const users = getUsers();
+  const idx = users.findIndex(u => u.username === oldUsername);
+  if (idx === -1) return false;
+  const oldKey = dietKey(oldUsername);
+  users[idx].username = newUsername;
+  users[idx].password = newPassword;
+  saveUsers(users);
+  if (oldUsername !== newUsername) {
+    const data = localStorage.getItem(oldKey);
+    if (data) {
+      localStorage.setItem(dietKey(newUsername), data);
+      localStorage.removeItem(oldKey);
+    }
+  }
+  return true;
+}
+
 function showError(el, msg) {
   el.textContent = msg;
 }

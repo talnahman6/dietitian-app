@@ -101,7 +101,7 @@ body::before{content:'';position:fixed;inset:0;background:
     <h2>כניסה לחשבון</h2>
 
     <div id="success-banner" class="success-msg" style="display:none">נרשמת בהצלחה! עכשיו תוכל/י להתחבר.</div>
-  <div id="reset-banner" class="success-msg" style="display:none">הסיסמה אופסה בהצלחה! כעת ניתן להתחבר.</div>
+  <div id="reset-banner" class="success-msg" style="display:none">שם המשתמש והסיסמה עודכנו בהצלחה</div>
     <span class="error-msg" id="login-error"></span>
 
     <form id="login-form" onsubmit="handleLogin(event)">
@@ -150,10 +150,14 @@ body::before{content:'';position:fixed;inset:0;background:
           <input type="text" id="reset-code-input" placeholder="הזן את הקוד" maxlength="4" autocomplete="off" required>
         </div>
         <div class="form-group">
+          <label for="reset-new-username">שם משתמש חדש</label>
+          <input type="text" id="reset-new-username" placeholder="הזן שם משתמש חדש" autocomplete="username">
+        </div>
+        <div class="form-group">
           <label for="reset-new-password">סיסמא חדשה</label>
           <input type="password" id="reset-new-password" placeholder="הזן סיסמא חדשה" autocomplete="new-password" required>
         </div>
-        <button type="submit" class="btn-submit">עדכן סיסמה ✓</button>
+        <button type="submit" class="btn-submit">עדכן פרטים ✓</button>
       </form>
     </div>
   </div>
@@ -246,12 +250,14 @@ body::before{content:'';position:fixed;inset:0;background:
     document.getElementById('reset-screen').style.display = 'block';
     document.getElementById('reset-error').textContent = '';
     document.getElementById('reset-code-input').value = '';
+    document.getElementById('reset-new-username').value = '';
     document.getElementById('reset-new-password').value = '';
   }
 
   function handleReset(e) {
     e.preventDefault();
     var enteredCode  = document.getElementById('reset-code-input').value.trim();
+    var newUsername  = document.getElementById('reset-new-username').value.trim().toLowerCase();
     var newPassword  = document.getElementById('reset-new-password').value;
     var err          = document.getElementById('reset-error');
     err.textContent  = '';
@@ -267,12 +273,16 @@ body::before{content:'';position:fixed;inset:0;background:
       err.textContent = 'הקוד שהוזן שגוי.';
       return;
     }
+    if (!newUsername) {
+      err.textContent = 'יש להזין שם משתמש חדש';
+      return;
+    }
     if (!newPassword) {
-      err.textContent = 'יש להזין סיסמא חדשה.';
+      err.textContent = 'יש להזין סיסמה חדשה';
       return;
     }
 
-    updatePassword(stored.username, newPassword);
+    updateCredentials(stored.username, newUsername, newPassword);
     localStorage.removeItem('resetCode');
     window.location.href = 'login.html?reset=1';
   }
