@@ -74,6 +74,16 @@
   </div>
 </div>
 
+<!-- DAILY MENUS -->
+<div class="menus-section">
+  <span class="menus-label">תפריטים יומיים</span>
+  <div class="menus-btns">
+    <button class="menu-btn" onclick="openMenuModal(0)">תפריט 1</button>
+    <button class="menu-btn" onclick="openMenuModal(1)">תפריט 2</button>
+    <button class="menu-btn" onclick="openMenuModal(2)">תפריט 3</button>
+  </div>
+</div>
+
 <!-- PROGRESS -->
 <div class="progress-box">
   <div class="progress-hdr">
@@ -187,6 +197,21 @@
   </div>
 </div>
 
+
+<!-- MENU MODAL -->
+<div class="menu-modal-overlay" id="menu-modal-overlay" hidden onclick="closeMenuModal()">
+  <div class="menu-modal" onclick="event.stopPropagation()">
+    <div class="menu-modal-hdr">
+      <span class="menu-modal-title" id="menu-modal-title">תפריט</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="menu-modal-dl" onclick="downloadMenuPDF()">הורד PDF ↓</button>
+        <button class="menu-modal-close" onclick="closeMenuModal()">✕</button>
+      </div>
+    </div>
+    <div class="menu-modal-body" id="menu-modal-body"></div>
+  </div>
+</div>
+
 </div><!-- end #app -->
 
 <!-- MIRI FLOATING CHAT -->
@@ -212,7 +237,7 @@
 
 <!-- ONBOARDING GOAL SELECTION -->
 <div class="onboarding-overlay" id="onboarding-overlay">
-  <div class="onboarding-box">
+  <div class="onboarding-box" id="onboarding-step1">
     <div class="onboarding-avatar">
       <img src="images/yamu_jay-ai-generated-9044938.png" alt="מירי">
     </div>
@@ -239,8 +264,170 @@
     </div>
     <button class="onboarding-btn" id="onboarding-btn">המשך ←</button>
   </div>
+
+  <div class="onboarding-box" id="onboarding-step2" style="display:none">
+    <div class="onboarding-avatar">
+      <img src="images/yamu_jay-ai-generated-9044938.png" alt="מירי">
+    </div>
+    <h2 class="onboarding-title">מתי אתה אוכל?</h2>
+    <div class="meal-times">
+      <div class="meal-time-row">
+        <label class="meal-time-label">ארוחת בוקר</label>
+        <select class="meal-time-sel" id="mt-breakfast" dir="rtl">
+          <option value="">בחר שעה</option>
+          <option>06:00</option><option>06:30</option><option>07:00</option><option>07:30</option>
+          <option>08:00</option><option>08:30</option><option>09:00</option><option>09:30</option>
+          <option>10:00</option><option>10:30</option><option>11:00</option><option>11:30</option>
+          <option>12:00</option>
+        </select>
+      </div>
+      <div class="meal-time-row">
+        <label class="meal-time-label">ארוחת צהריים</label>
+        <select class="meal-time-sel" id="mt-lunch" dir="rtl">
+          <option value="">בחר שעה</option>
+          <option>12:00</option><option>12:30</option><option>13:00</option><option>13:30</option>
+          <option>14:00</option><option>14:30</option><option>15:00</option><option>15:30</option>
+          <option>16:00</option>
+        </select>
+      </div>
+      <div class="meal-time-row">
+        <label class="meal-time-label">ארוחת ביניים</label>
+        <select class="meal-time-sel" id="mt-snack" dir="rtl">
+          <option value="">בחר שעה</option>
+          <option>16:00</option><option>16:30</option><option>17:00</option><option>17:30</option>
+          <option>18:00</option>
+        </select>
+      </div>
+      <div class="meal-time-row">
+        <label class="meal-time-label">ארוחת ערב</label>
+        <select class="meal-time-sel" id="mt-dinner" dir="rtl">
+          <option value="">בחר שעה</option>
+          <option>18:00</option><option>18:30</option><option>19:00</option><option>19:30</option>
+          <option>20:00</option><option>20:30</option><option>21:00</option><option>21:30</option>
+          <option>22:00</option>
+        </select>
+      </div>
+      <div class="meal-time-row">
+        <label class="meal-time-label">ארוחת לילה</label>
+        <select class="meal-time-sel" id="mt-night" dir="rtl">
+          <option value="">בחר שעה</option>
+          <option>22:00</option><option>22:30</option><option>23:00</option><option>23:30</option>
+          <option>00:00</option>
+        </select>
+      </div>
+    </div>
+    <button class="onboarding-btn" id="onboarding-btn2">המשך ←</button>
+  </div>
+
+  <div class="onboarding-box" id="onboarding-step3" style="display:none">
+    <div class="onboarding-avatar">
+      <img src="images/yamu_jay-ai-generated-9044938.png" alt="מירי">
+    </div>
+    <h2 class="onboarding-title">מה אתה אוהב לאכול?</h2>
+    <div class="food-pref-cats">
+      <button class="fpcat-btn" onclick="var l=document.getElementById('fpref-proteins');l.style.display=l.style.display==='none'?'flex':'none';this.classList.toggle('fpcat-active')">
+        <span class="fpcat-icon">💪</span>חלבונים
+      </button>
+      <button class="fpcat-btn" onclick="var l=document.getElementById('fpref-carbs');l.style.display=l.style.display==='none'?'flex':'none';this.classList.toggle('fpcat-active')">
+        <span class="fpcat-icon">🌾</span>פחמימות
+      </button>
+      <button class="fpcat-btn" onclick="var l=document.getElementById('fpref-fats');l.style.display=l.style.display==='none'?'flex':'none';this.classList.toggle('fpcat-active')">
+        <span class="fpcat-icon">🥑</span>שומנים
+      </button>
+    </div>
+
+    <div class="fpref-list" id="fpref-proteins" style="display:none">
+      <div class="fpref-list-title">💪 חלבונים</div>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="חזה עוף"> חזה עוף</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="ירך עוף"> ירך עוף</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="הודו טחון"> הודו טחון</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="בשר בקר"> בשר בקר</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="סלמון"> סלמון</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="טונה"> טונה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="ביצים"> ביצים</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="גבינת קוטג'"> גבינת קוטג'</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="יוגורט יווני"> יוגורט יווני</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="טופו"> טופו</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="עדשים"> עדשים</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="חומוס"> חומוס</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="שעועית שחורה"> שעועית שחורה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="אפונה ירוקה"> אפונה ירוקה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="שרימפס"> שרימפס</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="דג טילפיה"> דג טילפיה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="גבינה לבנה 5%"> גבינה לבנה 5%</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="אדממה"> אדממה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="גבינה פרמזן"> גבינה פרמזן</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="חלב 3%"> חלב 3%</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="סרדינים"> סרדינים</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="שעועית אדומה"> שעועית אדומה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="פיסטוקים"> פיסטוקים</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="שקדים"> שקדים</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-protein" value="קאשיו"> קאשיו</label>
+    </div>
+
+    <div class="fpref-list" id="fpref-carbs" style="display:none">
+      <div class="fpref-list-title">🌾 פחמימות</div>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="אורז לבן"> אורז לבן</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="אורז מלא"> אורז מלא</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="לחם מחיטה מלאה"> לחם מחיטה מלאה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="לחם לבן"> לחם לבן</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="פסטה"> פסטה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="תפוחי אדמה"> תפוחי אדמה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="בטטה"> בטטה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="שיבולת שועל"> שיבולת שועל</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="קינואה"> קינואה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="כוסמת"> כוסמת</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="פיתה"> פיתה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="לחם שיפון"> לחם שיפון</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="תירס"> תירס</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="בורגול"> בורגול</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="קוסקוס"> קוסקוס</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="פנקייק"> פנקייק</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="גרנולה"> גרנולה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="קרקרים מלאים"> קרקרים מלאים</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="בננה"> בננה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="ענבים"> ענבים</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="אבטיח"> אבטיח</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="מנגו"> מנגו</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="דבש"> דבש</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="מיץ תפוזים"> מיץ תפוזים</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-carb" value="לחמניה"> לחמניה</label>
+    </div>
+
+    <div class="fpref-list" id="fpref-fats" style="display:none">
+      <div class="fpref-list-title">🥑 שומנים</div>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="אבוקדו"> אבוקדו</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="שמן זית"> שמן זית</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="שקדים"> שקדים</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="אגוזי מלך"> אגוזי מלך</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="טחינה"> טחינה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="גרעיני חמניות"> גרעיני חמניות</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="גרעיני דלעת"> גרעיני דלעת</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="חמאת בוטנים"> חמאת בוטנים</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="גבינה צהובה"> גבינה צהובה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="שמן קוקוס"> שמן קוקוס</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="פיסטוקים"> פיסטוקים</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="קשיו"> קשיו</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="פקאן"> פקאן</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="שמנת חמוצה"> שמנת חמוצה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="חמאה"> חמאה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="מוצרלה"> מוצרלה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="גרעיני פשתן"> גרעיני פשתן</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="גרעיני צ'יה"> גרעיני צ'יה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="אגוזי ברזיל"> אגוזי ברזיל</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="מקדמיה"> מקדמיה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="זיתים"> זיתים</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="חלמון ביצה"> חלמון ביצה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="שמן שומשום"> שמן שומשום</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="קרם גבינה"> קרם גבינה</label>
+      <label class="fpref-item"><input type="checkbox" name="pref-fat" value="אגוזי לוז"> אגוזי לוז</label>
+    </div>
+
+    <button class="onboarding-btn" id="onboarding-btn3">סיום ✓</button>
+  </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/avatar.js"></script>
 <script src="data/foods.js"></script>

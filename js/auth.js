@@ -1,3 +1,19 @@
+/* ─── SUPABASE ─── */
+const _SB_URL = 'https://fujktuwxgzupicyrolwa.supabase.co';
+const _SB_KEY = 'sb_publishable_QszXfkwdlFXMEFgPgBShvw_QP5Ts7lv';
+
+const _sbReady = new Promise(resolve => {
+  if (window.supabase && window.supabase.createClient) {
+    resolve(window.supabase.createClient(_SB_URL, _SB_KEY));
+  } else {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+    s.onload = () => resolve(window.supabase.createClient(_SB_URL, _SB_KEY));
+    s.onerror = () => resolve(null);
+    document.head.appendChild(s);
+  }
+});
+
 /* ─── AUTH ─── */
 
 function getUsers() {
@@ -28,7 +44,7 @@ function dietKey(username) {
 }
 
 /* ─── REGISTER ─── */
-function handleRegister(e) {
+async function handleRegister(e) {
   e.preventDefault();
   const fullName = document.getElementById('reg-fullname').value.trim();
   const username = document.getElementById('reg-username').value.trim().toLowerCase();
@@ -49,12 +65,23 @@ function handleRegister(e) {
   if (password !== confirm) return showError(errEl, 'הסיסמאות אינן תואמות');
 
   const users = getUsers();
-  if (users.find(u => u.username === username)) {
-    return showError(errEl, 'שם המשתמש כבר קיים, בחר שם אחר');
+  const sb = await _sbReady;
+
+  if (sb) {
+    const { data: existing } = await sb.from('users').select('username').eq('username', username).maybeSingle();
+    if (existing) return showError(errEl, 'שם המשתמש כבר קיים, בחר שם אחר');
+  } else {
+    if (users.find(u => u.username === username)) return showError(errEl, 'שם המשתמש כבר קיים, בחר שם אחר');
   }
 
   users.push({ fullName, username, email, phone, password });
   saveUsers(users);
+
+  if (sb) {
+    try {
+      await sb.from('users').insert({ username, password, email, full_name: fullName, phone });
+    } catch(err) { console.error('Supabase register:', err); }
+  }
 
   fetch('https://hook.eu1.make.com/spfr5o7kvmyoh0ke6yphio4tiv99t61d', {
     method: 'POST',
@@ -67,7 +94,7 @@ function handleRegister(e) {
 }
 
 /* ─── LOGIN ─── */
-function handleLogin(e) {
+async function handleLogin(e) {
   e.preventDefault();
   const username = document.getElementById('login-username').value.trim().toLowerCase();
   const password = document.getElementById('login-password').value.trim();
@@ -76,23 +103,36 @@ function handleLogin(e) {
 
   errEl.textContent = '';
 
-  const users = getUsers();
-  console.log('[AUTH] users:', users);
-  console.log('[AUTH] input username:', username, '| password:', password);
+  let user = null;
+  const sb = await _sbReady;
 
-  const user = users.find(u => u.username.trim().toLowerCase() === username && u.password.trim() === password);
-  console.log('[AUTH] match:', user ? 'found' : 'not found');
+  if (sb) {
+    try {
+      const { data } = await sb.from('users').select('*').eq('username', username).eq('password', password).maybeSingle();
+      if (data) user = data;
+    } catch(err) { console.error('Supabase login:', err); }
+  }
+
+  if (!user) {
+    const users = getUsers();
+    user = users.find(u => u.username.trim().toLowerCase() === username && u.password.trim() === password);
+  }
 
   if (!user) return showError(errEl, 'שם משתמש או סיסמא שגויים');
 
-  const payload = JSON.stringify({ username: user.username, fullName: user.fullName });
+  const fullName = user.fullName || user.full_name || user.username;
+  const uname = user.username;
+  const payload = JSON.stringify({ username: uname, fullName });
   localStorage.setItem('loggedUser', payload);
   if (remember) {
     sessionStorage.removeItem('loggedUser');
   } else {
     sessionStorage.setItem('loggedUser', payload);
   }
-  const dietData = JSON.parse(localStorage.getItem(dietKey(user.username)) || '{}');
+
+  if (sb) await loadUserData(uname);
+
+  const dietData = JSON.parse(localStorage.getItem(dietKey(uname)) || '{}');
   window.location.href = dietData.tdee ? 'index.html' : 'onboarding.html';
 }
 
@@ -129,6 +169,50 @@ function updateCredentials(oldUsername, newUsername, newPassword) {
     }
   }
   return true;
+}
+
+/* ─── SUPABASE USER DATA ─── */
+async function saveUserData(username) {
+  const sb = await _sbReady;
+  if (!sb) return;
+  try {
+    const key = dietKey(username);
+    const d = JSON.parse(localStorage.getItem(key) || '{}');
+    const mealTimes = JSON.parse(localStorage.getItem('mealTimes') || 'null');
+    const foodPrefs = JSON.parse(localStorage.getItem('foodPreferences') || 'null');
+    const dietLog = {};
+    for (const k of Object.keys(d)) {
+      if (!['tdee','goal','weeklyGoal','dailyCal','bmr'].includes(k)) dietLog[k] = d[k];
+    }
+    const payload = { username, updated_at: new Date().toISOString() };
+    if (d.tdee)       payload.tdee             = d.tdee;
+    if (d.goal)       payload.goal             = d.goal;
+    if (d.weeklyGoal) payload.weekly_goal      = d.weeklyGoal;
+    if (d.dailyCal)   payload.daily_calories   = d.dailyCal;
+    if (mealTimes)    payload.meal_times       = mealTimes;
+    if (foodPrefs)    payload.food_preferences = foodPrefs;
+    if (Object.keys(dietLog).length) payload.diet_log = dietLog;
+    await sb.from('user_data').upsert(payload, { onConflict: 'username' });
+  } catch(err) { console.error('Supabase saveUserData:', err); }
+}
+
+async function loadUserData(username) {
+  const sb = await _sbReady;
+  if (!sb) return;
+  try {
+    const { data, error } = await sb.from('user_data').select('*').eq('username', username).maybeSingle();
+    if (error || !data) return;
+    const key = dietKey(username);
+    const local = JSON.parse(localStorage.getItem(key) || '{}');
+    if (data.tdee)           local.tdee       = data.tdee;
+    if (data.goal)           local.goal       = data.goal;
+    if (data.weekly_goal)    local.weeklyGoal = data.weekly_goal;
+    if (data.daily_calories) local.dailyCal   = data.daily_calories;
+    if (data.diet_log)       Object.assign(local, data.diet_log);
+    localStorage.setItem(key, JSON.stringify(local));
+    if (data.meal_times)       localStorage.setItem('mealTimes', JSON.stringify(data.meal_times));
+    if (data.food_preferences) localStorage.setItem('foodPreferences', JSON.stringify(data.food_preferences));
+  } catch(err) { console.error('Supabase loadUserData:', err); }
 }
 
 function showError(el, msg) {

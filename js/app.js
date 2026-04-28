@@ -37,6 +37,7 @@ function save() {
     const d = JSON.parse(localStorage.getItem(_DIET_KEY) || '{}');
     d[TODAY] = log;
     localStorage.setItem(_DIET_KEY, JSON.stringify(d));
+    if (typeof saveUserData === 'function') saveUserData(_currentUser.username);
   } catch {}
 }
 
@@ -44,11 +45,26 @@ const GOALS = {cal:2000,carbs:250,protein:60,fat:65};
 let _showRemaining = false;
 
 /* load calorie goal from onboarding; redirect if profile not set */
-(function() {
-  const d = JSON.parse(localStorage.getItem(_DIET_KEY) || '{}');
+async function _initGoals() {
+  let d = JSON.parse(localStorage.getItem(_DIET_KEY) || '{}');
+  if (!d.tdee && typeof loadUserData === 'function') {
+    await loadUserData(_currentUser.username);
+    d = JSON.parse(localStorage.getItem(_DIET_KEY) || '{}');
+  }
   if (!d.tdee) { window.location.href = 'onboarding.html'; return; }
-  GOALS.cal = d.tdee;
-})();
+  let cal = d.tdee;
+  if (d.weeklyGoal && d.goal) {
+    const dailyDelta = Math.round((7500 * d.weeklyGoal) / 7);
+    if (d.goal === 'loss') cal = d.tdee - dailyDelta;
+    else if (d.goal === 'gain') cal = d.tdee + dailyDelta;
+  }
+  d.dailyCal = cal;
+  localStorage.setItem(_DIET_KEY, JSON.stringify(d));
+  GOALS.cal = cal;
+  if (typeof saveUserData === 'function') saveUserData(_currentUser.username);
+  render();
+}
+_initGoals();
 
 function totals() {
   return log.reduce((a,e)=>({
@@ -1069,6 +1085,176 @@ document.querySelector('.miri-chat-send').addEventListener('click', miriSend);
 document.querySelector('.miri-chat-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') miriSend();
 });
+
+/* ─────────────────────────────────────────────────────────
+   ONBOARDING — GOAL SELECTION
+   ─────────────────────────────────────────────────────── */
+function selectGoal(goal) {
+  const d = JSON.parse(localStorage.getItem(_DIET_KEY) || '{}');
+  d.goal = goal;
+  localStorage.setItem(_DIET_KEY, JSON.stringify(d));
+  showWeeklyGoalStep();
+}
+
+function showWeeklyGoalStep() {
+  document.querySelectorAll('.goal-card').forEach(c => c.style.display = 'none');
+  let step = document.getElementById('weekly-goal-step');
+  if (!step) {
+    step = document.createElement('div');
+    step.id = 'weekly-goal-step';
+    step.className = 'onb-step';
+    step.innerHTML = `
+      <div class="onb-q">מה היעד השבועי שלך?</div>
+      <input type="number" id="weekly-goal-input" min="0.1" max="2" step="0.1" placeholder="ק״ג בשבוע">
+      <button class="onb-btn" onclick="submitWeeklyGoal()">המשך</button>`;
+    document.body.appendChild(step);
+  }
+  step.style.display = '';
+}
+
+function submitWeeklyGoal() {
+  const val = parseFloat(document.getElementById('weekly-goal-input').value);
+  if (!val || val <= 0) return;
+  const d = JSON.parse(localStorage.getItem(_DIET_KEY) || '{}');
+  d.weeklyGoal = val;
+  localStorage.setItem(_DIET_KEY, JSON.stringify(d));
+}
+
+function saveMealTimes(selected) {
+  const valid = ['breakfast','lunch','snack','dinner','night'];
+  const times = selected.filter(t => valid.includes(t));
+  localStorage.setItem('mealTimes', JSON.stringify(times));
+}
+
+/* ─────────────────────────────────────────────────────────
+   FOOD PREFERENCES
+   ─────────────────────────────────────────────────────── */
+function saveFoodPreferences(selected) {
+  const d = JSON.parse(localStorage.getItem('foodPreferences') || '{}');
+  d.selected = Array.isArray(selected) ? selected : [];
+  d.all = [...d.selected, ...(d.freeText || [])];
+  localStorage.setItem('foodPreferences', JSON.stringify(d));
+}
+
+function submitFoodFreeText() {
+  const inp = document.getElementById('food-pref-text');
+  if (!inp) return;
+  const items = inp.value.split(/[,،\n،]+/).map(s => s.trim()).filter(Boolean);
+  const d = JSON.parse(localStorage.getItem('foodPreferences') || '{}');
+  d.freeText = items;
+  d.all = [...(d.selected || []), ...items];
+  localStorage.setItem('foodPreferences', JSON.stringify(d));
+  inp.value = '';
+  const box = document.getElementById('food-pref-box');
+  if (box) box.style.display = 'none';
+}
+
+function showFoodFreeTextPrompt() {
+  let box = document.getElementById('food-pref-box');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'food-pref-box';
+    box.style.cssText = 'background:#fff;border-radius:14px;padding:14px;margin:10px 0;box-shadow:0 2px 10px rgba(0,0,0,.1);direction:rtl';
+    box.innerHTML = `
+      <div style="font-weight:700;margin-bottom:8px">יש עוד דברים שאתה אוהב?</div>
+      <textarea id="food-pref-text" rows="2" placeholder="לדוגמה: תפוח, גבינה, אורז" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px;font-size:1rem;font-family:inherit;box-sizing:border-box;resize:none"></textarea>
+      <button onclick="submitFoodFreeText()" style="margin-top:8px;padding:8px 18px;background:#4caf50;color:#fff;border:none;border-radius:8px;font-size:.95rem;cursor:pointer;font-family:inherit;font-weight:600">שמור</button>`;
+    document.body.appendChild(box);
+  }
+  box.style.display = '';
+}
+
+/* ─────────────────────────────────────────────────────────
+   DAILY MENUS GENERATOR
+   ─────────────────────────────────────────────────────── */
+function generateDailyMenus() {
+  const mealTimes = (() => { try { return JSON.parse(localStorage.getItem('mealTimes') || '["breakfast","lunch","dinner"]'); } catch { return ['breakfast','lunch','dinner']; } })();
+  const prefData  = (() => { try { return JSON.parse(localStorage.getItem('foodPreferences') || '{}'); } catch { return {}; } })();
+  const prefs = (prefData.all || []).map(s => s.toLowerCase());
+
+  const calShare  = { breakfast:0.25, lunch:0.35, snack:0.10, dinner:0.25, night:0.05 };
+  const mealLabel = { breakfast:'ארוחת בוקר', lunch:'ארוחת צהריים', snack:'חטיף', dinner:'ארוחת ערב', night:'ארוחת לילה' };
+
+  function macroRole(f) {
+    const cal = f.cal || 1;
+    if ((f.p * 4) / cal >= 0.3) return 'protein';
+    if ((f.c * 4) / cal >= 0.5) return 'carbs';
+    return 'fat';
+  }
+
+  function isPreferred(f) {
+    const name = (f.n[0] || '').toLowerCase();
+    return prefs.some(p => name.includes(p) || p.includes(name));
+  }
+
+  function sortedByPref(foods) {
+    return [...foods].sort((a, b) => (isPreferred(b) ? 1 : 0) - (isPreferred(a) ? 1 : 0));
+  }
+
+  const proteins = sortedByPref(DB.filter(f => macroRole(f) === 'protein' && f.cal > 0));
+  const carbs    = sortedByPref(DB.filter(f => macroRole(f) === 'carbs'   && f.cal > 0));
+  const fats     = sortedByPref(DB.filter(f => macroRole(f) === 'fat'     && f.cal > 0));
+
+  const menus = [];
+  for (let m = 0; m < 3; m++) {
+    let pi = m, ci = m, fi = m;
+    const meals = [];
+    for (const type of mealTimes) {
+      const calTarget = Math.round(GOALS.cal * (calShare[type] || 0.2));
+      const pf = proteins[pi % proteins.length];
+      const cf = carbs[ci % carbs.length];
+      const ff = fats[fi % fats.length];
+      pi++; ci++; fi++;
+
+      const items = [pf, cf, ff].filter(Boolean).map(f => {
+        const grams = Math.max(30, Math.min(250, Math.round((calTarget / 3) / (f.cal / 100))));
+        const r = grams / 100;
+        return { name: f.n[0], grams, cal: Math.round(f.cal * r), protein: Math.round(f.p * r), carbs: Math.round(f.c * r), fat: Math.round(f.f * r) };
+      });
+
+      meals.push({ type, label: mealLabel[type] || type, items });
+    }
+    menus.push({ index: m + 1, meals });
+  }
+  return menus;
+}
+
+let _currentMenuData = null;
+
+function openMenuModal(idx) {
+  const menus = generateDailyMenus();
+  const menu = menus[idx];
+  if (!menu) return;
+  _currentMenuData = menu;
+  document.getElementById('menu-modal-title').textContent = 'תפריט ' + menu.index;
+  const body = document.getElementById('menu-modal-body');
+  body.innerHTML = menu.meals.map(meal => {
+    const mealTotal = meal.items.reduce((s, it) => s + it.cal, 0);
+    return `<div class="menu-meal">
+      <div class="menu-meal-label">${escHtml(meal.label)}</div>
+      ${meal.items.map(it => `<div class="menu-meal-item">• ${escHtml(it.name)} — ${it.grams}g (${it.cal} קל׳, חלבון ${it.protein}g, פחמ׳ ${it.carbs}g, שומן ${it.fat}g)</div>`).join('')}
+      <div class="menu-meal-total">סה"כ: ${mealTotal} קל׳</div>
+    </div>`;
+  }).join('');
+  document.getElementById('menu-modal-overlay').hidden = false;
+}
+
+function closeMenuModal() {
+  document.getElementById('menu-modal-overlay').hidden = true;
+}
+
+function downloadMenuPDF() {
+  if (!_currentMenuData) return;
+  const menu = _currentMenuData;
+  const html = `<!DOCTYPE html><html dir="rtl" lang="he"><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;direction:rtl;padding:24px;color:#333}h2{color:#6366f1;margin-bottom:16px;font-size:1.2rem}.meal{margin-bottom:12px;border:1px solid #ddd;border-radius:8px;padding:10px 14px}.meal-lbl{font-weight:700;color:#6366f1;margin-bottom:6px;font-size:.95rem}.meal-item{font-size:.88rem;color:#333;padding:3px 0;border-bottom:1px solid #f0f0f0}.meal-item:last-child{border:none}.meal-total{font-size:.78rem;color:#888;margin-top:6px;padding-top:4px;border-top:1px solid #f0f0f0}.footer{font-size:.78rem;color:#aaa;text-align:center;margin-top:16px}</style></head><body><h2>תפריט ${menu.index} — מירי הדיאטנית</h2>${menu.meals.map(meal=>{const t=meal.items.reduce((s,it)=>s+it.cal,0);return`<div class="meal"><div class="meal-lbl">${meal.label}</div>${meal.items.map(it=>`<div class="meal-item">• ${it.name} — ${it.grams}g (${it.cal} קל׳, חלבון ${it.protein}g, פחמ׳ ${it.carbs}g, שומן ${it.fat}g)</div>`).join('')}<div class="meal-total">סה"כ: ${t} קל׳</div></div>`}).join('')}<div class="footer">יעד יומי: ${GOALS.cal} קל׳ | מירי הדיאטנית</div></body></html>`;
+  const w = window.open('', '_blank', 'width=620,height=780');
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(() => w.print(), 400);
+}
+
+function showDailyMenus() { openMenuModal(0); }
 
 /* ─────────────────────────────────────────────────────────
    INIT
