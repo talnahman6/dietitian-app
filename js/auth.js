@@ -104,7 +104,7 @@ if (insertError) console.error('[register] insert error:', insertError);
   }).catch(err => console.error('Webhook error:', err));
 
   sessionStorage.setItem('loggedUser', JSON.stringify({ username, fullName }));
-  //window.location.href = 'onboarding.html';
+  window.location.href = 'onboarding.html';
 }
 
 /* ─── LOGIN ─── */
