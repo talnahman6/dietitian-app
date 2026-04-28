@@ -33,10 +33,48 @@ function unitGrams(food, unit) {
   return {כפית:5, כף:15, כוס:240}[unit] ?? 5;
 }
 
+const UNIT_WEIGHTS = {
+  'תפוח אדמה': { sizes: { קטן: 130, בינוני: 170, גדול: 230 } },
+  'בטטה':      { sizes: { קטן: 130, בינוני: 200, גדול: 675 } },
+};
+
 function extractGrams(txt, food) {
   const t = txt.trim().toLowerCase();
+  const fname = food ? (food.n[0] || '') : '';
+  const isSizedFood = /תפוח\s*אדמה|תפוחי\s*אדמה|בטטה/.test(t) || /תפוח\s*אדמה|בטטה/.test(fname);
+  if (isSizedFood) {
+    const foodKey = /בטטה/.test(t) ? 'בטטה' : 'תפוח אדמה';
+    const sizeMap = UNIT_WEIGHTS[foodKey].sizes;
+    const sizeM = t.match(/קטנ|בינונ|גדול/);
+    const size = sizeM ? (sizeM[0].startsWith('קטנ') ? 'קטן' : sizeM[0].startsWith('בינונ') ? 'בינוני' : 'גדול') : 'בינוני';
+    let qty = 1;
+    if (/חצי/.test(t)) qty = 0.5;
+    else {
+      const qm = t.match(/^(\d+(?:[.,]\d+)?)\s/);
+      if (qm) qty = parseFloat(qm[1].replace(',', '.'));
+    }
+    return qty * sizeMap[size];
+  }
   for (const sq of SPECIAL_QTY) {
     if (sq.r.test(t)) return Math.round(sq.cups * unitGrams(food, 'כוס'));
+  }
+  const PLATE_TBSP = [
+    {r:/שלושת\s+רבעי\s+צלחת/, tbsp:9},
+    {r:/מלאה\s+צלחת|צלחת\s+מלאה/, tbsp:12},
+    {r:/חצי\s+צלחת/, tbsp:6},
+    {r:/רבע\s+צלחת/, tbsp:3},
+  ];
+  for (const pt of PLATE_TBSP) {
+    if (pt.r.test(t)) {
+      const spoonFoods = (typeof PLATE_CONVERSIONS_26CM !== 'undefined' &&
+        PLATE_CONVERSIONS_26CM?.spoonBasedFoods?.foods) || [];
+      const fname = food ? (food.n[0] || '').toLowerCase() : '';
+      if (spoonFoods.some(f => fname.includes(f.toLowerCase()) || f.toLowerCase().includes(fname))) {
+        const gramsPerTbsp = (food && food.dw) ? food.dw : 15;
+        return Math.round(pt.tbsp * gramsPerTbsp);
+      }
+      break;
+    }
   }
   const volM = t.match(/(\d+(?:[.,]\d+)?)\s*(כפיות|כפית|כפות|כף|כוסות|כוס)/);
   if (volM) {

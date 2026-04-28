@@ -1,6 +1,14 @@
 function toggleHelpPopup() {
-  const p = document.getElementById('help-popup');
+  const p = document.getElementById('help-modal-overlay');
   p.hidden = !p.hidden;
+}
+
+function setSearchMode(mode) {
+  const isManual = mode === 'manual';
+  document.getElementById('manual-section').style.display = isManual ? '' : 'none';
+  document.getElementById('auto-section').style.display = isManual ? 'none' : '';
+  document.getElementById('toggle-manual').classList.toggle('stgl-active', isManual);
+  document.getElementById('toggle-auto').classList.toggle('stgl-active', !isManual);
 }
 
 /* ─── AUTH GATE ─── */
@@ -386,36 +394,38 @@ async function addFood() {
     return;
   }
 
+  const rawOrig = raw;
   raw = applyQtyUnit(raw);
 
   /* ── Multi-food meal ── */
-  const isMeal = /,/.test(raw) || /^(אכלתי|אכלת|אכל|אכלה|שתיתי|שתית)\s/.test(raw);
+  const isMeal = /,|\n|\s+ו(?=[א-ת])/.test(raw) || /^(אכלתי|אכלת|אכל|אכלה|שתיתי|שתית)\s/.test(raw);
   if (isMeal) {
-    const handled = await addMeal(raw);
+    const handled = await addMeal(raw.replace(/\n/g, ','));
     if (handled) return;
   }
 
   /* ── Single food: local search only ── */
   const foodText = raw.replace(/^(אכלתי|אכלת|אכל|אכלה|שתיתי|שתית)\s+/, '').trim();
+  const origFoodText = rawOrig.replace(/^(אכלתי|אכלת|אכל|אכלה|שתיתי|שתית)\s+/, '').trim();
 
   const food = findFood(foodText);
   if (!food) {
     warnBox.innerHTML = '';
     aiMsg.classList.add('show');
-    aiText.textContent = `לא מצאתי "${foodText}" במאגר. נסה שם אחר.`;
+    aiText.textContent = `לא מצאתי "${origFoodText}" במאגר. נסה שם אחר.`;
     return;
   }
 
-  if (hasExplicitQty(foodText)) {
+  if (hasExplicitQty(origFoodText)) {
     const result = parseFood(foodText);
     if (result) { inp.value = ''; _commitFoodEntry(result); return; }
   }
 
-  /* No explicit quantity — ask */
+  /* No explicit quantity — open popup */
   inp.value = '';
   warnBox.innerHTML = '';
   aiMsg.classList.remove('show');
-  showQtyPopup(food, foodText);
+  showQtyPopup(food, origFoodText);
 }
 
 function deleteItem(i) {
@@ -521,6 +531,35 @@ function toggleVoice() {
     document.getElementById('food-input').value = '';
     recognition.start();
   }
+}
+
+function toggleMiriVoice() {
+  if (!recognition) {
+    if (!initVoice()) {
+      alert('הדפדפן שלך לא תומך בהקלטה קולית. נסה Chrome.');
+      return;
+    }
+  }
+  if (isRecording) { recognition.stop(); return; }
+  const chatInput = document.querySelector('.miri-chat-input');
+  const chatBtn = document.querySelector('.miri-chat-voice');
+  recognition.onstart = () => {
+    isRecording = true;
+    chatBtn.classList.add('rec');
+    chatBtn.textContent = '⏹ מקליט...';
+  };
+  recognition.onresult = (e) => {
+    let txt = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) txt += e.results[i][0].transcript;
+    chatInput.value = txt;
+  };
+  recognition.onend = () => {
+    isRecording = false;
+    chatBtn.classList.remove('rec');
+    chatBtn.textContent = '🎤';
+    initVoice();
+  };
+  recognition.start();
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -804,6 +843,232 @@ function showRemaining() {
   document.getElementById('tracker-title').textContent = _showRemaining ? 'כמה נשאר לי לאכול היום?' : 'כמה אכלתי היום?';
   renderTracker();
 }
+
+/* ─────────────────────────────────────────────────────────
+   MIRI CHAT
+   ─────────────────────────────────────────────────────── */
+function getMiriFeedback() {
+  const t = totals();
+  const hour = new Date().getHours();
+  const expectedPct = hour / 24;
+  const calPct = GOALS.cal > 0 ? t.cal / GOALS.cal : 0;
+  const sentences = [];
+
+  if (t.fat > GOALS.fat) {
+    sentences.push('שמי לב — צריכת השומן עברה את היעד היומי, עדיף לבחור מאכלים דלי שומן.');
+  } else if (t.carbs > GOALS.carbs) {
+    sentences.push('כמות הפחמימות היום גבוהה מהיעד, כדאי להימנע ממזונות עמילניים.');
+  } else if (t.cal > GOALS.cal) {
+    sentences.push('עברת את יעד הקלוריות היומי — שימי לב לכמויות בשאר היום.');
+  }
+
+  if (sentences.length < 2) {
+    if (t.protein < GOALS.protein * 0.5) {
+      sentences.push('רמת החלבון נמוכה — נסי להוסיף מנת חלבון כמו ביצה, קוטג׳ או עוף.');
+    } else if (t.protein >= GOALS.protein * 0.95) {
+      sentences.push('כל הכבוד — הגעת ליעד החלבון היומי! 💪');
+    }
+  }
+
+  if (sentences.length < 2) {
+    if (calPct > expectedPct + 0.15) {
+      sentences.push('קצב האכילה היום גבוה יחסית לשעה — שימי לב לכמויות בהמשך.');
+    } else if (calPct < expectedPct - 0.15 && hour >= 8) {
+      sentences.push('עדיין אכלת מעט יחסית לשעה — אל תשכחי לאכול ארוחות מסודרות.');
+    } else if (sentences.length === 0) {
+      sentences.push('את בדרך הנכונה היום — המשיכי כך! 🌟');
+    }
+  }
+
+  return sentences.slice(0, 2).join(' ');
+}
+
+function getMiriRecommendation(excluded = []) {
+  const t = totals();
+  const rem = {
+    cal:     Math.max(0, GOALS.cal     - t.cal),
+    carbs:   Math.max(0, GOALS.carbs   - t.carbs),
+    protein: Math.max(0, GOALS.protein - t.protein),
+    fat:     Math.max(0, GOALS.fat     - t.fat),
+  };
+
+  if (rem.cal < 50) return 'הגעת ליעד הקלוריות שלך להיום! כל הכבוד 💪';
+
+  const proteinLow = t.protein < GOALS.protein * 0.6;
+  const fatHigh    = t.fat     > GOALS.fat     * 0.8;
+  const carbsHigh  = t.carbs   > GOALS.carbs   * 0.8;
+
+  function scoreFood(f) {
+    if (!f.cal) return -1;
+    const cal100 = f.cal;
+    let s = 5;
+    if (proteinLow) s += (f.p / cal100) * 200;
+    if (fatHigh)    s -= (f.f / cal100) * 100;
+    if (carbsHigh)  s -= (f.c / cal100) * 80;
+    return s;
+  }
+
+  const _excSet = new Set(excluded.map(f => f.n[0]));
+  const picks = DB
+    .map(f => ({ f, s: scoreFood(f) }))
+    .filter(x => x.s > 0 && !_excSet.has(x.f.n[0]))
+    .sort((a, b) => b.s - a.s)
+    .slice(0, 3);
+  _lastRecommendedFoods = picks.map(x => x.f);
+
+  if (picks.length === 0) return 'כל הכבוד — הגעת ליעדי התזונה שלך!';
+
+  const _mf = getMiriFeedback();
+  let msg = (_mf ? _mf + '\n\n' : '') + 'היי! הנה ההמלצות שלי:\n\n';
+  let totCal = 0, totProt = 0, totCarbs = 0, totFat = 0;
+
+  for (const { f } of picks) {
+    const g = Math.min(Math.max(f.dw || 100, 50), 300);
+    const fac = g / 100;
+    const c  = Math.round(f.cal * fac);
+    const p  = Math.round(f.p   * fac);
+    const h  = Math.round(f.c   * fac);
+    const ft = Math.round(f.f   * fac);
+    msg += `• ${f.n[0]} — ${g}g (${c} קל׳, חלבון ${p}g)\n`;
+    totCal += c; totProt += p; totCarbs += h; totFat += ft;
+  }
+
+  msg += `\nסה"כ: ${totCal} קל׳ | חלבון ${totProt}g | פחמימות ${totCarbs}g | שומן ${totFat}g`;
+  return msg;
+}
+
+let _lastRecommendedFoods = [];
+let _rejectedFoods = [];
+
+function _getMacroRole(f) {
+  const cal = f.cal || 1;
+  const cat = (f.cat || '').toLowerCase();
+  if (/ירק/.test(cat)) return 'vegetable';
+  if ((f.p * 4) / cal >= 0.3) return 'protein';
+  if ((f.c * 4) / cal >= 0.5) return 'carbs';
+  return 'other';
+}
+
+function _findAltFood(target, excluded) {
+  const excSet = new Set(excluded.map(f => f.n[0]));
+  const role = _getMacroRole(target);
+  const calTarget = target.cal || 100;
+  return DB.find(f =>
+    !excSet.has(f.n[0]) &&
+    _getMacroRole(f) === role &&
+    Math.abs(f.cal - calTarget) / calTarget <= 0.5
+  ) || null;
+}
+
+function _handleRejection(text) {
+  const prefix = 'אין בעיה 😊 אני מחליפה לך את זה למשהו שמתאים יותר ועדיין שומר על היעדים שלך להיום.\n\n';
+  let rejectedFood = null;
+  for (const f of _lastRecommendedFoods) {
+    if (f.n.some(name => text.includes(name))) { rejectedFood = f; break; }
+  }
+
+  if (rejectedFood) _rejectedFoods.push(rejectedFood);
+  else _rejectedFoods.push(..._lastRecommendedFoods);
+
+  let altFoods;
+  if (rejectedFood) {
+    const alt = _findAltFood(rejectedFood, _rejectedFoods);
+    altFoods = alt ? [alt] : [];
+  } else {
+    const excSet = new Set(_rejectedFoods.map(f => f.n[0]));
+    const t = totals();
+    const proteinLow = t.protein < GOALS.protein * 0.6;
+    const fatHigh    = t.fat     > GOALS.fat     * 0.8;
+    const carbsHigh  = t.carbs   > GOALS.carbs   * 0.8;
+    altFoods = DB
+      .filter(f => !excSet.has(f.n[0]) && f.cal > 0)
+      .map(f => {
+        let s = 5;
+        if (proteinLow) s += (f.p / f.cal) * 200;
+        if (fatHigh)    s -= (f.f / f.cal) * 100;
+        if (carbsHigh)  s -= (f.c / f.cal) * 80;
+        return { f, s };
+      })
+      .filter(x => x.s > 0)
+      .sort((a, b) => b.s - a.s)
+      .slice(0, 3)
+      .map(x => x.f);
+  }
+
+  if (altFoods.length === 0)
+    return prefix + 'לא מצאתי תחליף מתאים במאגר. נסי לפנות אליי עם בקשה אחרת.';
+
+  _lastRecommendedFoods = altFoods;
+  let msg = prefix + 'הצעה חלופית:\n';
+  let totCal = 0, totProt = 0, totCarbs = 0, totFat = 0;
+  for (const f of altFoods) {
+    const g = Math.min(Math.max(f.dw || 100, 50), 300);
+    const fac = g / 100;
+    const c  = Math.round(f.cal * fac);
+    const p  = Math.round(f.p   * fac);
+    const h  = Math.round(f.c   * fac);
+    const ft = Math.round(f.f   * fac);
+    msg += `• ${f.n[0]} — ${g}g\n`;
+    totCal += c; totProt += p; totCarbs += h; totFat += ft;
+  }
+  msg += `\nסיכום:\n${totCal} קל׳ | חלבון ${totProt}g | פחמימות ${totCarbs}g | שומן ${totFat}g`;
+  return msg;
+}
+
+function miriSend() {
+  const input = document.querySelector('.miri-chat-input');
+  const msgs = document.getElementById('miri-chat-msgs');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const userDiv = document.createElement('div');
+  userDiv.className = 'miri-msg miri-msg-user';
+  userDiv.textContent = text;
+  msgs.appendChild(userDiv);
+
+  const replyDiv = document.createElement('div');
+  replyDiv.className = 'miri-msg miri-msg-bot';
+  replyDiv.textContent = 'אני מחשבת את הנתונים שלך...';
+  msgs.appendChild(replyDiv);
+
+  msgs.scrollTop = msgs.scrollHeight;
+  input.value = '';
+
+  const isRecommendRequest = /המלצ|מה לאכול|מה כדאי|תמליצ|מה אפשר|תציעי|תציע|מה עוד|מה נשאר/.test(text);
+
+  const isRejection = /לא בא לי|לא רוצה|לא אוהב|אין לי|תחליף|בלי/.test(text);
+
+  if (isRejection && _lastRecommendedFoods.length > 0) {
+    replyDiv.textContent = _handleRejection(text);
+  } else if (isRecommendRequest) {
+    _rejectedFoods = [];
+    replyDiv.textContent = getMiriRecommendation();
+  } else {
+    const t = totals();
+    const rem = {
+      cal:     Math.max(0, Math.round(GOALS.cal     - t.cal)),
+      protein: Math.max(0, Math.round(GOALS.protein - t.protein)),
+      fat:     Math.max(0, Math.round(GOALS.fat     - t.fat)),
+    };
+
+    let reply = `קלוריות: ${Math.round(t.cal)} מתוך ${GOALS.cal} — נשאר לך ${rem.cal} קל׳.\n`;
+    reply += `חלבונים: ${Math.round(t.protein)}g מתוך ${GOALS.protein}g — נשאר ${rem.protein}g.\n`;
+    reply += `שומנים: ${Math.round(t.fat)}g מתוך ${GOALS.fat}g.`;
+
+    if (t.fat > GOALS.fat * 0.85) reply += '\n⚠️ שימי לב — צריכת השומן גבוהה.';
+    if (t.protein < GOALS.protein * 0.5) reply += '\n💪 כדאי להוסיף מקור חלבון.';
+
+    replyDiv.textContent = reply;
+  }
+
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+document.querySelector('.miri-chat-voice').addEventListener('click', toggleMiriVoice);
+document.querySelector('.miri-chat-send').addEventListener('click', miriSend);
+document.querySelector('.miri-chat-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') miriSend();
+});
 
 /* ─────────────────────────────────────────────────────────
    INIT

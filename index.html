@@ -38,39 +38,33 @@
 <div class="input-area">
   <label>מה אכלת היום? 😊</label>
   <div class="manual-search-hdr">
-    <span class="manual-search-title">חיפוש ידני</span>
+    <span class="manual-search-title">לבחירתך</span>
+    <div class="search-toggle">
+      <button class="stgl-btn stgl-active" id="toggle-manual" onclick="setSearchMode('manual')">חיפוש ידני</button>
+      <button class="stgl-btn" id="toggle-auto" onclick="setSearchMode('auto')">חיפוש אוטומטי</button>
+    </div>
     <button class="btn-help" onclick="toggleHelpPopup()">?</button>
   </div>
-  <div class="help-popup" id="help-popup" hidden>
-    <button class="help-popup-close" onclick="toggleHelpPopup()">✕</button>
-    <p class="help-popup-title">הוראות לחיפוש ידני:</p>
-    <ol>
-      <li>רשום את המוצר שאכלת ובחר אותו מתוך החיפוש.</li>
-      <li>הזן כמות חופשית, למשל 50 לגרם/מ"ל או 2 לכפות/כפיות/יחידות/כוסות.</li>
-      <li>בחר את סוג היחידה מהתפריט ליד שדה הכמות.</li>
-    </ol>
-  </div>
-  <div class="input-row">
-    <input type="text" class="food-input" id="food-input"
-      placeholder="לדוגמא: 100 גרם חזה עוף, 5 כפות אורז ו2 תפוחי אדמה קטנים"
-      onkeydown="if(event.key==='Enter')addFood()">
-    <input type="number" class="qty-num" id="qty-num" value="100" min="1" max="9999" placeholder="כמות">
-    <select class="qty-sel" id="qty-sel">
-      <option value="גרם">גרם</option>
-      <option value='מ"ל'>מ"ל</option>
-      <option value="כפית">כפית</option>
-      <option value="כף">כף</option>
-      <option value="כוס">כוס</option>
-      <option value="יחידה">יחידה</option>
-    </select>
-    <button class="btn-mic" id="mic-btn" onclick="toggleVoice()" title="הקלטה בעברית">🎤</button>
-    <button class="btn-mic" id="cam-btn" onclick="openCamera()" title="צלם מנה">📷</button>
-    <button class="btn-go" onclick="addFood()">חשבי ✓</button>
-  </div>
-  <div class="auto-search-section">
-    <div class="manual-search-hdr">
-      <span class="manual-search-title">חיפוש אוטומטי</span>
+  <div id="manual-section">
+    <div class="input-row">
+      <input type="text" class="food-input" id="food-input"
+        placeholder="לדוגמא: 100 גרם חזה עוף, 5 כפות אורז ו2 תפוחי אדמה קטנים"
+        onkeydown="if(event.key==='Enter')addFood()">
+      <input type="number" class="qty-num" id="qty-num" value="100" min="1" max="9999" placeholder="כמות">
+      <select class="qty-sel" id="qty-sel">
+        <option value="גרם">גרם</option>
+        <option value='מ"ל'>מ"ל</option>
+        <option value="כפית">כפית</option>
+        <option value="כף">כף</option>
+        <option value="כוס">כוס</option>
+        <option value="יחידה">יחידה</option>
+      </select>
+      <button class="btn-mic" id="mic-btn" onclick="toggleVoice()" title="הקלטה בעברית">🎤</button>
+      <button class="btn-mic" id="cam-btn" onclick="openCamera()" title="צלם מנה">📷</button>
+      <button class="btn-go" onclick="addFood()">חשבי ✓</button>
     </div>
+  </div>
+  <div id="auto-section" style="display:none">
     <div class="input-row">
       <input type="text" class="food-input" id="auto-input"
         placeholder="לדוגמא: אכלתי שניצל, חצי פיתה וסלט">
@@ -178,7 +172,74 @@
   </div>
 </div>
 
+
+<!-- HELP MODAL -->
+<div class="help-modal-overlay" id="help-modal-overlay" hidden onclick="toggleHelpPopup()">
+  <div class="help-modal" onclick="event.stopPropagation()">
+    <button class="help-modal-close" onclick="toggleHelpPopup()">✕</button>
+    <p class="help-modal-section-title">חיפוש ידני:</p>
+    <p class="help-modal-text">רשום את המוצר שאכלת ובחר אותו מתוך החיפוש. הזן כמות חופשית, למשל 50 לגרם/מ"ל או 2 לכפות/כפיות/יחידות/כוסות. לאחר מכן בחר את סוג היחידה מהתפריט ליד שדה הכמות.</p>
+    <p class="help-modal-section-title">חיפוש אוטומטי:</p>
+    <p class="help-modal-text">כתוב מה אכלת במלל שלך.</p>
+    <p class="help-modal-example-lbl">לדוגמה:</p>
+    <p class="help-modal-example">אכלתי 100 גרם חזה עוף רבע צלחת אורז ורבע צלחת תפוחי אדמה.</p>
+    <p class="help-modal-example">אכלתי שניצל 100 גרם 5 כפות פתיתים ורבע צלחת סלט.</p>
+  </div>
+</div>
+
 </div><!-- end #app -->
+
+<!-- MIRI FLOATING CHAT -->
+<div class="miri-fab-wrap" id="miri-fab-wrap">
+  <div class="miri-chat" id="miri-popup" style="display:none">
+    <div class="miri-chat-hdr">
+      <span class="miri-popup-title">מירי ממליצה</span>
+      <button class="miri-popup-close" onclick="document.getElementById('miri-popup').style.display='none'">✕</button>
+    </div>
+    <div class="miri-chat-msgs" id="miri-chat-msgs"></div>
+    <div class="miri-chat-input-row">
+      <button class="miri-chat-voice btn-mic" title="הקלטה">🎤</button>
+      <input class="miri-chat-input" type="text" placeholder="כתבי הודעה…" dir="rtl">
+      <button class="miri-chat-send btn-go">שלח</button>
+    </div>
+  </div>
+  <button class="miri-fab" onclick="var p=document.getElementById('miri-popup');p.style.display=p.style.display==='flex'?'none':'flex'" aria-label="מירי ממליצה">
+    <div class="miri-fab-avatar">
+      <img src="images/מירי ממליצה חיוך 2.png" alt="מירי ממליצה">
+    </div>
+  </button>
+</div>
+
+<!-- ONBOARDING GOAL SELECTION -->
+<div class="onboarding-overlay" id="onboarding-overlay">
+  <div class="onboarding-box">
+    <div class="onboarding-avatar">
+      <img src="images/yamu_jay-ai-generated-9044938.png" alt="מירי">
+    </div>
+    <h2 class="onboarding-title">מה המטרה שלך?</h2>
+    <div class="onboarding-cards">
+      <label class="goal-card">
+        <input type="radio" name="goal" value="loss">
+        <div class="goal-card-inner">
+          <div class="goal-gif-placeholder">
+            <span class="goal-gif-icon">🔥</span>
+          </div>
+          <div class="goal-label">ירידה במשקל</div>
+        </div>
+      </label>
+      <label class="goal-card">
+        <input type="radio" name="goal" value="gain">
+        <div class="goal-card-inner">
+          <div class="goal-gif-placeholder">
+            <span class="goal-gif-icon">💪</span>
+          </div>
+          <div class="goal-label">עלייה במסה</div>
+        </div>
+      </label>
+    </div>
+    <button class="onboarding-btn" id="onboarding-btn">המשך ←</button>
+  </div>
+</div>
 
 <script src="js/auth.js"></script>
 <script src="js/avatar.js"></script>

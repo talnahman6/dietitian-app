@@ -1,0 +1,59 @@
+# Prompt Templates
+
+## Logic
+
+Follow CLAUDE.md strictly.
+
+Task:
+[task]
+
+File:
+[file]
+
+Rules:
+- Logic only
+- Minimal change
+- Do not refactor
+- Do not explain reasoning
+- Return only changed code
+
+---
+
+## UI / CSS
+
+Follow CLAUDE.md strictly.
+
+Task:
+[task]
+
+File:
+[file]
+
+Rules:
+- UI only
+- Match design
+- RTL support
+- Minimal change
+- Do not explain reasoning
+- Return only result
+
+---
+
+## Debug
+
+Follow CLAUDE.md strictly.
+
+Bug:
+[bug]
+
+Expected:
+[expected]
+
+File:
+[file]
+
+Rules:
+- Minimal fix
+- Do not rewrite file
+- Do not explain reasoning
+- Return only changed code

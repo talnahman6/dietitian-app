@@ -70,24 +70,27 @@ function handleRegister(e) {
 function handleLogin(e) {
   e.preventDefault();
   const username = document.getElementById('login-username').value.trim().toLowerCase();
-  const password = document.getElementById('login-password').value;
+  const password = document.getElementById('login-password').value.trim();
   const remember = document.getElementById('login-remember').checked;
   const errEl    = document.getElementById('login-error');
 
   errEl.textContent = '';
 
   const users = getUsers();
-  const user  = users.find(u => u.username === username && u.password === password);
+  console.log('[AUTH] users:', users);
+  console.log('[AUTH] input username:', username, '| password:', password);
+
+  const user = users.find(u => u.username.trim().toLowerCase() === username && u.password.trim() === password);
+  console.log('[AUTH] match:', user ? 'found' : 'not found');
 
   if (!user) return showError(errEl, 'שם משתמש או סיסמא שגויים');
 
   const payload = JSON.stringify({ username: user.username, fullName: user.fullName });
+  localStorage.setItem('loggedUser', payload);
   if (remember) {
-    localStorage.setItem('loggedUser', payload);
     sessionStorage.removeItem('loggedUser');
   } else {
     sessionStorage.setItem('loggedUser', payload);
-    localStorage.removeItem('loggedUser');
   }
   const dietData = JSON.parse(localStorage.getItem(dietKey(user.username)) || '{}');
   window.location.href = dietData.tdee ? 'index.html' : 'onboarding.html';
