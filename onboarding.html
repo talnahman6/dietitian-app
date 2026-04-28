@@ -139,6 +139,7 @@ body::before{content:'';position:fixed;inset:0;background:
         <div class="dot" id="dot-3"></div>
         <div class="dot" id="dot-4"></div>
         <div class="dot" id="dot-5"></div>
+        <div class="dot" id="dot-6"></div>
       </div>
       <div class="ob-step-label" id="step-label">שלב 1 מתוך 5</div>
     </div>
@@ -242,6 +243,21 @@ body::before{content:'';position:fixed;inset:0;background:
       </div>
     </div>
 
+    <!-- Step 6: Goal -->
+    <div class="ob-step" id="step-6" style="display:none">
+      <h2>מה המטרה שלך?</h2>
+      <div class="gender-btns">
+        <button type="button" class="gender-btn" id="btn-goal-loss" onclick="selectGoal('ירידה במשקל')">
+          <span class="gender-icon">⬇️</span>
+          <span>ירידה במשקל</span>
+        </button>
+        <button type="button" class="gender-btn" id="btn-goal-gain" onclick="selectGoal('עלייה במסה')">
+          <span class="gender-icon">💪</span>
+          <span>עלייה במסה</span>
+        </button>
+      </div>
+    </div>
+
     <!-- Results screen -->
     <div class="ob-step" id="step-results" style="display:none">
       <div class="results-header">
@@ -281,14 +297,21 @@ body::before{content:'';position:fixed;inset:0;background:
 const _user = getLoggedUser();
 if (!_user) window.location.href = 'login.html';
 
-const answers = { gender: null, age: null, height: null, weight: null, activity: null };
+const answers = { gender: null, age: null, height: null, weight: null, activity: null, goal: null };
 let currentStep = 1;
-const TOTAL = 5;
+const TOTAL = 6;
 
 function selectGender(g) {
   answers.gender = g;
   document.getElementById('btn-male').classList.toggle('selected', g === 'זכר');
   document.getElementById('btn-female').classList.toggle('selected', g === 'נקבה');
+}
+
+function selectGoal(g) {
+  answers.goal = g;
+  console.log('goal selected:', g);
+  document.getElementById('btn-goal-loss').classList.toggle('selected', g === 'ירידה במשקל');
+  document.getElementById('btn-goal-gain').classList.toggle('selected', g === 'עלייה במסה');
 }
 
 function updateUI() {
@@ -324,16 +347,22 @@ function validate() {
     const sel = document.querySelector('input[name="activity"]:checked');
     if (!sel) { err.textContent = 'יש לבחור רמת פעילות'; return false; }
     answers.activity = parseFloat(sel.value);
+  } else if (currentStep === 6) {
+    if (!answers.goal) { err.textContent = 'יש לבחור מטרה'; console.log('blocked: no goal selected'); return false; }
   }
   return true;
 }
 
 function goNext() {
+  console.log('continue clicked, currentStep:', currentStep, 'selected goal:', answers.goal);
   if (!validate()) return;
   if (currentStep < TOTAL) {
-    currentStep++;
+    const nextStep = currentStep + 1;
+    console.log('next step:', nextStep);
+    currentStep = nextStep;
     updateUI();
   } else {
+    console.log('showing results');
     showResults();
   }
 }
