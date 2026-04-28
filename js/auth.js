@@ -1,15 +1,21 @@
 /* ─── SUPABASE ─── */
 const _SB_URL = 'https://fujktuwxgzupicyrolwa.supabase.co';
-const _SB_KEY = 'sb_publishable_QszXfkwdlFXMEFgPgBShvw_QP5Ts7lv';
-
+const _SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1amt0dXd4Z3p1cGljeXJvbHdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNjY2MDIsImV4cCI6MjA5Mjk0MjYwMn0.WffiDP56plkft7lBBD1sYikOzstgONRw7awViO4hwOk';
 const _sbReady = new Promise(resolve => {
   if (window.supabase && window.supabase.createClient) {
+    console.log('[auth] supabase client ready (inline)');
     resolve(window.supabase.createClient(_SB_URL, _SB_KEY));
   } else {
     const s = document.createElement('script');
     s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-    s.onload = () => resolve(window.supabase.createClient(_SB_URL, _SB_KEY));
-    s.onerror = () => resolve(null);
+    s.onload = () => {
+      console.log('[auth] supabase client ready (dynamic)');
+      resolve(window.supabase.createClient(_SB_URL, _SB_KEY));
+    };
+    s.onerror = () => {
+      console.error('[auth] supabase CDN failed to load');
+      resolve(null);
+    };
     document.head.appendChild(s);
   }
 });
@@ -46,6 +52,7 @@ function dietKey(username) {
 /* ─── REGISTER ─── */
 async function handleRegister(e) {
   e.preventDefault();
+  console.log('[register] submit started');
   const fullName = document.getElementById('reg-fullname').value.trim();
   const username = document.getElementById('reg-username').value.trim().toLowerCase();
   const email    = document.getElementById('reg-email').value.trim();
@@ -66,6 +73,7 @@ async function handleRegister(e) {
 
   const users = getUsers();
   const sb = await _sbReady;
+  console.log('[register] supabase client:', sb ? 'ready' : 'NOT ready');
 
   if (sb) {
     const { data: existing } = await sb.from('users').select('username').eq('username', username).maybeSingle();
@@ -78,9 +86,11 @@ async function handleRegister(e) {
   saveUsers(users);
 
   if (sb) {
-    try {
-      await sb.from('users').insert({ username, password, email, full_name: fullName, phone });
-    } catch(err) { console.error('Supabase register:', err); }
+    const insertPayload = { username, password, email, full_name: fullName, phone };
+    console.log('[register] insert payload:', insertPayload);
+    const { data: insertData, error: insertError } = await sb.from('users').insert(insertPayload);
+    console.log('[register] insert result:', insertData);
+    if (insertError) console.error('[register] insert error:', insertError);
   }
 
   fetch('https://hook.eu1.make.com/spfr5o7kvmyoh0ke6yphio4tiv99t61d', {
