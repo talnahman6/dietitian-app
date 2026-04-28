@@ -208,3 +208,18 @@ body::before{content:'';position:fixed;inset:0;background:
 .ac-item{padding:10px 16px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background .15s;color:var(--txt)}
 .ac-item:hover{background:var(--inp)}
 .ac-cat{font-size:.7rem;color:var(--txt3);background:var(--inp);border-radius:6px;padding:2px 7px;white-space:nowrap;flex-shrink:0}
+
+/* ─── QUANTITY POPUP ─── */
+.qty-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.qty-popup-overlay[hidden]{display:none}
+.qty-popup{background:var(--card);border:1px solid rgba(99,102,241,.35);border-radius:18px;padding:28px 24px;width:100%;max-width:340px;box-shadow:0 16px 48px rgba(0,0,0,.6),0 0 0 1px rgba(99,102,241,.1);direction:rtl;animation:slideIn .25s ease}
+.qty-popup-title{font-size:1.1rem;font-weight:800;color:var(--txt);margin-bottom:18px;text-align:center}
+.qty-popup-input{width:100%;background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:13px 16px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:1rem;outline:none;text-align:center;margin-bottom:10px;transition:border-color .2s,box-shadow .2s}
+.qty-popup-input:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.qty-popup-sel{width:100%;background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:13px 16px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:.95rem;outline:none;cursor:pointer;direction:rtl;margin-bottom:18px;transition:border-color .2s,box-shadow .2s}
+.qty-popup-sel:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.qty-popup-actions{display:flex;gap:10px}
+.qty-popup-confirm{flex:1;background:linear-gradient(135deg,var(--indigo),var(--purple));border:none;color:#fff;border-radius:10px;padding:13px;font-family:'Heebo',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s}
+.qty-popup-confirm:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(99,102,241,.42)}
+.qty-popup-cancel{background:var(--inp);border:1px solid var(--bdr);color:var(--txt2);border-radius:10px;padding:13px 18px;font-family:'Heebo',sans-serif;font-size:.9rem;cursor:pointer;transition:all .2s}
+.qty-popup-cancel:hover{border-color:var(--red);color:var(--red)}
