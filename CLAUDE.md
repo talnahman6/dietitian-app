@@ -1,68 +1,88 @@
 # Dietitian App — Miri (מירי הדיאטנית)
 
-Hebrew-language personal dietitian web app. Single-page, no build step, no dependencies.
-
 ---
 
 ## Identity
 
 The assistant name is "Miri" (מירי הדיאטנית).  
-Always refer to her as Miri in UI, text, and logic.
+Always refer to her as Miri.
 
 ---
 
 ## Core Rules
 
-1. Read ONLY the relevant file or snippet provided  
-2. Never scan the full project  
-3. Edit only the requested part  
-4. Do not rewrite full files  
-5. Always respond in Hebrew  
+- Read ONLY the specified file  
+- Do not scan the project  
+- Do not search across files  
+- Edit only requested part  
+- Do not rewrite full files  
+- Always respond in Hebrew  
 
 ---
 
 ## Token Efficiency (CRITICAL)
 
 - Answer as short as possible  
-- No explanations unless explicitly asked  
+- No explanations unless asked  
+- Do not explain reasoning  
+- Do not describe steps  
+- Do not think out loud  
 - No introductions or summaries  
 - Do not restate the request  
 - Avoid suggestions unless asked  
 - Avoid creativity unless asked  
-- Ask a short clarification question if unsure  
+- Ask a short clarification if needed  
+- Return only final result  
 
 ---
 
 ## Code Rules
 
 - Return ONLY changed code  
-- If change is small → return only the relevant function/block  
-- Do not return full files  
-- Prefer minimal diff over full rewrite  
+- If small change → return only that block  
+- Do not return full file  
+- Do not add comments unless asked  
+
+---
+
+## File Access Rules
+
+- Do not use grep/search across project  
+- Do not read multiple files  
+- Use only the file provided  
+- If missing info → ask for specific function  
 
 ---
 
 ## Work Strategy
 
-- Start with PLAN only if task is non-trivial  
-- Break tasks into small steps  
-- Execute one step at a time  
-- Prefer editing over rewriting  
-- Avoid unnecessary refactoring  
+- Minimal change only  
+- Do not refactor  
+- Do not implement full logic unless asked  
 
 ---
 
 ## Output Rules
 
 - Code → code only  
-- Data → JSON / table  
-- UI → minimal change description  
-- Keep responses minimal  
+- If no change needed → respond exactly: NO CHANGE  
 
 ---
 
-## Context Control
+## Git Rules
 
-- Treat each request as isolated unless told otherwise  
-- Do not rely on previous messages  
-- Do not repeat known information  
+- Never use git add .  
+- Add ONLY changed file  
+- Short commit message  
+
+---
+
+## Strict Mode (DEFAULT)
+
+- No reasoning output  
+- No step-by-step  
+- No narration  
+- No "Let me..."  
+- No tool logs explanation  
+- Avoid grep/search unless absolutely required  
+- Output only final answer or code  
