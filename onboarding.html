@@ -140,8 +140,9 @@ body::before{content:'';position:fixed;inset:0;background:
         <div class="dot" id="dot-4"></div>
         <div class="dot" id="dot-5"></div>
         <div class="dot" id="dot-6"></div>
+        <div class="dot" id="dot-7"></div>
       </div>
-      <div class="ob-step-label" id="step-label">שלב 1 מתוך 5</div>
+      <div class="ob-step-label" id="step-label">שלב 1 מתוך 7</div>
     </div>
 
     <!-- Step 1: Gender -->
@@ -258,6 +259,35 @@ body::before{content:'';position:fixed;inset:0;background:
       </div>
     </div>
 
+    <!-- Step 7: Weekly target -->
+    <div class="ob-step" id="step-7" style="display:none">
+      <div id="step-7-loss" style="display:none">
+        <h2>קצב ירידה שבועי?</h2>
+        <div class="gender-btns" style="grid-template-columns:1fr 1fr 1fr">
+          <button type="button" class="gender-btn wt-btn" data-val="0.25" onclick="selectWeeklyTarget(0.25)">
+            <span class="gender-icon">🐢</span><span>0.25 ק״ג</span>
+          </button>
+          <button type="button" class="gender-btn wt-btn" data-val="0.5" onclick="selectWeeklyTarget(0.5)">
+            <span class="gender-icon">⚖️</span><span>0.5 ק״ג</span>
+          </button>
+          <button type="button" class="gender-btn wt-btn" data-val="0.75" onclick="selectWeeklyTarget(0.75)">
+            <span class="gender-icon">🔥</span><span>0.75 ק״ג</span>
+          </button>
+        </div>
+      </div>
+      <div id="step-7-gain" style="display:none">
+        <h2>קצב עלייה שבועי?</h2>
+        <div class="gender-btns">
+          <button type="button" class="gender-btn wt-btn" data-val="0.25" onclick="selectWeeklyTarget(0.25)">
+            <span class="gender-icon">🐢</span><span>0.25 ק״ג</span>
+          </button>
+          <button type="button" class="gender-btn wt-btn" data-val="0.5" onclick="selectWeeklyTarget(0.5)">
+            <span class="gender-icon">💪</span><span>0.5 ק״ג</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Results screen -->
     <div class="ob-step" id="step-results" style="display:none">
       <div class="results-header">
@@ -297,9 +327,9 @@ body::before{content:'';position:fixed;inset:0;background:
 const _user = getLoggedUser();
 if (!_user) window.location.href = 'login.html';
 
-const answers = { gender: null, age: null, height: null, weight: null, activity: null, goal: null };
+const answers = { gender: null, age: null, height: null, weight: null, activity: null, goal: null, weekly_target: null };
 let currentStep = 1;
-const TOTAL = 6;
+const TOTAL = 7;
 
 function selectGender(g) {
   answers.gender = g;
@@ -309,9 +339,15 @@ function selectGender(g) {
 
 function selectGoal(g) {
   answers.goal = g;
-  console.log('goal selected:', g);
   document.getElementById('btn-goal-loss').classList.toggle('selected', g === 'ירידה במשקל');
   document.getElementById('btn-goal-gain').classList.toggle('selected', g === 'עלייה במסה');
+}
+
+function selectWeeklyTarget(v) {
+  answers.weekly_target = v;
+  document.querySelectorAll('.wt-btn').forEach(btn => {
+    btn.classList.toggle('selected', parseFloat(btn.dataset.val) === v);
+  });
 }
 
 function updateUI() {
@@ -325,6 +361,12 @@ function updateUI() {
   document.getElementById('btn-back').style.visibility = currentStep > 1 ? 'visible' : 'hidden';
   document.getElementById('btn-next').textContent = currentStep === TOTAL ? 'חשב ✓' : 'המשך';
   document.getElementById('ob-error').textContent = '';
+  if (currentStep === 7) {
+    answers.weekly_target = null;
+    document.querySelectorAll('.wt-btn').forEach(btn => btn.classList.remove('selected'));
+    document.getElementById('step-7-loss').style.display = answers.goal === 'ירידה במשקל' ? '' : 'none';
+    document.getElementById('step-7-gain').style.display = answers.goal === 'עלייה במסה' ? '' : 'none';
+  }
 }
 
 function validate() {
@@ -348,21 +390,25 @@ function validate() {
     if (!sel) { err.textContent = 'יש לבחור רמת פעילות'; return false; }
     answers.activity = parseFloat(sel.value);
   } else if (currentStep === 6) {
-    if (!answers.goal) { err.textContent = 'יש לבחור מטרה'; console.log('blocked: no goal selected'); return false; }
+    if (!answers.goal) { err.textContent = 'יש לבחור מטרה'; return false; }
+  } else if (currentStep === 7) {
+    if (!answers.weekly_target) { err.textContent = 'יש לבחור קצב שבועי'; return false; }
   }
   return true;
 }
 
 function goNext() {
-  console.log('continue clicked, currentStep:', currentStep, 'selected goal:', answers.goal);
+  console.log('[onboarding] continue clicked');
+  console.log('[onboarding] current step:', currentStep);
+  console.log('[onboarding] selected goal:', answers.goal);
   if (!validate()) return;
   if (currentStep < TOTAL) {
     const nextStep = currentStep + 1;
-    console.log('next step:', nextStep);
+    console.log('[onboarding] next step:', nextStep);
     currentStep = nextStep;
     updateUI();
   } else {
-    console.log('showing results');
+    console.log('[onboarding] next step: results');
     showResults();
   }
 }
