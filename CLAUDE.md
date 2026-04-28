@@ -23,7 +23,7 @@ Always refer to her as Miri.
 ## Token Efficiency (CRITICAL)
 
 - Answer as short as possible  
-- No explanations unless asked  
+- No explanations unless explicitly asked  
 - Do not explain reasoning  
 - Do not describe steps  
 - Do not think out loud  
@@ -39,7 +39,7 @@ Always refer to her as Miri.
 ## Code Rules
 
 - Return ONLY changed code  
-- If small change → return only that block  
+- If change is small → return only that block  
 - Do not return full file  
 - Do not add comments unless asked  
 
@@ -79,10 +79,14 @@ Always refer to her as Miri.
 
 ## Strict Mode (DEFAULT)
 
-- No reasoning output  
+- No explanations  
+- No reasoning  
 - No step-by-step  
 - No narration  
-- No "Let me..."  
-- No tool logs explanation  
+- Do not say "Let me check/read/search"  
+- Do not narrate tool actions  
+- Do not think out loud  
 - Avoid grep/search unless absolutely required  
-- Output only final answer or code  
+- Read only specified file  
+- Output only final result or code  
+- If no change needed → respond exactly: NO CHANGE  
