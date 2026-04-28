@@ -123,7 +123,9 @@ body::before{content:'';position:fixed;inset:0;background:
         <input type="password" id="reg-confirm" placeholder="הקלד שוב את הסיסמא" autocomplete="new-password" required>
       </div>
 
-      <button type="submit" class="btn-submit">הרשמה ✓</button>
+      <button type="button" class="btn-submit" onclick="handleRegister(event)">
+  הרשמה ✓
+</button>
     </form>
   </div>
 

@@ -86,11 +86,15 @@ async function handleRegister(e) {
   saveUsers(users);
 
   if (sb) {
-    const insertPayload = { username, password, email, full_name: fullName, phone };
-    console.log('[register] insert payload:', insertPayload);
-    const { data: insertData, error: insertError } = await sb.from('users').insert(insertPayload);
-    console.log('[register] insert result:', insertData);
-    if (insertError) console.error('[register] insert error:', insertError);
+const insertPayload = { username, password, email, full_name: fullName, phone };
+
+console.log('[register] insert payload:', insertPayload);
+
+const { data: insertData, error: insertError } =
+  await sb.from('users').insert([insertPayload]);
+
+console.log('[register] insert result:', insertData);
+if (insertError) console.error('[register] insert error:', insertError);
   }
 
   fetch('https://hook.eu1.make.com/spfr5o7kvmyoh0ke6yphio4tiv99t61d', {
@@ -228,3 +232,4 @@ async function loadUserData(username) {
 function showError(el, msg) {
   el.textContent = msg;
 }
+window.handleRegister = handleRegister;
