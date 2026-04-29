@@ -60,7 +60,10 @@ async function _initGoals() {
   }
   d.dailyCal = cal;
   localStorage.setItem(_DIET_KEY, JSON.stringify(d));
-  GOALS.cal = cal;
+  GOALS.cal     = cal;
+  GOALS.protein = Math.round(cal * 0.30 / 4 * 10) / 10;
+  GOALS.carbs   = Math.round(cal * 0.40 / 4 * 10) / 10;
+  GOALS.fat     = Math.round(cal * 0.30 / 9 * 10) / 10;
   if (typeof saveUserData === 'function') saveUserData(_currentUser.username);
   render();
 }
@@ -146,6 +149,7 @@ function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').
    ─────────────────────────────────────────────────────── */
 const _acInput = document.getElementById('food-input');
 let _acSelected = false;
+let _acSelectedFood = null;
 const _acList = document.createElement('div');
 _acList.id = 'ac-list';
 _acList.className = 'ac-list';
@@ -176,12 +180,13 @@ function acSearch(val) {
       e.preventDefault();
       _acInput.value = item.dataset.name;
       _acSelected = true;
+      _acSelectedFood = findFood(item.dataset.name);
       _acList.style.display = 'none';
     });
   });
 }
 
-_acInput.addEventListener('input', () => { _acSelected = false; acSearch(_acInput.value); });
+_acInput.addEventListener('input', () => { _acSelected = false; _acSelectedFood = null; acSearch(_acInput.value); });
 _acInput.addEventListener('blur', () => setTimeout(() => { _acList.style.display = 'none'; }, 200));
 _acInput.addEventListener('focus', () => { if (_acInput.value.trim().length >= 2) acSearch(_acInput.value); });
 
@@ -394,19 +399,47 @@ async function addFood() {
   const aiText = document.getElementById('ai-text');
   const warnBox = document.getElementById('warn-box');
 
-  /* ── Manual search (autocomplete-selected item) ── */
-  if (_acSelected) {
-    const qtyNum = document.getElementById('qty-num').value.trim();
-    if (!qtyNum || isNaN(+qtyNum) || +qtyNum <= 0) {
+  /* ── Manual search (autocomplete-selected item OR manual mode) ── */
+  const _manualSec = document.getElementById('manual-section');
+  const _isManual = _manualSec && _manualSec.style.display !== 'none';
+  if (_acSelected || _acSelectedFood || _isManual) {
+    const qtyNum = parseFloat(document.getElementById('qty-num').value);
+    if (!qtyNum || qtyNum <= 0) {
       aiMsg.classList.add('show');
       aiText.textContent = 'יש להזין כמות לפני הוספת המאכל';
       return;
     }
-    const qtySel = document.getElementById('qty-sel').value;
-    raw = `${qtyNum} ${qtySel} ${raw}`;
+    const unit = document.getElementById('qty-sel').value;
+    const food = _acSelectedFood || findFood(raw);
+    if (!food) {
+      aiMsg.classList.add('show');
+      aiText.textContent = `לא מצאתי "${raw}" במאגר.`;
+      _acSelected = false;
+      _acSelectedFood = null;
+      return;
+    }
+    let grams;
+    if (unit === 'גרם') grams = qtyNum;
+    else if (unit === 'מ"ל' || unit === 'מיליליטר') grams = qtyNum;
+    else if (unit === 'יחידות' || unit === 'יחידה' || unit === 'פרוסות' || unit === 'פרוסה') grams = qtyNum * (food.dw || 100);
+    else if (unit === 'כוס' || unit === 'כוסות') grams = qtyNum * 240;
+    else if (unit === 'כף' || unit === 'כפות') grams = qtyNum * 15;
+    else if (unit === 'כפית' || unit === 'כפיות') grams = qtyNum * 5;
+    else grams = qtyNum;
+    const multiplier = grams / 100;
+    const entry = {
+      food,
+      grams,
+      cal:     Math.round(food.cal * multiplier),
+      carbs:   Math.round(food.c   * multiplier * 10) / 10,
+      protein: Math.round(food.p   * multiplier * 10) / 10,
+      fat:     Math.round(food.f   * multiplier * 10) / 10,
+      raw,
+    };
     _acSelected = false;
-    const result = parseFood(raw);
-    if (result) { inp.value = ''; _commitFoodEntry(result); }
+    _acSelectedFood = null;
+    inp.value = '';
+    _commitFoodEntry(entry);
     return;
   }
 
@@ -1172,14 +1205,21 @@ function generateDailyMenus() {
   const prefData  = (() => { try { return JSON.parse(localStorage.getItem('foodPreferences') || '{}'); } catch { return {}; } })();
   const prefs = (prefData.all || []).map(s => s.toLowerCase());
 
-  const calShare  = { breakfast:0.25, lunch:0.35, snack:0.10, dinner:0.25, night:0.05 };
+  const calShareBase = { breakfast:0.25, lunch:0.40, snack:0.10, dinner:0.30, night:0.05 };
   const mealLabel = { breakfast:'ארוחת בוקר', lunch:'ארוחת צהריים', snack:'חטיף', dinner:'ארוחת ערב', night:'ארוחת לילה' };
+
+  const totalShare = mealTimes.reduce((s, t) => s + (calShareBase[t] || 0.2), 0);
+  const calShare = {};
+  mealTimes.forEach(t => { calShare[t] = (calShareBase[t] || 0.2) / totalShare; });
 
   function macroRole(f) {
     const cal = f.cal || 1;
-    if ((f.p * 4) / cal >= 0.3) return 'protein';
-    if ((f.c * 4) / cal >= 0.5) return 'carbs';
-    return 'fat';
+    const cat = (f.cat || '').toLowerCase();
+    if (/ירק/.test(cat)) return 'vegetable';
+    if ((f.p * 4) / cal >= 0.30) return 'protein';
+    if ((f.c * 4) / cal >= 0.50) return 'carbs';
+    if ((f.f * 9) / cal >= 0.40) return 'fat';
+    return 'other';
   }
 
   function isPreferred(f) {
@@ -1199,22 +1239,44 @@ function generateDailyMenus() {
   for (let m = 0; m < 3; m++) {
     let pi = m, ci = m, fi = m;
     const meals = [];
+    let menuTotCal = 0, menuTotProt = 0, menuTotCarbs = 0, menuTotFat = 0;
     for (const type of mealTimes) {
-      const calTarget = Math.round(GOALS.cal * (calShare[type] || 0.2));
+      const share = calShare[type];
+      const protTarget = Math.round(GOALS.protein * share);
+      const carbTarget = Math.round(GOALS.carbs   * share);
+      const fatTarget  = Math.round(GOALS.fat     * share);
+
       const pf = proteins[pi % proteins.length];
       const cf = carbs[ci % carbs.length];
       const ff = fats[fi % fats.length];
       pi++; ci++; fi++;
 
-      const items = [pf, cf, ff].filter(Boolean).map(f => {
-        const grams = Math.max(30, Math.min(250, Math.round((calTarget / 3) / (f.cal / 100))));
+      const items = [];
+      if (pf && pf.p > 0) {
+        const grams = Math.max(30, Math.min(250, Math.round(protTarget * 100 / pf.p)));
         const r = grams / 100;
-        return { name: f.n[0], grams, cal: Math.round(f.cal * r), protein: Math.round(f.p * r), carbs: Math.round(f.c * r), fat: Math.round(f.f * r) };
-      });
+        items.push({ name: pf.n[0], grams, cal: Math.round(pf.cal * r), protein: Math.round(pf.p * r), carbs: Math.round(pf.c * r), fat: Math.round(pf.f * r) });
+      }
+      if (cf && cf.c > 0) {
+        const grams = Math.max(30, Math.min(300, Math.round(carbTarget * 100 / cf.c)));
+        const r = grams / 100;
+        items.push({ name: cf.n[0], grams, cal: Math.round(cf.cal * r), protein: Math.round(cf.p * r), carbs: Math.round(cf.c * r), fat: Math.round(cf.f * r) });
+      }
+      if (ff && ff.f > 0) {
+        const grams = Math.max(10, Math.min(100, Math.round(fatTarget * 100 / ff.f)));
+        const r = grams / 100;
+        items.push({ name: ff.n[0], grams, cal: Math.round(ff.cal * r), protein: Math.round(ff.p * r), carbs: Math.round(ff.c * r), fat: Math.round(ff.f * r) });
+      }
+
+      const mealCal   = items.reduce((s, it) => s + it.cal,     0);
+      const mealProt  = items.reduce((s, it) => s + it.protein,  0);
+      const mealCarbs = items.reduce((s, it) => s + it.carbs,    0);
+      const mealFat   = items.reduce((s, it) => s + it.fat,      0);
+      menuTotCal += mealCal; menuTotProt += mealProt; menuTotCarbs += mealCarbs; menuTotFat += mealFat;
 
       meals.push({ type, label: mealLabel[type] || type, items });
     }
-    menus.push({ index: m + 1, meals });
+    menus.push({ index: m + 1, meals, total: { cal: menuTotCal, protein: menuTotProt, carbs: menuTotCarbs, fat: menuTotFat } });
   }
   return menus;
 }
@@ -1229,13 +1291,16 @@ function openMenuModal(idx) {
   document.getElementById('menu-modal-title').textContent = 'תפריט ' + menu.index;
   const body = document.getElementById('menu-modal-body');
   body.innerHTML = menu.meals.map(meal => {
-    const mealTotal = meal.items.reduce((s, it) => s + it.cal, 0);
+    const mealCal   = meal.items.reduce((s, it) => s + it.cal,     0);
+    const mealProt  = meal.items.reduce((s, it) => s + it.protein,  0);
+    const mealCarbs = meal.items.reduce((s, it) => s + it.carbs,    0);
+    const mealFat   = meal.items.reduce((s, it) => s + it.fat,      0);
     return `<div class="menu-meal">
       <div class="menu-meal-label">${escHtml(meal.label)}</div>
       ${meal.items.map(it => `<div class="menu-meal-item">• ${escHtml(it.name)} — ${it.grams}g (${it.cal} קל׳, חלבון ${it.protein}g, פחמ׳ ${it.carbs}g, שומן ${it.fat}g)</div>`).join('')}
-      <div class="menu-meal-total">סה"כ: ${mealTotal} קל׳</div>
+      <div class="menu-meal-total">סה"כ: ${mealCal} קל׳ | חלבון ${mealProt}g | פחמ׳ ${mealCarbs}g | שומן ${mealFat}g</div>
     </div>`;
-  }).join('');
+  }).join('') + (menu.total ? `<div class="menu-meal" style="background:#f0f0ff"><div class="menu-meal-label">סה״כ יומי</div><div class="menu-meal-total">${menu.total.cal} קל׳ | חלבון ${menu.total.protein}g | פחמ׳ ${menu.total.carbs}g | שומן ${menu.total.fat}g</div></div>` : '');
   document.getElementById('menu-modal-overlay').hidden = false;
 }
 
@@ -1261,3 +1326,10 @@ function showDailyMenus() { openMenuModal(0); }
    ─────────────────────────────────────────────────────── */
 render();
 initVoice();
+(function() {
+  const calcBtn = document.getElementById('calc-btn');
+  if (calcBtn && !calcBtn.dataset.bound) {
+    calcBtn.dataset.bound = '1';
+    calcBtn.addEventListener('click', addFood);
+  }
+})();

@@ -141,8 +141,10 @@ body::before{content:'';position:fixed;inset:0;background:
         <div class="dot" id="dot-5"></div>
         <div class="dot" id="dot-6"></div>
         <div class="dot" id="dot-7"></div>
+        <div class="dot" id="dot-8"></div>
+        <div class="dot" id="dot-9"></div>
       </div>
-      <div class="ob-step-label" id="step-label">שלב 1 מתוך 7</div>
+      <div class="ob-step-label" id="step-label">שלב 1 מתוך 9</div>
     </div>
 
     <!-- Step 1: Gender -->
@@ -256,35 +258,69 @@ body::before{content:'';position:fixed;inset:0;background:
           <span class="gender-icon">💪</span>
           <span>עלייה במסה</span>
         </button>
+        <button type="button" class="gender-btn" id="btn-goal-lean" onclick="selectGoal('להתחטב')">
+          <span class="gender-icon">🔥</span>
+          <span>להתחטב</span>
+        </button>
       </div>
     </div>
 
-    <!-- Step 7: Weekly target -->
+    <!-- Step 7: Weekly target (right after goal) -->
     <div class="ob-step" id="step-7" style="display:none">
       <div id="step-7-loss" style="display:none">
-        <h2>קצב ירידה שבועי?</h2>
-        <div class="gender-btns" style="grid-template-columns:1fr 1fr 1fr">
-          <button type="button" class="gender-btn wt-btn" data-val="0.25" onclick="selectWeeklyTarget(0.25)">
-            <span class="gender-icon">🐢</span><span>0.25 ק״ג</span>
-          </button>
-          <button type="button" class="gender-btn wt-btn" data-val="0.5" onclick="selectWeeklyTarget(0.5)">
-            <span class="gender-icon">⚖️</span><span>0.5 ק״ג</span>
-          </button>
-          <button type="button" class="gender-btn wt-btn" data-val="0.75" onclick="selectWeeklyTarget(0.75)">
-            <span class="gender-icon">🔥</span><span>0.75 ק״ג</span>
-          </button>
+        <h2>מה היעד שלך? כמה את/ה רוצה לרדת?</h2>
+        <div class="num-input-wrap">
+          <input type="number" class="ob-num-input" id="total-loss-input" min="1" max="200" step="0.5" placeholder="10">
+          <span class="num-unit">ק״ג</span>
         </div>
       </div>
-      <div id="step-7-gain" style="display:none">
+      <div id="step-7-weekly-gain" style="display:none">
         <h2>קצב עלייה שבועי?</h2>
-        <div class="gender-btns">
-          <button type="button" class="gender-btn wt-btn" data-val="0.25" onclick="selectWeeklyTarget(0.25)">
-            <span class="gender-icon">🐢</span><span>0.25 ק״ג</span>
-          </button>
-          <button type="button" class="gender-btn wt-btn" data-val="0.5" onclick="selectWeeklyTarget(0.5)">
-            <span class="gender-icon">💪</span><span>0.5 ק״ג</span>
-          </button>
+        <div class="num-input-wrap">
+          <input type="number" class="ob-num-input" id="weekly-gain-input" min="0.25" max="2" step="0.25" placeholder="0.5">
+          <span class="num-unit">ק״ג/שבוע</span>
         </div>
+      </div>
+    </div>
+
+    <!-- Step 8: Target weight change -->
+    <div class="ob-step" id="step-8" style="display:none">
+      <div id="step-8-loss-timeframe" style="display:none">
+        <h2>תוך כמה זמן את/ה רוצה להגיע ליעד?</h2>
+        <div class="num-input-wrap">
+          <input type="number" class="ob-num-input" id="loss-months-input" min="1" max="30" placeholder="6" style="width:120px">
+          <span class="num-unit">חודשים</span>
+        </div>
+      </div>
+      <div id="step-8-target-gain" style="display:none">
+        <h2>כמה את/ה רוצה לעלות?</h2>
+        <div class="num-input-wrap">
+          <input type="number" class="ob-num-input" id="target-gain-input" min="1" max="100" step="0.5" placeholder="5">
+          <span class="num-unit">ק״ג</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 9: Target timeframe -->
+    <div class="ob-step" id="step-9" style="display:none">
+      <h2>תוך כמה זמן את/ה רוצה להגיע ליעד?</h2>
+      <div class="num-input-wrap">
+        <input type="number" class="ob-num-input" id="timeframe-amount-input" min="1" max="30" placeholder="6" style="width:120px">
+        <select id="timeframe-unit-select" style="background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:14px 16px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:1.1rem;font-weight:700;outline:none;cursor:pointer">
+          <option value="חודשים">חודשים</option>
+          <option value="ימים">ימים</option>
+        </select>
+      </div>
+    </div>
+
+
+
+    <!-- Loss goal confirmation screen -->
+    <div class="ob-step" id="step-loss-confirm" style="display:none">
+      <div class="results-header">
+        <img src="img/miri-smile.png" alt="" onerror="this.style.display='none'" style="width:80px;height:80px;border-radius:50%;margin:0 auto 12px;display:block;object-fit:cover;border:3px solid var(--green);box-shadow:0 0 24px rgba(16,185,129,.35)">
+        <h2>יפה!</h2>
+        <p id="confirm-weekly-text" style="font-size:1rem;color:var(--txt);margin-top:10px"></p>
       </div>
     </div>
 
@@ -307,6 +343,11 @@ body::before{content:'';position:fixed;inset:0;background:
           <div class="result-unit">קלוריות ביום</div>
         </div>
       </div>
+      <div class="result-card" style="margin-bottom:20px;border-color:rgba(20,184,166,.4);background:rgba(20,184,166,.08)">
+        <div class="result-lbl">כמות קלוריות מומלצת לפי היעד שלך</div>
+        <div class="result-val" id="res-dailycal" style="color:var(--teal);font-size:2.3rem">—</div>
+        <div class="result-unit">קלוריות ביום</div>
+      </div>
       <button type="button" class="btn-start" onclick="startTracking()">התחל לעקוב ✓</button>
     </div>
 
@@ -327,9 +368,10 @@ body::before{content:'';position:fixed;inset:0;background:
 const _user = getLoggedUser();
 if (!_user) window.location.href = 'login.html';
 
-const answers = { gender: null, age: null, height: null, weight: null, activity: null, goal: null, weekly_target: null };
+const answers = { gender: null, age: null, height: null, weight: null, activity: null, goal: null, weekly_target: null, targetKg: null, targetTimeAmount: null, targetTimeUnit: null, totalGoalKg: null, goalMonths: null, weeklyGoal: null };
 let currentStep = 1;
-const TOTAL = 7;
+let onLossConfirm = false;
+const TOTAL = 9;
 
 function selectGender(g) {
   answers.gender = g;
@@ -338,9 +380,10 @@ function selectGender(g) {
 }
 
 function selectGoal(g) {
-  answers.goal = g;
+  answers.goal = (g === 'להתחטב') ? 'ירידה במשקל' : g;
   document.getElementById('btn-goal-loss').classList.toggle('selected', g === 'ירידה במשקל');
   document.getElementById('btn-goal-gain').classList.toggle('selected', g === 'עלייה במסה');
+  document.getElementById('btn-goal-lean').classList.toggle('selected', g === 'להתחטב');
 }
 
 function selectWeeklyTarget(v) {
@@ -362,10 +405,21 @@ function updateUI() {
   document.getElementById('btn-next').textContent = currentStep === TOTAL ? 'חשב ✓' : 'המשך';
   document.getElementById('ob-error').textContent = '';
   if (currentStep === 7) {
-    answers.weekly_target = null;
-    document.querySelectorAll('.wt-btn').forEach(btn => btn.classList.remove('selected'));
     document.getElementById('step-7-loss').style.display = answers.goal === 'ירידה במשקל' ? '' : 'none';
-    document.getElementById('step-7-gain').style.display = answers.goal === 'עלייה במסה' ? '' : 'none';
+    document.getElementById('step-7-weekly-gain').style.display = answers.goal === 'עלייה במסה' ? '' : 'none';
+    document.getElementById('total-loss-input').value = '';
+    document.getElementById('weekly-gain-input').value = '';
+  }
+  if (currentStep === 8) {
+    document.getElementById('step-8-loss-timeframe').style.display = answers.goal === 'ירידה במשקל' ? '' : 'none';
+    document.getElementById('step-8-target-gain').style.display = answers.goal === 'עלייה במסה' ? '' : 'none';
+    if (answers.goal === 'ירידה במשקל') document.getElementById('loss-months-input').value = '';
+  }
+  if (currentStep === 9) {
+    answers.targetTimeAmount = null;
+    answers.targetTimeUnit = null;
+    document.getElementById('timeframe-amount-input').value = '';
+    document.getElementById('timeframe-unit-select').value = 'חודשים';
   }
 }
 
@@ -392,7 +446,30 @@ function validate() {
   } else if (currentStep === 6) {
     if (!answers.goal) { err.textContent = 'יש לבחור מטרה'; return false; }
   } else if (currentStep === 7) {
-    if (!answers.weekly_target) { err.textContent = 'יש לבחור קצב שבועי'; return false; }
+    if (answers.goal === 'ירידה במשקל') {
+      const v = parseFloat(document.getElementById('total-loss-input').value);
+      if (!v || v <= 0) { err.textContent = 'יש להזין כמות תקינה בק״ג'; return false; }
+      answers.totalGoalKg = v;
+    } else {
+      const v = parseFloat(document.getElementById('weekly-gain-input').value);
+      if (!v || v <= 0) { err.textContent = 'יש להזין קצב שבועי תקין'; return false; }
+      answers.weekly_target = v;
+    }
+  } else if (currentStep === 8) {
+    if (answers.goal === 'ירידה במשקל') {
+      const v = parseInt(document.getElementById('loss-months-input').value);
+      if (!v || v < 1 || v > 30) { err.textContent = 'יש להזין מספר בין 1 ל-30'; return false; }
+      answers.goalMonths = v;
+    } else {
+      const v = parseFloat(document.getElementById('target-gain-input').value);
+      if (!v || v <= 0) { err.textContent = 'יש להזין כמות תקינה בק״ג'; return false; }
+      answers.targetKg = v;
+    }
+  } else if (currentStep === 9) {
+    const v = parseInt(document.getElementById('timeframe-amount-input').value);
+    if (!v || v < 1 || v > 30) { err.textContent = 'יש להזין מספר בין 1 ל-30'; return false; }
+    answers.targetTimeAmount = v;
+    answers.targetTimeUnit = document.getElementById('timeframe-unit-select').value;
   }
   return true;
 }
@@ -401,7 +478,9 @@ function goNext() {
   console.log('[onboarding] continue clicked');
   console.log('[onboarding] current step:', currentStep);
   console.log('[onboarding] selected goal:', answers.goal);
+  if (onLossConfirm) { onLossConfirm = false; showResults(); return; }
   if (!validate()) return;
+  if (currentStep === 8 && answers.goal === 'ירידה במשקל') { showLossConfirm(); return; }
   if (currentStep < TOTAL) {
     const nextStep = currentStep + 1;
     console.log('[onboarding] next step:', nextStep);
@@ -414,6 +493,7 @@ function goNext() {
 }
 
 function goBack() {
+  if (onLossConfirm) { onLossConfirm = false; document.getElementById('step-loss-confirm').style.display = 'none'; currentStep = 8; updateUI(); return; }
   if (currentStep > 1) { currentStep--; updateUI(); }
 }
 
@@ -426,6 +506,20 @@ function calcBMR() {
   }
 }
 
+function showLossConfirm() {
+  const weeks = answers.goalMonths * 4;
+  answers.weeklyGoal = parseFloat((answers.totalGoalKg / weeks).toFixed(2));
+  document.getElementById('confirm-weekly-text').textContent = 'זה אומר יעד שבועי של ' + answers.weeklyGoal + ' ק״ג';
+  for (let i = 1; i <= TOTAL; i++) document.getElementById('step-' + i).style.display = 'none';
+  document.getElementById('step-loss-confirm').style.display = '';
+  document.getElementById('btn-back').style.visibility = 'visible';
+  document.getElementById('btn-next').textContent = 'המשך';
+  document.getElementById('ob-error').textContent = '';
+  for (let i = 1; i <= TOTAL; i++) document.getElementById('dot-' + i).className = 'dot done';
+  document.getElementById('step-label').textContent = 'כמעט סיימנו!';
+  onLossConfirm = true;
+}
+
 function showResults() {
   for (let i = 1; i <= TOTAL; i++) document.getElementById('step-' + i).style.display = 'none';
   document.getElementById('step-results').style.display = '';
@@ -436,15 +530,34 @@ function showResults() {
   const bmr  = Math.round(calcBMR());
   const tdee = Math.round(bmr * answers.activity);
 
-  document.getElementById('res-bmr').textContent  = bmr.toLocaleString('he-IL');
-  document.getElementById('res-tdee').textContent = tdee.toLocaleString('he-IL');
+  let dailyDelta, dailyCal;
+  if (answers.goal === 'ירידה במשקל') {
+    const weeks = answers.goalMonths * 4;
+    answers.weeklyGoal = parseFloat((answers.totalGoalKg / weeks).toFixed(2));
+    answers.weekly_target = answers.weeklyGoal;
+    const totalDeficit = answers.totalGoalKg * 7500;
+    const dailyDeficit = totalDeficit / weeks / 7;
+    dailyCal = Math.round(tdee - dailyDeficit);
+    dailyDelta = Math.round(dailyDeficit);
+  } else {
+    dailyDelta = Math.round((answers.weekly_target * 7500) / 7);
+    dailyCal = tdee + dailyDelta;
+  }
+
+  document.getElementById('res-bmr').textContent     = bmr.toLocaleString('he-IL');
+  document.getElementById('res-tdee').textContent    = tdee.toLocaleString('he-IL');
+  document.getElementById('res-dailycal').textContent = dailyCal.toLocaleString('he-IL');
 
   const data = JSON.parse(localStorage.getItem(dietKey(_user.username)) || '{}');
-  Object.assign(data, { ...answers, bmr, tdee });
+  const goalLabel = answers.goal === 'ירידה במשקל' ? 'loss' : answers.goal;
+  Object.assign(data, { ...answers, goal: goalLabel, bmr, tdee, dailyDelta, dailyCal });
   localStorage.setItem(dietKey(_user.username), JSON.stringify(data));
 }
 
 function startTracking() {
+  console.log('[onboarding] marking completed');
+  localStorage.setItem('onboardingCompleted', 'true');
+  console.log('[onboarding] redirecting to index');
   window.location.href = 'index.html';
 }
 </script>
