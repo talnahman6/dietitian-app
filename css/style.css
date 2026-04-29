@@ -205,15 +205,26 @@ body::before{content:'';position:fixed;inset:0;background:
   .hdr-text h1{font-size:1.5rem}
   .sc-val{font-size:1.6rem}
 }
+@media(max-width:600px){
+  .input-row{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"search search" "qty unit" "mic cam" "add add";gap:10px}
+  .ac-wrap{grid-area:search;width:100%}
+  #food-input{width:100%;box-sizing:border-box}
+  #qty-num{grid-area:qty;width:100%}
+  #plate-fraction{grid-area:qty;width:100%}
+  #qty-sel{grid-area:unit;width:100%}
+  #mic-btn{grid-area:mic;width:100%}
+  #cam-btn{grid-area:cam;width:100%}
+  .btn-go{grid-area:add;width:100%}
+}
 @media(max-width:420px){
-  .input-row{flex-wrap:wrap}
-  .btn-go{width:100%}
   .fi-nutrients{display:none}
   .btn-mic{flex:1 1 40%;justify-content:center;align-items:center;white-space:nowrap}
 }
 
 /* ─── AUTO-COMPLETE ─── */
-.ac-list{background:var(--card2);border:1px solid var(--bdr2);border-radius:10px;overflow:hidden;box-shadow:var(--sh);margin-top:4px}
+.ac-wrap{position:relative;flex:1;min-width:0}
+.ac-wrap .food-input,.ac-wrap #food-input{flex:none;width:100%;box-sizing:border-box}
+.ac-list{position:fixed;z-index:9999;background:var(--card2);border:1px solid var(--bdr2);border-radius:10px;overflow:hidden;box-shadow:var(--sh)}
 .ac-item{padding:10px 16px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background .15s;color:var(--txt)}
 .ac-item:hover{background:var(--inp)}
 .ac-cat{font-size:.7rem;color:var(--txt3);background:var(--inp);border-radius:6px;padding:2px 7px;white-space:nowrap;flex-shrink:0}
@@ -313,3 +324,59 @@ body::before{content:'';position:fixed;inset:0;background:
 .menu-meal-item{font-size:.82rem;color:var(--txt2);padding:3px 0;border-bottom:1px solid var(--bdr)}
 .menu-meal-item:last-child{border-bottom:none;padding-bottom:0}
 .menu-meal-total{font-size:.75rem;color:var(--txt3);margin-top:8px;padding-top:6px;border-top:1px solid var(--bdr)}
+
+@media (max-width: 600px) {
+  #manual-section .input-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-areas:
+      "search search"
+      "qty unit"
+      "mic cam"
+      "add add" !important;
+    gap: 10px !important;
+  }
+
+  #manual-section .ac-wrap {
+    grid-area: search !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  #manual-section #food-input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  #manual-section #qty-num,
+  #manual-section #plate-fraction {
+    grid-area: qty !important;
+    width: 100% !important;
+  }
+
+  #manual-section #qty-sel {
+    grid-area: unit !important;
+    width: 100% !important;
+  }
+
+  #manual-section #mic-btn {
+    grid-area: mic !important;
+    width: 100% !important;
+  }
+
+  #manual-section #cam-btn {
+    grid-area: cam !important;
+    width: 100% !important;
+  }
+
+  #manual-section .btn-go {
+    grid-area: add !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 600px) {
+  #manual-section {
+    outline: 5px solid red !important;
+  }
+}
