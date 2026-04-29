@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <style>
+.miri-fab-wrap{right:20px;left:auto;bottom:20px;z-index:9999;align-items:flex-start}
 @media (min-width:600px){
   .miri-fab-wrap{width:560px}
   .miri-chat{width:100%;height:75vh;max-height:75vh}
@@ -57,16 +58,23 @@
   <div id="manual-section">
     <div class="input-row">
       <input type="text" class="food-input" id="food-input"
-        placeholder="לדוגמא: 100 גרם חזה עוף, 5 כפות אורז ו2 תפוחי אדמה קטנים"
+        placeholder="הוסף מאכל אחד בכל פעם"
         onkeydown="if(event.key==='Enter')addFood()">
       <input type="number" class="qty-num" id="qty-num" value="100" min="1" max="9999" placeholder="כמות">
-      <select class="qty-sel" id="qty-sel">
+      <select id="plate-fraction" style="display:none">
+        <option value="0.25">רבע</option>
+        <option value="0.33">שליש</option>
+        <option value="0.5">חצי</option>
+        <option value="1">שלם</option>
+      </select>
+      <select class="qty-sel" id="qty-sel" onchange="(function(v){var n=document.getElementById('qty-num'),p=document.getElementById('plate-fraction');if(v==='צלחת'){n.style.display='none';p.style.display='';}else{n.style.display='';p.style.display='none';}})(this.value)">
         <option value="גרם">גרם</option>
         <option value='מ"ל'>מ"ל</option>
         <option value="כפית">כפית</option>
         <option value="כף">כף</option>
         <option value="כוס">כוס</option>
         <option value="יחידה">יחידה</option>
+        <option value="צלחת">צלחת</option>
       </select>
       <button class="btn-mic" id="mic-btn" onclick="toggleVoice()" title="הקלטה בעברית">🎤</button>
       <button class="btn-mic" id="cam-btn" onclick="openCamera()" title="צלם מנה">📷</button>

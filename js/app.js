@@ -115,20 +115,20 @@ function render() {
   document.getElementById('pf-fat').style.width = pct(t.fat,GOALS.fat)+'%';
 
   const el = document.getElementById('food-list');
+  _emptyState.remove();
   if (log.length === 0) {
     el.innerHTML = '';
     el.appendChild(_emptyState);
     _emptyState.style.display = '';
     return;
   }
-  _emptyState.style.display = 'none';
   el.innerHTML = '';
   log.forEach((e, i) => {
     const div = document.createElement('div');
     div.className = 'fi';
     div.innerHTML = `
       <div class="fi-info">
-        <div class="fi-name">${escHtml(e.food.n[0])}</div>
+        <div class="fi-name">${escHtml(e.food.n[0])}${e.quantityDisplay ? ' - ' + escHtml(e.quantityDisplay) : ''}</div>
         <div class="fi-qty">${Math.round(e.grams)}g · ${escHtml(e.food.cat)}</div>
       </div>
       <div class="fi-nutrients">
@@ -150,13 +150,23 @@ function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').
 const _acInput = document.getElementById('food-input');
 let _acSelected = false;
 let _acSelectedFood = null;
+let selectedManualFood = null;
+let selectingAutocomplete = false;
+let _acIgnoreNextInput = false;
+let _acSuppress = false;
 const _acList = document.createElement('div');
 _acList.id = 'ac-list';
 _acList.className = 'ac-list';
 _acList.style.display = 'none';
 document.querySelector('.input-row').insertAdjacentElement('afterend', _acList);
 
+function closeAutocomplete() {
+  _acList.style.display = 'none';
+  _acList.innerHTML = '';
+}
+
 function acSearch(val) {
+  if (_acSelected && selectedManualFood) { closeAutocomplete(); return; }
   const norm = s => s.toLowerCase().replace(/['"״׳]/g,'').replace(/\s+/g,' ').trim();
   const t = norm(val);
   if (t.length < 2) { _acList.style.display = 'none'; return; }
@@ -174,21 +184,30 @@ function acSearch(val) {
   _acList.innerHTML = matches.map(f =>
     `<div class="ac-item" data-name="${escHtml(f.n[0])}">${escHtml(f.n[0])}<span class="ac-cat">${escHtml(f.cat)}</span></div>`
   ).join('');
-  _acList.style.display = '';
+  _acList.style.display = 'block';
   _acList.querySelectorAll('.ac-item').forEach(item => {
     item.addEventListener('mousedown', e => {
       e.preventDefault();
+      selectingAutocomplete = true;
       _acInput.value = item.dataset.name;
       _acSelected = true;
-      _acSelectedFood = findFood(item.dataset.name);
-      _acList.style.display = 'none';
+      _acSelectedFood = DB.find(f => f.n && f.n.includes(item.dataset.name)) || null;
+      selectedManualFood = _acSelectedFood;
+      _acIgnoreNextInput = true;
+      closeAutocomplete();
+      _acSuppress = true;
+      setTimeout(() => { selectingAutocomplete = false; _acSuppress = false; }, 300);
+      requestAnimationFrame(() => {
+        _acList.style.display = 'none';
+        _acList.innerHTML = '';
+      });
     });
   });
 }
 
-_acInput.addEventListener('input', () => { _acSelected = false; _acSelectedFood = null; acSearch(_acInput.value); });
+_acInput.addEventListener('input', () => { if (_acSuppress) return; if (_acIgnoreNextInput) { _acIgnoreNextInput = false; return; } if (selectingAutocomplete) return; _acSelected = false; _acSelectedFood = null; selectedManualFood = null; acSearch(_acInput.value); });
 _acInput.addEventListener('blur', () => setTimeout(() => { _acList.style.display = 'none'; }, 200));
-_acInput.addEventListener('focus', () => { if (_acInput.value.trim().length >= 2) acSearch(_acInput.value); });
+_acInput.addEventListener('focus', () => { if (_acSuppress) return; if (_acSelected || selectedManualFood) return; if (_acInput.value.trim().length >= 2) acSearch(_acInput.value); });
 
 /* ─────────────────────────────────────────────────────────
    ADD / DELETE / CLEAR
@@ -368,6 +387,14 @@ function qtyPopupSubmit() {
   _commitFoodEntry(result);
 }
 
+function manualFindFood(name) {
+  if (!name || typeof DB === 'undefined' || !Array.isArray(DB)) return null;
+  const q = name.trim().toLowerCase();
+  return DB.find(f => Array.isArray(f.n) && f.n.some(s => s && s.toLowerCase() === q))
+      || DB.find(f => Array.isArray(f.n) && f.n.some(s => s && s.toLowerCase().includes(q)))
+      || null;
+}
+
 function _commitFoodEntry(result) {
   log.push(result);
   save();
@@ -403,6 +430,15 @@ async function addFood() {
   const _manualSec = document.getElementById('manual-section');
   const _isManual = _manualSec && _manualSec.style.display !== 'none';
   if (_acSelected || _acSelectedFood || _isManual) {
+    console.log('[manual-add] clicked add');
+    console.log('[manual-add] input value:', raw);
+    console.log('[manual-add] selectedManualFood:', selectedManualFood);
+    console.log('[manual-add] DB length:', typeof DB !== 'undefined' ? DB.length : 'DB not defined');
+    if (typeof DB === 'undefined' || !Array.isArray(DB) || DB.length === 0) {
+      aiMsg.classList.add('show');
+      aiText.textContent = 'מאגר המאכלים לא נטען';
+      return;
+    }
     const qtyNum = parseFloat(document.getElementById('qty-num').value);
     if (!qtyNum || qtyNum <= 0) {
       aiMsg.classList.add('show');
@@ -410,12 +446,19 @@ async function addFood() {
       return;
     }
     const unit = document.getElementById('qty-sel').value;
-    const food = _acSelectedFood || findFood(raw);
+    const food = selectedManualFood || _acSelectedFood || manualFindFood(raw);
+    console.log('[manual-add] findFood result:', food);
     if (!food) {
       aiMsg.classList.add('show');
-      aiText.textContent = `לא מצאתי "${raw}" במאגר.`;
+      aiText.textContent = 'המאכל לא נמצא במאגר';
       _acSelected = false;
       _acSelectedFood = null;
+      selectedManualFood = null;
+      return;
+    }
+    if (food.cal === undefined || food.p === undefined || food.c === undefined || food.f === undefined) {
+      aiMsg.classList.add('show');
+      aiText.textContent = 'המאכל לא נמצא במאגר';
       return;
     }
     let grams;
@@ -425,7 +468,27 @@ async function addFood() {
     else if (unit === 'כוס' || unit === 'כוסות') grams = qtyNum * 240;
     else if (unit === 'כף' || unit === 'כפות') grams = qtyNum * 15;
     else if (unit === 'כפית' || unit === 'כפיות') grams = qtyNum * 5;
+    else if (unit === 'צלחת') {
+      const foodName = (food.name || '').trim();
+      const spoonFoods = ['אורז','פסטה','פתיתים','קוסקוס','בורגול','קינואה','עדשים','שעועית','גריסים','שיבולת שועל'];
+      const potatoFoods = ['תפוח אדמה','תפוחי אדמה','בטטה','סלק','קולורבי','לפת'];
+      let fullPlateGrams;
+      if (spoonFoods.some(s => foodName.includes(s))) {
+        fullPlateGrams = 270;
+      } else if (potatoFoods.some(s => foodName.includes(s))) {
+        const unitWeight = foodName.includes('בטטה') ? 310 : (food.dw || 170);
+        fullPlateGrams = unitWeight * 4;
+      } else {
+        fullPlateGrams = food.plateGrams || 300;
+      }
+      const fraction = document.getElementById('plate-fraction') ? document.getElementById('plate-fraction').value : 'שלם';
+      if (fraction === 'רבע') grams = fullPlateGrams * 0.25;
+      else if (fraction === 'שליש') grams = fullPlateGrams / 3;
+      else if (fraction === 'חצי') grams = fullPlateGrams * 0.5;
+      else grams = fullPlateGrams;
+    }
     else grams = qtyNum;
+    const plateFraction = unit === 'צלחת' && document.getElementById('plate-fraction') ? document.getElementById('plate-fraction').value : null;
     const multiplier = grams / 100;
     const entry = {
       food,
@@ -435,10 +498,16 @@ async function addFood() {
       protein: Math.round(food.p   * multiplier * 10) / 10,
       fat:     Math.round(food.f   * multiplier * 10) / 10,
       raw,
+      quantityDisplay: plateFraction ? plateFraction + ' צלחת' : qtyNum + " " + unit,
     };
+    console.log('[manual-add] created entry:', entry);
     _acSelected = false;
     _acSelectedFood = null;
+    selectedManualFood = null;
     inp.value = '';
+    _acList.style.display = 'none';
+    const _qn = document.getElementById('qty-num');
+    if (_qn) _qn.value = '';
     _commitFoodEntry(entry);
     return;
   }
@@ -1321,15 +1390,65 @@ function downloadMenuPDF() {
 
 function showDailyMenus() { openMenuModal(0); }
 
+function addManualFood() {
+  const inp = document.getElementById('food-input');
+  const raw = inp.value.trim();
+  const aiMsg = document.getElementById('ai-msg');
+  const aiText = document.getElementById('ai-text');
+  if (!raw && !selectedManualFood) return;
+  const qtyNum = parseFloat(document.getElementById('qty-num').value);
+  if (!qtyNum || qtyNum <= 0) {
+    aiMsg.classList.add('show');
+    aiText.textContent = 'יש להזין כמות לפני הוספת המאכל';
+    return;
+  }
+  const unit = document.getElementById('qty-sel').value;
+  const food = selectedManualFood || manualFindFood(raw);
+  if (!food) {
+    aiMsg.classList.add('show');
+    aiText.textContent = 'המאכל לא נמצא במאגר';
+    return;
+  }
+  let grams;
+  if (unit === 'גרם') grams = qtyNum;
+  else if (unit === 'מ"ל' || unit === 'מיליליטר') grams = qtyNum;
+  else if (unit === 'יחידות' || unit === 'יחידה' || unit === 'פרוסות' || unit === 'פרוסה') grams = qtyNum * (food.dw || 100);
+  else if (unit === 'כוס' || unit === 'כוסות') grams = qtyNum * 240;
+  else if (unit === 'כף' || unit === 'כפות') grams = qtyNum * 15;
+  else if (unit === 'כפית' || unit === 'כפיות') grams = qtyNum * 5;
+  else grams = qtyNum;
+  const multiplier = grams / 100;
+  const entry = {
+    food, grams,
+    cal:     Math.round(food.cal * multiplier),
+    carbs:   Math.round(food.c   * multiplier * 10) / 10,
+    protein: Math.round(food.p   * multiplier * 10) / 10,
+    fat:     Math.round(food.f   * multiplier * 10) / 10,
+    raw,
+    quantityDisplay: qtyNum + " " + unit,
+  };
+  selectedManualFood = null;
+  _acSelected = false;
+  _acSelectedFood = null;
+  inp.value = '';
+  _acList.style.display = 'none';
+  const _qn2 = document.getElementById('qty-num');
+  if (_qn2) _qn2.value = '';
+  _commitFoodEntry(entry);
+}
+
 /* ─────────────────────────────────────────────────────────
    INIT
    ─────────────────────────────────────────────────────── */
 render();
 initVoice();
 (function() {
-  const calcBtn = document.getElementById('calc-btn');
-  if (calcBtn && !calcBtn.dataset.bound) {
-    calcBtn.dataset.bound = '1';
-    calcBtn.addEventListener('click', addFood);
+  const _minp = document.getElementById('food-input');
+  const _mbtn = document.querySelector('#manual-section .btn-go');
+  if (_mbtn && !_mbtn.dataset.bound) {
+    _mbtn.dataset.bound = '1';
+    _mbtn.textContent = 'הוספה';
+    _mbtn.removeAttribute('onclick');
+    _mbtn.addEventListener('click', addFood);
   }
 })();
