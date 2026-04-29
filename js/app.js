@@ -439,13 +439,13 @@ async function addFood() {
       aiText.textContent = 'מאגר המאכלים לא נטען';
       return;
     }
+    const unit = document.getElementById('qty-sel').value;
     const qtyNum = parseFloat(document.getElementById('qty-num').value);
-    if (!qtyNum || qtyNum <= 0) {
+    if (unit !== 'צלחת' && (!qtyNum || qtyNum <= 0)) {
       aiMsg.classList.add('show');
       aiText.textContent = 'יש להזין כמות לפני הוספת המאכל';
       return;
     }
-    const unit = document.getElementById('qty-sel').value;
     const food = selectedManualFood || _acSelectedFood || manualFindFood(raw);
     console.log('[manual-add] findFood result:', food);
     if (!food) {
@@ -469,26 +469,22 @@ async function addFood() {
     else if (unit === 'כף' || unit === 'כפות') grams = qtyNum * 15;
     else if (unit === 'כפית' || unit === 'כפיות') grams = qtyNum * 5;
     else if (unit === 'צלחת') {
-      const foodName = (food.name || '').trim();
-      const spoonFoods = ['אורז','פסטה','פתיתים','קוסקוס','בורגול','קינואה','עדשים','שעועית','גריסים','שיבולת שועל'];
-      const potatoFoods = ['תפוח אדמה','תפוחי אדמה','בטטה','סלק','קולורבי','לפת'];
+      const foodText = ((food.n || []).join(' ') + ' ' + (food.cat || '')).trim();
       let fullPlateGrams;
-      if (spoonFoods.some(s => foodName.includes(s))) {
+      if (/(אורז|פסטה|פתיתים|קוסקוס|בורגול|קינואה|עדשים|שעועית|גריסים|שיבולת)/.test(foodText)) {
         fullPlateGrams = 270;
-      } else if (potatoFoods.some(s => foodName.includes(s))) {
-        const unitWeight = foodName.includes('בטטה') ? 310 : (food.dw || 170);
-        fullPlateGrams = unitWeight * 4;
+      } else if (/בטטה/.test(foodText)) {
+        fullPlateGrams = 310 * 3;
+      } else if (/תפוח\s*אדמה|תפו["״]?א|תפוחי\s*אדמה/.test(foodText)) {
+        fullPlateGrams = 170 * 4;
       } else {
         fullPlateGrams = food.plateGrams || 300;
       }
-      const fraction = document.getElementById('plate-fraction') ? document.getElementById('plate-fraction').value : 'שלם';
-      if (fraction === 'רבע') grams = fullPlateGrams * 0.25;
-      else if (fraction === 'שליש') grams = fullPlateGrams / 3;
-      else if (fraction === 'חצי') grams = fullPlateGrams * 0.5;
-      else grams = fullPlateGrams;
+      const fraction = document.getElementById('plate-fraction') ? document.getElementById('plate-fraction').value : '1';
+      const f = parseFloat(fraction) || 1;
+      grams = fullPlateGrams * f;
     }
     else grams = qtyNum;
-    const plateFraction = unit === 'צלחת' && document.getElementById('plate-fraction') ? document.getElementById('plate-fraction').value : null;
     const multiplier = grams / 100;
     const entry = {
       food,
@@ -498,7 +494,7 @@ async function addFood() {
       protein: Math.round(food.p   * multiplier * 10) / 10,
       fat:     Math.round(food.f   * multiplier * 10) / 10,
       raw,
-      quantityDisplay: plateFraction ? plateFraction + ' צלחת' : qtyNum + " " + unit,
+      quantityDisplay: unit === 'צלחת' ? document.getElementById('plate-fraction').selectedOptions[0].text + " צלחת" : qtyNum + " " + unit,
     };
     console.log('[manual-add] created entry:', entry);
     _acSelected = false;
@@ -1397,12 +1393,12 @@ function addManualFood() {
   const aiText = document.getElementById('ai-text');
   if (!raw && !selectedManualFood) return;
   const qtyNum = parseFloat(document.getElementById('qty-num').value);
-  if (!qtyNum || qtyNum <= 0) {
+  const unit = document.getElementById('qty-sel').value;
+  if (unit !== 'צלחת' && (!qtyNum || qtyNum <= 0)) {
     aiMsg.classList.add('show');
     aiText.textContent = 'יש להזין כמות לפני הוספת המאכל';
     return;
   }
-  const unit = document.getElementById('qty-sel').value;
   const food = selectedManualFood || manualFindFood(raw);
   if (!food) {
     aiMsg.classList.add('show');
@@ -1416,6 +1412,17 @@ function addManualFood() {
   else if (unit === 'כוס' || unit === 'כוסות') grams = qtyNum * 240;
   else if (unit === 'כף' || unit === 'כפות') grams = qtyNum * 15;
   else if (unit === 'כפית' || unit === 'כפיות') grams = qtyNum * 5;
+  else if (unit === 'צלחת') {
+    const foodText = ((food.n || []).join(' ') + ' ' + (food.cat || '')).trim();
+    let fullPlateGrams;
+    if (/(אורז|פסטה|פתיתים|קוסקוס|בורגול|קינואה|עדשים|שעועית|גריסים|שיבולת)/.test(foodText)) fullPlateGrams = 270;
+    else if (/בטטה/.test(foodText)) fullPlateGrams = 310 * 3;
+    else if (/תפוח\s*אדמה|תפו["״]?א|תפוחי\s*אדמה/.test(foodText)) fullPlateGrams = 170 * 4;
+    else fullPlateGrams = food.plateGrams || 300;
+    const fraction = document.getElementById('plate-fraction') ? document.getElementById('plate-fraction').value : '1';
+    const f = parseFloat(fraction) || 1;
+    grams = fullPlateGrams * f;
+  }
   else grams = qtyNum;
   const multiplier = grams / 100;
   const entry = {
@@ -1425,7 +1432,7 @@ function addManualFood() {
     protein: Math.round(food.p   * multiplier * 10) / 10,
     fat:     Math.round(food.f   * multiplier * 10) / 10,
     raw,
-    quantityDisplay: qtyNum + " " + unit,
+    quantityDisplay: unit === 'צלחת' ? document.getElementById('plate-fraction').selectedOptions[0].text + " צלחת" : qtyNum + " " + unit,
   };
   selectedManualFood = null;
   _acSelected = false;
