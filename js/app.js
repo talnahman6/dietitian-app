@@ -231,9 +231,13 @@ function handleQtyUnitChange(sel) {
   const qtyNum = document.getElementById('qty-num');
   const plateFraction = document.getElementById('plate-fraction');
   if (!qtyNum || !plateFraction || !sel) return;
-  const isPlate = sel.selectedIndex === sel.options.length - 1;
+  const isPlate = isPlateUnit(sel.value);
   qtyNum.style.display = isPlate ? 'none' : 'block';
   plateFraction.style.display = isPlate ? 'block' : 'none';
+}
+
+function isPlateUnit(unit) {
+  return unit === 'plate' || unit === 'צלחת';
 }
 
 function applyQtyUnit(raw) {
@@ -463,7 +467,7 @@ async function addFood() {
     }
     const unit = document.getElementById('qty-sel').value;
     const qtyNum = parseFloat(document.getElementById('qty-num').value);
-    if (unit !== 'צלחת' && (!qtyNum || qtyNum <= 0)) {
+    if (!isPlateUnit(unit) && (!qtyNum || qtyNum <= 0)) {
       aiMsg.classList.add('show');
       aiText.textContent = 'יש להזין כמות לפני הוספת המאכל';
       return;
@@ -490,7 +494,7 @@ async function addFood() {
     else if (unit === 'כוס' || unit === 'כוסות') grams = qtyNum * 240;
     else if (unit === 'כף' || unit === 'כפות') grams = qtyNum * 15;
     else if (unit === 'כפית' || unit === 'כפיות') grams = qtyNum * 5;
-    else if (unit === 'צלחת') {
+    else if (isPlateUnit(unit)) {
       const foodText = ((food.n || []).join(' ') + ' ' + (food.cat || '')).trim();
       let fullPlateGrams;
       if (/(אורז|פסטה|פתיתים|קוסקוס|בורגול|קינואה|עדשים|שעועית|גריסים|שיבולת)/.test(foodText)) {
@@ -516,7 +520,7 @@ async function addFood() {
       protein: Math.round(food.p   * multiplier * 10) / 10,
       fat:     Math.round(food.f   * multiplier * 10) / 10,
       raw,
-      quantityDisplay: unit === 'צלחת' ? document.getElementById('plate-fraction').selectedOptions[0].text + " צלחת" : qtyNum + " " + unit,
+      quantityDisplay: isPlateUnit(unit) ? document.getElementById('plate-fraction').selectedOptions[0].text + " צלחת" : qtyNum + " " + unit,
     };
     console.log('[manual-add] created entry:', entry);
     _acSelected = false;
@@ -1416,7 +1420,7 @@ function addManualFood() {
   if (!raw && !selectedManualFood) return;
   const qtyNum = parseFloat(document.getElementById('qty-num').value);
   const unit = document.getElementById('qty-sel').value;
-  if (unit !== 'צלחת' && (!qtyNum || qtyNum <= 0)) {
+  if (!isPlateUnit(unit) && (!qtyNum || qtyNum <= 0)) {
     aiMsg.classList.add('show');
     aiText.textContent = 'יש להזין כמות לפני הוספת המאכל';
     return;
@@ -1434,7 +1438,7 @@ function addManualFood() {
   else if (unit === 'כוס' || unit === 'כוסות') grams = qtyNum * 240;
   else if (unit === 'כף' || unit === 'כפות') grams = qtyNum * 15;
   else if (unit === 'כפית' || unit === 'כפיות') grams = qtyNum * 5;
-  else if (unit === 'צלחת') {
+  else if (isPlateUnit(unit)) {
     const foodText = ((food.n || []).join(' ') + ' ' + (food.cat || '')).trim();
     let fullPlateGrams;
     if (/(אורז|פסטה|פתיתים|קוסקוס|בורגול|קינואה|עדשים|שעועית|גריסים|שיבולת)/.test(foodText)) fullPlateGrams = 270;
@@ -1454,7 +1458,7 @@ function addManualFood() {
     protein: Math.round(food.p   * multiplier * 10) / 10,
     fat:     Math.round(food.f   * multiplier * 10) / 10,
     raw,
-    quantityDisplay: unit === 'צלחת' ? document.getElementById('plate-fraction').selectedOptions[0].text + " צלחת" : qtyNum + " " + unit,
+    quantityDisplay: isPlateUnit(unit) ? document.getElementById('plate-fraction').selectedOptions[0].text + " צלחת" : qtyNum + " " + unit,
   };
   selectedManualFood = null;
   _acSelected = false;
@@ -1473,6 +1477,12 @@ render();
 initVoice();
 (function() {
   const _minp = document.getElementById('food-input');
+  const _qtySel = document.getElementById('qty-sel');
+  if (_qtySel && !_qtySel.dataset.plateBound) {
+    _qtySel.dataset.plateBound = '1';
+    _qtySel.addEventListener('change', () => handleQtyUnitChange(_qtySel));
+    handleQtyUnitChange(_qtySel);
+  }
   const _mbtn = document.querySelector('#manual-section .btn-go');
   if (_mbtn && !_mbtn.dataset.bound) {
     _mbtn.dataset.bound = '1';
