@@ -232,8 +232,9 @@ function handleQtyUnitChange(sel) {
   const plateFraction = document.getElementById('plate-fraction');
   if (!qtyNum || !plateFraction || !sel) return;
   const isPlate = isPlateUnit(sel.value);
-  qtyNum.style.display = isPlate ? 'none' : 'block';
-  plateFraction.style.display = isPlate ? 'block' : 'none';
+  document.getElementById('manual-section')?.classList.toggle('is-plate-unit', isPlate);
+  qtyNum.style.setProperty('display', isPlate ? 'none' : 'block', 'important');
+  plateFraction.style.setProperty('display', isPlate ? 'block' : 'none', 'important');
 }
 
 function isPlateUnit(unit) {

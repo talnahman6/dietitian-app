@@ -329,6 +329,18 @@ body::before{content:'';position:fixed;inset:0;background:
   overflow: visible !important;
 }
 
+#manual-section.is-plate-unit #qty-num {
+  display: none !important;
+}
+
+#manual-section.is-plate-unit #plate-fraction {
+  display: block !important;
+}
+
+#manual-section:not(.is-plate-unit) #plate-fraction {
+  display: none !important;
+}
+
 
 #manual-section .ac-item {
   background: transparent !important;
