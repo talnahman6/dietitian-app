@@ -277,8 +277,12 @@ function buildCustomSelect(id, onChange) {
     `<button type="button" class="custom-select-item" data-value="${escHtml(opt.value)}">${escHtml(opt.text)}<span class="custom-select-check"></span></button>`
   ).join('');
 
+  list.addEventListener('pointerdown', e => {
+    e.stopPropagation();
+  });
+
   list.querySelectorAll('.custom-select-item').forEach(item => {
-    item.addEventListener('pointerdown', e => {
+    item.addEventListener('click', e => {
       e.preventDefault();
       e.stopPropagation();
       sync(item.dataset.value);
@@ -286,7 +290,7 @@ function buildCustomSelect(id, onChange) {
     });
   });
 
-  btn.addEventListener('pointerdown', e => {
+  btn.addEventListener('click', e => {
     e.preventDefault();
     e.stopPropagation();
     const open = list.style.display === 'block';
@@ -1542,7 +1546,7 @@ initVoice();
   }
   buildCustomSelect('qty-unit', handleQtyUnitChange);
   buildCustomSelect('plate-fraction');
-  document.addEventListener('pointerdown', closeAllCustomSelects);
+  document.addEventListener('click', closeAllCustomSelects);
   const _mbtn = document.querySelector('#manual-section .btn-go');
   if (_mbtn && !_mbtn.dataset.bound) {
     _mbtn.dataset.bound = '1';
