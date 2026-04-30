@@ -70,7 +70,7 @@
         <option value="0.5">חצי</option>
         <option value="1">שלם</option>
       </select>
-      <select class="qty-sel" id="qty-sel" onchange="(function(v){var n=document.getElementById('qty-num'),p=document.getElementById('plate-fraction');if(v==='צלחת'){n.style.display='none';p.style.display='';}else{n.style.display='';p.style.display='none';}})(this.value)">
+      <select class="qty-sel" id="qty-sel" onchange="handleQtyUnitChange(this)">
         <option value="גרם">גרם</option>
         <option value='מ"ל'>מ"ל</option>
         <option value="כפית">כפית</option>

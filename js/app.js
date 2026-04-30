@@ -227,6 +227,15 @@ _acInput.addEventListener('focus', () => { if (_acSuppress) return; if (_acSelec
    ─────────────────────────────────────────────────────── */
 
 /* Prepend "1 <unit>" when qty-sel has a volume unit and text has no unit yet */
+function handleQtyUnitChange(sel) {
+  const qtyNum = document.getElementById('qty-num');
+  const plateFraction = document.getElementById('plate-fraction');
+  if (!qtyNum || !plateFraction || !sel) return;
+  const isPlate = sel.selectedIndex === sel.options.length - 1;
+  qtyNum.style.display = isPlate ? 'none' : 'block';
+  plateFraction.style.display = isPlate ? 'block' : 'none';
+}
+
 function applyQtyUnit(raw) {
   const qtySel = document.getElementById('qty-sel');
   if (!qtySel) return raw;
