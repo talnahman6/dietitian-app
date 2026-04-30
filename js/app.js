@@ -237,19 +237,62 @@ function handleQtyUnitChange(sel) {
   qtyNum.style.setProperty('display', isPlate ? 'none' : 'block', 'important');
   plateFraction.style.setProperty('display', 'none', 'important');
   if (plateUi) plateUi.style.setProperty('display', isPlate ? 'block' : 'none', 'important');
+  if (!isPlate) closeCustomSelect('plate-fraction');
 }
 
 function isPlateUnit(unit) {
   return unit === 'plate' || unit === 'צלחת';
 }
 
-function selectPlateFraction(value) {
-  const select = document.getElementById('plate-fraction');
-  if (!select) return;
-  select.value = value;
-  document.querySelectorAll('.plate-fraction-item').forEach(item => {
-    item.classList.toggle('active', item.dataset.value === value);
+function closeCustomSelect(id) {
+  const list = document.getElementById(id + '-list');
+  if (list) list.style.display = 'none';
+}
+
+function closeAllCustomSelects() {
+  closeCustomSelect('qty-unit');
+  closeCustomSelect('plate-fraction');
+}
+
+function buildCustomSelect(id, onChange) {
+  const select = document.getElementById(id === 'qty-unit' ? 'qty-sel' : 'plate-fraction');
+  const btn = document.getElementById(id + '-btn');
+  const list = document.getElementById(id + '-list');
+  if (!select || !btn || !list || btn.dataset.bound) return;
+  btn.dataset.bound = '1';
+
+  function sync(value) {
+    select.value = value;
+    const label = select.selectedOptions[0]?.text || '';
+    btn.textContent = label;
+    list.querySelectorAll('.custom-select-item').forEach(item => {
+      item.classList.toggle('active', item.dataset.value === value);
+      const check = item.querySelector('.custom-select-check');
+      if (check) check.textContent = item.dataset.value === value ? '✓' : '';
+    });
+    if (onChange) onChange(select);
+  }
+
+  list.innerHTML = Array.from(select.options).map(opt =>
+    `<button type="button" class="custom-select-item" data-value="${escHtml(opt.value)}">${escHtml(opt.text)}<span class="custom-select-check"></span></button>`
+  ).join('');
+
+  list.querySelectorAll('.custom-select-item').forEach(item => {
+    item.addEventListener('click', e => {
+      e.stopPropagation();
+      sync(item.dataset.value);
+      closeCustomSelect(id);
+    });
   });
+
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = list.style.display === 'block';
+    closeAllCustomSelects();
+    list.style.display = open ? 'none' : 'block';
+  });
+
+  sync(select.value);
 }
 
 function applyQtyUnit(raw) {
@@ -1495,17 +1538,9 @@ initVoice();
     _qtySel.addEventListener('change', () => handleQtyUnitChange(_qtySel));
     handleQtyUnitChange(_qtySel);
   }
-  const _plateUi = document.getElementById('plate-fraction-ui');
-  if (_plateUi && !_plateUi.dataset.bound) {
-    _plateUi.dataset.bound = '1';
-    selectPlateFraction(document.getElementById('plate-fraction')?.value || '0.25');
-    _plateUi.querySelectorAll('.plate-fraction-item').forEach(item => {
-      item.addEventListener('click', e => {
-        e.preventDefault();
-        selectPlateFraction(item.dataset.value);
-      });
-    });
-  }
+  buildCustomSelect('qty-unit', handleQtyUnitChange);
+  buildCustomSelect('plate-fraction');
+  document.addEventListener('click', closeAllCustomSelects);
   const _mbtn = document.querySelector('#manual-section .btn-go');
   if (_mbtn && !_mbtn.dataset.bound) {
     _mbtn.dataset.bound = '1';

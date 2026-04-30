@@ -70,13 +70,11 @@
         <option value="0.5">חצי</option>
         <option value="1">שלם</option>
       </select>
-      <div class="plate-fraction-wrap" id="plate-fraction-ui" style="display:none">
-        <button type="button" class="plate-fraction-item" data-value="0.25">רבע</button>
-        <button type="button" class="plate-fraction-item" data-value="0.33">שליש</button>
-        <button type="button" class="plate-fraction-item" data-value="0.5">חצי</button>
-        <button type="button" class="plate-fraction-item" data-value="1">שלם</button>
+      <div class="custom-select-wrap" id="plate-fraction-ui" style="display:none">
+        <button type="button" class="custom-select-btn" id="plate-fraction-btn">רבע</button>
+        <div class="custom-select-list" id="plate-fraction-list" style="display:none"></div>
       </div>
-      <select class="qty-sel" id="qty-sel" onchange="handleQtyUnitChange(this)">
+      <select class="qty-sel" id="qty-sel" onchange="handleQtyUnitChange(this)" aria-hidden="true" tabindex="-1">
         <option value="גרם">גרם</option>
         <option value='מ"ל'>מ"ל</option>
         <option value="כפית">כפית</option>
@@ -85,6 +83,10 @@
         <option value="יחידה">יחידה</option>
         <option value="plate">צלחת</option>
       </select>
+      <div class="custom-select-wrap" id="qty-unit-ui">
+        <button type="button" class="custom-select-btn" id="qty-unit-btn">גרם</button>
+        <div class="custom-select-list" id="qty-unit-list" style="display:none"></div>
+      </div>
       <button class="btn-mic" id="mic-btn" onclick="toggleVoice()" title="הקלטה בעברית">🎤</button>
       <button class="btn-mic" id="cam-btn" onclick="openCamera()" title="צלם מנה">📷</button>
       <button class="btn-go" onclick="addFood()">חשבי ✓</button>
@@ -458,7 +460,7 @@
 <script src="js/avatar.js"></script>
 <script src="data/foods.js"></script>
 <script src="js/parser.js"></script>
-<script src="js/app.js?v=10006"></script>
+<script src="js/app.js?v=10007"></script>
 <script src="js/usda.js"></script>
 <script>
 (function() {
