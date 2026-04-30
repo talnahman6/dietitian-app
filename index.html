@@ -64,13 +64,17 @@
         <div id="ac-list" class="ac-list" style="display:none"></div>
       </div>
       <input type="number" class="qty-num" id="qty-num" min="1" max="9999" placeholder="כמות">
-      <select id="plate-fraction" style="display:none">
+      <select id="plate-fraction" style="display:none" aria-hidden="true" tabindex="-1">
         <option value="0.25">רבע</option>
         <option value="0.33">שליש</option>
         <option value="0.5">חצי</option>
         <option value="1">שלם</option>
       </select>
-      <select class="qty-sel" id="qty-sel" onchange="handleQtyUnitChange(this)">
+      <div class="custom-select-wrap" id="plate-fraction-ui" style="display:none">
+        <button type="button" class="custom-select-btn" id="plate-fraction-btn">רבע</button>
+        <div class="custom-select-list" id="plate-fraction-list" style="display:none"></div>
+      </div>
+      <select class="qty-sel" id="qty-sel" onchange="handleQtyUnitChange(this)" aria-hidden="true" tabindex="-1">
         <option value="גרם">גרם</option>
         <option value='מ"ל'>מ"ל</option>
         <option value="כפית">כפית</option>
@@ -79,6 +83,10 @@
         <option value="יחידה">יחידה</option>
         <option value="plate">צלחת</option>
       </select>
+      <div class="custom-select-wrap" id="qty-unit-ui">
+        <button type="button" class="custom-select-btn" id="qty-unit-btn">גרם</button>
+        <div class="custom-select-list" id="qty-unit-list" style="display:none"></div>
+      </div>
       <button class="btn-mic" id="mic-btn" onclick="toggleVoice()" title="הקלטה בעברית">🎤</button>
       <button class="btn-mic" id="cam-btn" onclick="openCamera()" title="צלם מנה">📷</button>
       <button class="btn-go" onclick="addFood()">חשבי ✓</button>
@@ -452,7 +460,7 @@
 <script src="js/avatar.js"></script>
 <script src="data/foods.js"></script>
 <script src="js/parser.js"></script>
-<script src="js/app.js?v=10010"></script>
+<script src="js/app.js?v=10011"></script>
 <script src="js/usda.js"></script>
 <script>
 (function() {

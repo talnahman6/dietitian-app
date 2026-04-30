@@ -230,15 +230,71 @@ _acInput.addEventListener('focus', () => { if (_acSuppress) return; if (_acSelec
 function handleQtyUnitChange(sel) {
   const qtyNum = document.getElementById('qty-num');
   const plateFraction = document.getElementById('plate-fraction');
+  const plateUi = document.getElementById('plate-fraction-ui');
   if (!qtyNum || !plateFraction || !sel) return;
   const isPlate = isPlateUnit(sel.value);
   document.getElementById('manual-section')?.classList.toggle('is-plate-unit', isPlate);
   qtyNum.style.setProperty('display', isPlate ? 'none' : 'block', 'important');
-  plateFraction.style.setProperty('display', isPlate ? 'block' : 'none', 'important');
+  plateFraction.style.setProperty('display', 'none', 'important');
+  if (plateUi) plateUi.style.setProperty('display', isPlate ? 'block' : 'none', 'important');
+  if (!isPlate) closeCustomSelect('plate-fraction');
 }
 
 function isPlateUnit(unit) {
   return unit === 'plate' || unit === 'צלחת';
+}
+
+function closeCustomSelect(id) {
+  const list = document.getElementById(id + '-list');
+  if (list) list.style.display = 'none';
+}
+
+function closeAllCustomSelects() {
+  closeCustomSelect('qty-unit');
+  closeCustomSelect('plate-fraction');
+}
+
+function buildCustomSelect(id, onChange) {
+  const select = document.getElementById(id === 'qty-unit' ? 'qty-sel' : 'plate-fraction');
+  const btn = document.getElementById(id + '-btn');
+  const list = document.getElementById(id + '-list');
+  if (!select || !btn || !list || btn.dataset.bound) return;
+  btn.dataset.bound = '1';
+
+  function sync(value) {
+    select.value = value;
+    btn.textContent = select.selectedOptions[0]?.text || '';
+    list.querySelectorAll('.custom-select-item').forEach(item => {
+      const active = item.dataset.value === value;
+      item.classList.toggle('active', active);
+      const check = item.querySelector('.custom-select-check');
+      if (check) check.textContent = active ? '✓' : '';
+    });
+    if (onChange) onChange(select);
+  }
+
+  list.innerHTML = Array.from(select.options).map(opt =>
+    `<button type="button" class="custom-select-item" data-value="${escHtml(opt.value)}">${escHtml(opt.text)}<span class="custom-select-check"></span></button>`
+  ).join('');
+
+  list.querySelectorAll('.custom-select-item').forEach(item => {
+    item.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      sync(item.dataset.value);
+      closeCustomSelect(id);
+    });
+  });
+
+  btn.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const open = list.style.display === 'block';
+    closeAllCustomSelects();
+    list.style.display = open ? 'none' : 'block';
+  });
+
+  sync(select.value);
 }
 
 function applyQtyUnit(raw) {
@@ -1484,6 +1540,9 @@ initVoice();
     _qtySel.addEventListener('change', () => handleQtyUnitChange(_qtySel));
     handleQtyUnitChange(_qtySel);
   }
+  buildCustomSelect('qty-unit', handleQtyUnitChange);
+  buildCustomSelect('plate-fraction');
+  document.addEventListener('pointerdown', closeAllCustomSelects);
   const _mbtn = document.querySelector('#manual-section .btn-go');
   if (_mbtn && !_mbtn.dataset.bound) {
     _mbtn.dataset.bound = '1';

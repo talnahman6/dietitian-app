@@ -131,6 +131,14 @@ body::before{content:'';position:fixed;inset:0;background:
 .qty-sel:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
 #plate-fraction{background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:14px 12px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:.88rem;outline:none;cursor:pointer;direction:rtl;transition:border-color .2s,box-shadow .2s;flex-shrink:0}
 #plate-fraction:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+#qty-sel,#plate-fraction{display:none!important}
+.custom-select-wrap{position:relative;min-width:0;flex-shrink:0}
+.custom-select-btn{width:100%;background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:14px 12px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:.88rem;outline:none;cursor:pointer;direction:rtl;text-align:center;transition:border-color .2s,box-shadow .2s;touch-action:manipulation}
+.custom-select-btn:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.custom-select-list{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;width:100%;box-sizing:border-box;background:var(--card2);border:1px solid var(--bdr2);border-radius:10px;box-shadow:var(--sh);z-index:999999;overflow:hidden}
+.custom-select-item{padding:10px 16px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background .15s;color:var(--txt);background:transparent;border:0;width:100%;font-family:'Heebo',sans-serif;text-align:right;direction:rtl;touch-action:manipulation}
+.custom-select-item:hover,.custom-select-item.active{background:var(--inp)}
+.custom-select-check{font-size:.7rem;color:var(--txt3);background:var(--inp);border-radius:6px;padding:2px 7px;white-space:nowrap;flex-shrink:0}
 .btn-mic{background:rgba(99,102,241,.13);border:1px solid rgba(99,102,241,.28);color:var(--indigo);border-radius:12px;padding:0 16px;cursor:pointer;font-size:1.35rem;transition:all .2s;display:flex;align-items:center;white-space:nowrap;font-family:'Heebo',sans-serif}
 .btn-mic:hover,.btn-mic.rec{background:rgba(99,102,241,.26);box-shadow:0 0 14px rgba(99,102,241,.3)}
 .btn-mic.rec{background:rgba(239,68,68,.18);border-color:rgba(239,68,68,.38);color:var(--red);animation:recPulse 1.2s infinite}
@@ -334,10 +342,18 @@ body::before{content:'';position:fixed;inset:0;background:
 }
 
 #manual-section.is-plate-unit #plate-fraction {
+  display: none !important;
+}
+
+#manual-section.is-plate-unit #plate-fraction-ui {
   display: block !important;
 }
 
 #manual-section:not(.is-plate-unit) #plate-fraction {
+  display: none !important;
+}
+
+#manual-section:not(.is-plate-unit) #plate-fraction-ui {
   display: none !important;
 }
 
@@ -382,11 +398,19 @@ body::before{content:'';position:fixed;inset:0;background:
   }
 
   #manual-section #qty-sel {
+    display: none !important;
+  }
+
+  #manual-section #qty-unit-ui {
     grid-area: unit !important;
     width: 100% !important;
   }
 
   #manual-section #plate-fraction {
+    display: none !important;
+  }
+
+  #manual-section #plate-fraction-ui {
     grid-area: fraction !important;
     width: 100% !important;
   }
