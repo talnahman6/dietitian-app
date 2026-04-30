@@ -190,6 +190,9 @@ function acSearch(val) {
   ).join('');
   const r = _acInput.getBoundingClientRect();
   _acList.style.display = 'block';
+  _acList.style.background = 'red';
+  _acList.style.height = '200px';
+  _acList.style.opacity = '1';
   _acList.style.position = 'fixed';
   _acList.style.top = (r.bottom + 6) + 'px';
   _acList.style.left = r.left + 'px';
@@ -215,7 +218,12 @@ function acSearch(val) {
 }
 
 _acInput.addEventListener('input', () => { if (_acSuppress) return; if (_acIgnoreNextInput) { _acIgnoreNextInput = false; return; } if (selectingAutocomplete) return; _acSelected = false; _acSelectedFood = null; selectedManualFood = null; acSearch(_acInput.value); });
-_acInput.addEventListener('blur', () => setTimeout(() => { _acList.style.display = 'none'; }, 200));
+_acInput.addEventListener('blur', () => {
+  setTimeout(() => {
+    if (selectingAutocomplete) return;
+    _acList.style.display = 'none';
+  }, 800);
+});
 _acInput.addEventListener('focus', () => { if (_acSuppress) return; if (_acSelected || selectedManualFood) return; if (_acInput.value.trim().length >= 2) acSearch(_acInput.value); });
 
 /* ─────────────────────────────────────────────────────────
