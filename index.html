@@ -64,12 +64,21 @@
         <div id="ac-list" class="ac-list" style="display:none"></div>
       </div>
       <input type="number" class="qty-num" id="qty-num" min="1" max="9999" placeholder="כמות">
-      <select id="plate-fraction" style="display:none">
+      <select id="plate-fraction" style="display:none" aria-hidden="true" tabindex="-1">
         <option value="0.25">רבע</option>
         <option value="0.33">שליש</option>
         <option value="0.5">חצי</option>
         <option value="1">שלם</option>
       </select>
+      <div class="plate-fraction-wrap" id="plate-fraction-ui" style="display:none">
+        <button type="button" class="plate-fraction-btn" id="plate-fraction-btn" aria-expanded="false">רבע</button>
+        <div class="plate-fraction-list" id="plate-fraction-list" style="display:none">
+          <button type="button" class="plate-fraction-item" data-value="0.25">רבע</button>
+          <button type="button" class="plate-fraction-item" data-value="0.33">שליש</button>
+          <button type="button" class="plate-fraction-item" data-value="0.5">חצי</button>
+          <button type="button" class="plate-fraction-item" data-value="1">שלם</button>
+        </div>
+      </div>
       <select class="qty-sel" id="qty-sel" onchange="handleQtyUnitChange(this)">
         <option value="גרם">גרם</option>
         <option value='מ"ל'>מ"ל</option>
@@ -452,7 +461,7 @@
 <script src="js/avatar.js"></script>
 <script src="data/foods.js"></script>
 <script src="js/parser.js"></script>
-<script src="js/app.js?v=10003"></script>
+<script src="js/app.js?v=10004"></script>
 <script src="js/usda.js"></script>
 <script>
 (function() {

@@ -230,15 +230,38 @@ _acInput.addEventListener('focus', () => { if (_acSuppress) return; if (_acSelec
 function handleQtyUnitChange(sel) {
   const qtyNum = document.getElementById('qty-num');
   const plateFraction = document.getElementById('plate-fraction');
+  const plateUi = document.getElementById('plate-fraction-ui');
   if (!qtyNum || !plateFraction || !sel) return;
   const isPlate = isPlateUnit(sel.value);
   document.getElementById('manual-section')?.classList.toggle('is-plate-unit', isPlate);
   qtyNum.style.setProperty('display', isPlate ? 'none' : 'block', 'important');
-  plateFraction.style.setProperty('display', isPlate ? 'block' : 'none', 'important');
+  plateFraction.style.setProperty('display', 'none', 'important');
+  if (plateUi) plateUi.style.setProperty('display', isPlate ? 'block' : 'none', 'important');
+  if (!isPlate) closePlateFractionMenu();
 }
 
 function isPlateUnit(unit) {
   return unit === 'plate' || unit === 'צלחת';
+}
+
+function closePlateFractionMenu() {
+  const list = document.getElementById('plate-fraction-list');
+  const btn = document.getElementById('plate-fraction-btn');
+  if (list) list.style.display = 'none';
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+}
+
+function selectPlateFraction(value) {
+  const select = document.getElementById('plate-fraction');
+  const btn = document.getElementById('plate-fraction-btn');
+  if (!select || !btn) return;
+  select.value = value;
+  const label = select.selectedOptions[0]?.text || 'רבע';
+  btn.textContent = label;
+  document.querySelectorAll('.plate-fraction-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.value === value);
+  });
+  closePlateFractionMenu();
 }
 
 function applyQtyUnit(raw) {
@@ -1483,6 +1506,25 @@ initVoice();
     _qtySel.dataset.plateBound = '1';
     _qtySel.addEventListener('change', () => handleQtyUnitChange(_qtySel));
     handleQtyUnitChange(_qtySel);
+  }
+  const _plateBtn = document.getElementById('plate-fraction-btn');
+  const _plateList = document.getElementById('plate-fraction-list');
+  if (_plateBtn && _plateList && !_plateBtn.dataset.bound) {
+    _plateBtn.dataset.bound = '1';
+    selectPlateFraction(document.getElementById('plate-fraction')?.value || '0.25');
+    _plateBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      const open = _plateList.style.display === 'block';
+      _plateList.style.display = open ? 'none' : 'block';
+      _plateBtn.setAttribute('aria-expanded', String(!open));
+    });
+    _plateList.querySelectorAll('.plate-fraction-item').forEach(item => {
+      item.addEventListener('click', e => {
+        e.stopPropagation();
+        selectPlateFraction(item.dataset.value);
+      });
+    });
+    document.addEventListener('click', closePlateFractionMenu);
   }
   const _mbtn = document.querySelector('#manual-section .btn-go');
   if (_mbtn && !_mbtn.dataset.bound) {
