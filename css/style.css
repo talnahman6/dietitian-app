@@ -367,15 +367,6 @@ body::before{content:'';position:fixed;inset:0;background:
 
   #manual-section .btn-go { grid-area: add !important; }
 
-  #manual-section .ac-list {
-    position: absolute !important;
-    top: 100% !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 999999 !important;
-    max-height: 240px !important;
-    overflow-y: auto !important;
-  }
 }
 
 @media (max-width: 600px) {
@@ -406,18 +397,6 @@ body::before{content:'';position:fixed;inset:0;background:
     box-sizing: border-box !important;
   }
 
-  #manual-section .ac-list {
-    position: static !important;
-    width: 100% !important;
-    margin-top: 6px !important;
-    background: var(--card2) !important;
-    border: 1px solid var(--bdr2) !important;
-    border-radius: 10px !important;
-    box-shadow: var(--sh) !important;
-    max-height: 240px !important;
-    overflow-y: auto !important;
-    z-index: 999999 !important;
-  }
 
   #manual-section #qty-num {
     grid-area: qty !important;
