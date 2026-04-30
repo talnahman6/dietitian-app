@@ -79,7 +79,7 @@
           <button type="button" class="plate-fraction-item" data-value="1">שלם</button>
         </div>
       </div>
-      <select class="qty-sel" id="qty-sel" onchange="handleQtyUnitChange(this)">
+      <select class="qty-sel" id="qty-sel" onchange="handleQtyUnitChange(this)" aria-hidden="true" tabindex="-1">
         <option value="גרם">גרם</option>
         <option value='מ"ל'>מ"ל</option>
         <option value="כפית">כפית</option>
@@ -88,6 +88,18 @@
         <option value="יחידה">יחידה</option>
         <option value="plate">צלחת</option>
       </select>
+      <div class="qty-unit-wrap" id="qty-unit-ui">
+        <button type="button" class="qty-unit-btn" id="qty-unit-btn" aria-expanded="false">גרם</button>
+        <div class="qty-unit-list" id="qty-unit-list" style="display:none">
+          <button type="button" class="qty-unit-item" data-value="גרם">גרם</button>
+          <button type="button" class="qty-unit-item" data-value='מ"ל'>מ"ל</button>
+          <button type="button" class="qty-unit-item" data-value="כפית">כפית</button>
+          <button type="button" class="qty-unit-item" data-value="כף">כף</button>
+          <button type="button" class="qty-unit-item" data-value="כוס">כוס</button>
+          <button type="button" class="qty-unit-item" data-value="יחידה">יחידה</button>
+          <button type="button" class="qty-unit-item" data-value="plate">צלחת</button>
+        </div>
+      </div>
       <button class="btn-mic" id="mic-btn" onclick="toggleVoice()" title="הקלטה בעברית">🎤</button>
       <button class="btn-mic" id="cam-btn" onclick="openCamera()" title="צלם מנה">📷</button>
       <button class="btn-go" onclick="addFood()">חשבי ✓</button>
@@ -461,7 +473,7 @@
 <script src="js/avatar.js"></script>
 <script src="data/foods.js"></script>
 <script src="js/parser.js"></script>
-<script src="js/app.js?v=10004"></script>
+<script src="js/app.js?v=10005"></script>
 <script src="js/usda.js"></script>
 <script>
 (function() {

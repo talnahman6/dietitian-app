@@ -251,6 +251,26 @@ function closePlateFractionMenu() {
   if (btn) btn.setAttribute('aria-expanded', 'false');
 }
 
+function closeQtyUnitMenu() {
+  const list = document.getElementById('qty-unit-list');
+  const btn = document.getElementById('qty-unit-btn');
+  if (list) list.style.display = 'none';
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+}
+
+function selectQtyUnit(value) {
+  const select = document.getElementById('qty-sel');
+  const btn = document.getElementById('qty-unit-btn');
+  if (!select || !btn) return;
+  select.value = value;
+  btn.textContent = select.selectedOptions[0]?.text || 'גרם';
+  document.querySelectorAll('.qty-unit-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.value === value);
+  });
+  handleQtyUnitChange(select);
+  closeQtyUnitMenu();
+}
+
 function selectPlateFraction(value) {
   const select = document.getElementById('plate-fraction');
   const btn = document.getElementById('plate-fraction-btn');
@@ -1507,6 +1527,26 @@ initVoice();
     _qtySel.addEventListener('change', () => handleQtyUnitChange(_qtySel));
     handleQtyUnitChange(_qtySel);
   }
+  const _qtyUnitBtn = document.getElementById('qty-unit-btn');
+  const _qtyUnitList = document.getElementById('qty-unit-list');
+  if (_qtyUnitBtn && _qtyUnitList && !_qtyUnitBtn.dataset.bound) {
+    _qtyUnitBtn.dataset.bound = '1';
+    selectQtyUnit(document.getElementById('qty-sel')?.value || 'גרם');
+    _qtyUnitBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      closePlateFractionMenu();
+      const open = _qtyUnitList.style.display === 'block';
+      _qtyUnitList.style.display = open ? 'none' : 'block';
+      _qtyUnitBtn.setAttribute('aria-expanded', String(!open));
+    });
+    _qtyUnitList.querySelectorAll('.qty-unit-item').forEach(item => {
+      item.addEventListener('click', e => {
+        e.stopPropagation();
+        selectQtyUnit(item.dataset.value);
+      });
+    });
+    document.addEventListener('click', closeQtyUnitMenu);
+  }
   const _plateBtn = document.getElementById('plate-fraction-btn');
   const _plateList = document.getElementById('plate-fraction-list');
   if (_plateBtn && _plateList && !_plateBtn.dataset.bound) {
@@ -1514,6 +1554,7 @@ initVoice();
     selectPlateFraction(document.getElementById('plate-fraction')?.value || '0.25');
     _plateBtn.addEventListener('click', e => {
       e.stopPropagation();
+      closeQtyUnitMenu();
       const open = _plateList.style.display === 'block';
       _plateList.style.display = open ? 'none' : 'block';
       _plateBtn.setAttribute('aria-expanded', String(!open));
