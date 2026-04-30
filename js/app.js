@@ -149,7 +149,6 @@ function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').
    ─────────────────────────────────────────────────────── */
 const _acInput = document.getElementById('food-input');
 const _acList = document.getElementById('ac-list');
-document.body.appendChild(_acList);
 let _acSelected = false;
 let _acSelectedFood = null;
 let selectedManualFood = null;
@@ -181,18 +180,19 @@ function acSearch(val) {
   _acList.innerHTML = matches.map(f =>
     `<div class="ac-item" data-name="${escHtml(f.n[0])}">${escHtml(f.n[0])}<span class="ac-cat">${escHtml(f.cat)}</span></div>`
   ).join('');
-  const r = _acInput.getBoundingClientRect();
   _acList.style.setProperty('display', 'block', 'important');
-  _acList.style.setProperty('position', 'fixed', 'important');
-  _acList.style.setProperty('top', (r.bottom + 6) + 'px', 'important');
-  _acList.style.setProperty('left', r.left + 'px', 'important');
-  _acList.style.setProperty('width', r.width + 'px', 'important');
+  _acList.style.setProperty('position', 'absolute', 'important');
+  _acList.style.setProperty('top', 'calc(100% + 6px)', 'important');
+  _acList.style.setProperty('left', '0', 'important');
+  _acList.style.setProperty('right', '0', 'important');
+  _acList.style.setProperty('width', '100%', 'important');
   _acList.style.setProperty('background', 'var(--card2)', 'important');
   _acList.style.setProperty('border', '1px solid var(--bdr2)', 'important');
   _acList.style.setProperty('border-radius', '10px', 'important');
   _acList.style.setProperty('box-shadow', 'var(--sh)', 'important');
   _acList.style.setProperty('max-height', '240px', 'important');
   _acList.style.setProperty('overflow-y', 'auto', 'important');
+  _acList.style.setProperty('-webkit-overflow-scrolling', 'touch', 'important');
   _acList.style.setProperty('z-index', '999999', 'important');
   function selectAutocompleteItem(item) {
     if (selectedManualFood && _acInput.value === item.dataset.name) return;

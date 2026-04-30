@@ -1,0 +1,21 @@
+# Dietitian App Instructions
+
+- Always answer the user in Hebrew.
+- Keep responses short and practical.
+- Avoid long explanations unless asked.
+- Do not show chain-of-thought or internal reasoning.
+- For code changes, show only the relevant result and concise testing notes.
+- Make minimal changes only.
+- Do not refactor unless explicitly asked.
+- Do not rewrite full files.
+- Do not overwrite existing user changes.
+- Prefer reading only relevant files.
+- Search the project only when needed to understand or fix a bug.
+- Before editing, inspect the relevant code.
+- After changes, summarize briefly:
+  - What changed
+  - How to test
+- Git:
+  - Never use git add .
+  - Stage only changed files.
+  - Use short English commit messages.

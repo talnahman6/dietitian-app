@@ -57,9 +57,12 @@
   </div>
   <div id="manual-section">
     <div class="input-row">
-      <input type="text" class="food-input" id="food-input"
-        placeholder="הוסף מאכל אחד בכל פעם"
-        onkeydown="if(event.key==='Enter')addFood()">
+      <div class="ac-wrap">
+        <input type="text" class="food-input" id="food-input"
+          placeholder="הוסף מאכל אחד בכל פעם"
+          onkeydown="if(event.key==='Enter')addFood()">
+        <div id="ac-list" class="ac-list" style="display:none"></div>
+      </div>
       <input type="number" class="qty-num" id="qty-num" value="100" min="1" max="9999" placeholder="כמות">
       <select id="plate-fraction" style="display:none">
         <option value="0.25">רבע</option>

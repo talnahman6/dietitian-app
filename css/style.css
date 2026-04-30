@@ -211,9 +211,9 @@ body::before{content:'';position:fixed;inset:0;background:
 }
 
 /* ─── AUTO-COMPLETE ─── */
-.ac-wrap{position:relative;flex:1;min-width:0}
-.ac-wrap .food-input,.ac-wrap #food-input{flex:none;width:100%;box-sizing:border-box}
-.ac-list{display:none;position:absolute;background:var(--card2);border:1px solid var(--bdr2);border-radius:10px;box-shadow:var(--sh)}
+.ac-wrap{position:relative;flex:1 1 auto;min-width:0}
+.ac-wrap .food-input,.ac-wrap #food-input{display:block;flex:none;width:100%;max-width:none;box-sizing:border-box}
+.ac-list{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;width:100%;box-sizing:border-box;background:var(--card2);border:1px solid var(--bdr2);border-radius:10px;box-shadow:var(--sh)}
 .ac-item{padding:10px 16px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background .15s;color:var(--txt)}
 .ac-item:hover{background:var(--inp)}
 .ac-cat{font-size:.7rem;color:var(--txt3);background:var(--inp);border-radius:6px;padding:2px 7px;white-space:nowrap;flex-shrink:0}
@@ -316,6 +316,7 @@ body::before{content:'';position:fixed;inset:0;background:
 
 
 #manual-section {
+  width: 100%;
   overflow: visible !important;
 }
 
@@ -324,6 +325,7 @@ body::before{content:'';position:fixed;inset:0;background:
 }
 
 #manual-section .input-row {
+  width: 100%;
   overflow: visible !important;
 }
 
@@ -331,42 +333,6 @@ body::before{content:'';position:fixed;inset:0;background:
 #manual-section .ac-item {
   background: transparent !important;
   color: var(--txt) !important;
-}
-
-@media (max-width: 600px) {
-  #manual-section .input-row {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    grid-template-areas:
-      "search search"
-      "qty unit"
-      "cam mic"
-      "add add" !important;
-    gap: 10px !important;
-    overflow: visible !important;
-  }
-
-  #manual-section .ac-wrap {
-    grid-area: search !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    position: relative !important;
-    overflow: visible !important;
-  }
-
-  #manual-section #food-input {
-    width: 100% !important;
-  }
-
-  #manual-section #qty-num { grid-area: qty !important; }
-  #manual-section #qty-sel,
-  #manual-section #plate-fraction { grid-area: unit !important; }
-
-  #manual-section #cam-btn { grid-area: cam !important; }
-  #manual-section #mic-btn { grid-area: mic !important; }
-
-  #manual-section .btn-go { grid-area: add !important; }
-
 }
 
 @media (max-width: 600px) {
