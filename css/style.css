@@ -205,16 +205,6 @@ body::before{content:'';position:fixed;inset:0;background:
   .hdr-text h1{font-size:1.5rem}
   .sc-val{font-size:1.6rem}
 }
-@media(max-width:600px){
-  .input-row{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"search search" "qty unit" "mic cam" "add add";gap:10px}
-  #food-input{width:100%;box-sizing:border-box}
-  #qty-num{grid-area:qty;width:100%}
-  #plate-fraction{grid-area:qty;width:100%}
-  #qty-sel{grid-area:unit;width:100%}
-  #mic-btn{grid-area:mic;width:100%}
-  #cam-btn{grid-area:cam;width:100%}
-  .btn-go{grid-area:add;width:100%}
-}
 @media(max-width:420px){
   .fi-nutrients{display:none}
   .btn-mic{flex:1 1 40%;justify-content:center;align-items:center;white-space:nowrap}
@@ -223,7 +213,7 @@ body::before{content:'';position:fixed;inset:0;background:
 /* ─── AUTO-COMPLETE ─── */
 .ac-wrap{position:relative;flex:1;min-width:0}
 .ac-wrap .food-input,.ac-wrap #food-input{flex:none;width:100%;box-sizing:border-box}
-.ac-list{position:absolute;top:100%;left:0;right:0;width:100%;z-index:9999;background:var(--card2);border:1px solid var(--bdr2);border-radius:10px;overflow:hidden;box-shadow:var(--sh);box-sizing:border-box}
+.ac-list{display:none;position:absolute;background:var(--card2);border:1px solid var(--bdr2);border-radius:10px;box-shadow:var(--sh)}
 .ac-item{padding:10px 16px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background .15s;color:var(--txt)}
 .ac-item:hover{background:var(--inp)}
 .ac-cat{font-size:.7rem;color:var(--txt3);background:var(--inp);border-radius:6px;padding:2px 7px;white-space:nowrap;flex-shrink:0}
@@ -324,130 +314,6 @@ body::before{content:'';position:fixed;inset:0;background:
 .menu-meal-item:last-child{border-bottom:none;padding-bottom:0}
 .menu-meal-total{font-size:.75rem;color:var(--txt3);margin-top:8px;padding-top:6px;border-top:1px solid var(--bdr)}
 
-@media (max-width: 600px) {
-  #manual-section .input-row {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    grid-template-areas:
-      "search search"
-      "qty unit"
-      "mic cam"
-      "add add" !important;
-    gap: 10px !important;
-  }
-
-  #manual-section #food-input {
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  #manual-section #qty-num,
-  #manual-section #plate-fraction {
-    grid-area: qty !important;
-    width: 100% !important;
-  }
-
-  #manual-section #qty-sel {
-    grid-area: unit !important;
-    width: 100% !important;
-  }
-
-  #manual-section #mic-btn {
-    grid-area: mic !important;
-    width: 100% !important;
-  }
-
-  #manual-section #cam-btn {
-    grid-area: cam !important;
-    width: 100% !important;
-  }
-
-  #manual-section .btn-go {
-    grid-area: add !important;
-    width: 100% !important;
-  }
-}
-
-@media (max-width: 600px) {
-  #manual-section .input-row {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    grid-template-areas:
-      "search search"
-      "qty unit"
-      "cam mic"
-      "add add" !important;
-    gap: 10px !important;
-  }
-
-  #manual-section #qty-num {
-    grid-area: qty !important;
-    width: 100% !important;
-  }
-
-  #manual-section #qty-sel,
-  #manual-section #plate-fraction {
-    grid-area: unit !important;
-    width: 100% !important;
-  }
-
-  #manual-section #cam-btn {
-    grid-area: cam !important;
-    width: 100% !important;
-  }
-
-  #manual-section #mic-btn {
-    grid-area: mic !important;
-    width: 100% !important;
-  }
-
-  #manual-section .btn-go {
-    grid-area: add !important;
-    width: 100% !important;
-  }
-}
-
-@media (max-width: 600px) {
-  #manual-section .input-row {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
-  }
-
-  #manual-section #qty-num {
-    grid-column: 1 / 2 !important;
-    width: 100% !important;
-  }
-
-  #manual-section #qty-sel,
-  #manual-section #plate-fraction {
-    grid-column: 2 / 3 !important;
-    width: 100% !important;
-  }
-
-  #manual-section #cam-btn {
-    grid-column: 1 / 2 !important;
-    width: 100% !important;
-  }
-
-  #manual-section #mic-btn {
-    grid-column: 2 / 3 !important;
-    width: 100% !important;
-  }
-
-  #manual-section .btn-go {
-    grid-column: 1 / -1 !important;
-    width: 100% !important;
-  }
-}
-
-@media (max-width: 600px) {
-  #manual-section .input-row {
-    display: grid !important;
-    flex-direction: unset !important;
-    align-items: stretch !important;
-  }
-}
 
 #manual-section {
   overflow: visible !important;
@@ -461,31 +327,6 @@ body::before{content:'';position:fixed;inset:0;background:
   overflow: visible !important;
 }
 
-@media (max-width: 600px) {
-  #manual-section .ac-wrap {
-    grid-column: 1 / -1 !important;
-    width: 100% !important;
-    min-width: 0 !important;
-  }
-
-  #manual-section #food-input {
-    width: 100% !important;
-    max-width: none !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
-  }
-}
-
-#manual-section .ac-list {
-  background: var(--card2) !important;
-  border: 1px solid var(--bdr2) !important;
-  border-radius: 10px !important;
-  box-shadow: var(--sh) !important;
-  height: auto !important;
-  max-height: 240px !important;
-  overflow-y: auto !important;
-  z-index: 99999 !important;
-}
 
 #manual-section .ac-item {
   background: transparent !important;
@@ -493,8 +334,65 @@ body::before{content:'';position:fixed;inset:0;background:
 }
 
 @media (max-width: 600px) {
+  #manual-section .input-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-areas:
+      "search search"
+      "qty unit"
+      "cam mic"
+      "add add" !important;
+    gap: 10px !important;
+    overflow: visible !important;
+  }
+
   #manual-section .ac-wrap {
-    grid-column: 1 / -1 !important;
+    grid-area: search !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    position: relative !important;
+    overflow: visible !important;
+  }
+
+  #manual-section #food-input {
+    width: 100% !important;
+  }
+
+  #manual-section #qty-num { grid-area: qty !important; }
+  #manual-section #qty-sel,
+  #manual-section #plate-fraction { grid-area: unit !important; }
+
+  #manual-section #cam-btn { grid-area: cam !important; }
+  #manual-section #mic-btn { grid-area: mic !important; }
+
+  #manual-section .btn-go { grid-area: add !important; }
+
+  #manual-section .ac-list {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 999999 !important;
+    max-height: 240px !important;
+    overflow-y: auto !important;
+  }
+}
+
+@media (max-width: 600px) {
+  #manual-section .input-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    grid-template-areas:
+      "search search"
+      "qty unit"
+      "cam mic"
+      "add add" !important;
+    gap: 10px !important;
+    overflow: visible !important;
+  }
+
+  #manual-section .ac-wrap {
+    grid-area: search !important;
     width: 100% !important;
     min-width: 0 !important;
     position: relative !important;
@@ -509,13 +407,41 @@ body::before{content:'';position:fixed;inset:0;background:
   }
 
   #manual-section .ac-list {
+    position: static !important;
+    width: 100% !important;
+    margin-top: 6px !important;
     background: var(--card2) !important;
     border: 1px solid var(--bdr2) !important;
     border-radius: 10px !important;
     box-shadow: var(--sh) !important;
-    height: auto !important;
     max-height: 240px !important;
     overflow-y: auto !important;
-    z-index: 99999 !important;
+    z-index: 999999 !important;
+  }
+
+  #manual-section #qty-num {
+    grid-area: qty !important;
+    width: 100% !important;
+  }
+
+  #manual-section #qty-sel,
+  #manual-section #plate-fraction {
+    grid-area: unit !important;
+    width: 100% !important;
+  }
+
+  #manual-section #cam-btn {
+    grid-area: cam !important;
+    width: 100% !important;
+  }
+
+  #manual-section #mic-btn {
+    grid-area: mic !important;
+    width: 100% !important;
+  }
+
+  #manual-section .btn-go {
+    grid-area: add !important;
+    width: 100% !important;
   }
 }
