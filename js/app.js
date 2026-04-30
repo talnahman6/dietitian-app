@@ -326,6 +326,88 @@ function applyQtyUnit(raw) {
   return raw;
 }
 
+function normalizeAutoFoodText(text) {
+  return String(text || '')
+    .toLowerCase()
+    .replace(/["'״׳]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function stripAutoQty(text) {
+  return normalizeAutoFoodText(text)
+    .replace(/^(אכלתי|אכלת|אכל|אכלה|שתיתי|שתית)\s+/, '')
+    .replace(/\d+(?:[.,]\d+)?\s*(גרם|ג|מ"ל|מיליליטר|מל|כף|כפות|כפית|כפיות|כוס|כוסות|יחידה|יחידות)/g, ' ')
+    .replace(/(^|\s)(רבע|שליש|חצי|שלם|צלחת|גרם|ג|מ"ל|מיליליטר|מל|כף|כפות|כפית|כפיות|כוס|כוסות|יחידה|יחידות)(?=\s|$)/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function findFood(text) {
+  if (!text || typeof DB === 'undefined' || !Array.isArray(DB)) return null;
+  const q = stripAutoQty(text);
+  if (!q) return null;
+  let best = null;
+  let bestLen = 0;
+  for (const food of DB) {
+    if (!Array.isArray(food.n)) continue;
+    for (const name of food.n) {
+      const n = normalizeAutoFoodText(name);
+      if (!n) continue;
+      const match = q === n || q.includes(n) || n.includes(q);
+      if (match && n.length > bestLen) {
+        best = food;
+        bestLen = n.length;
+      }
+    }
+  }
+  return best;
+}
+
+function getAutoFraction(text) {
+  const t = normalizeAutoFoodText(text);
+  if (/(^|\s)רבע(?=\s|$)/.test(t)) return 0.25;
+  if (/(^|\s)שליש(?=\s|$)/.test(t)) return 1 / 3;
+  if (/(^|\s)חצי(?=\s|$)/.test(t)) return 0.5;
+  return 1;
+}
+
+function parseFood(text) {
+  const food = findFood(text);
+  if (!food || food.cal === undefined || food.c === undefined || food.p === undefined || food.f === undefined) return null;
+  const t = normalizeAutoFoodText(text);
+  let grams = 0;
+  let quantityDisplay = '';
+
+  const gramMatch = t.match(/(\d+(?:[.,]\d+)?)\s*(גרם|ג)(?=\s|$)/);
+  if (gramMatch) {
+    grams = parseFloat(gramMatch[1].replace(',', '.'));
+    quantityDisplay = `${grams} גרם`;
+  } else if (/(^|\s)צלחת(?=\s|$)/.test(t)) {
+    const fraction = getAutoFraction(t);
+    grams = getFullPlateGrams(food) * fraction;
+    const fractionText = fraction === 0.25 ? 'רבע' : fraction === 1 / 3 ? 'שליש' : fraction === 0.5 ? 'חצי' : 'שלם';
+    quantityDisplay = `${fractionText} צלחת`;
+  } else {
+    const numMatch = t.match(/(\d+(?:[.,]\d+)?)/);
+    grams = numMatch ? parseFloat(numMatch[1].replace(',', '.')) : (food.dw || 100);
+    quantityDisplay = `${grams} גרם`;
+  }
+
+  if (!grams || grams <= 0) return null;
+  const multiplier = grams / 100;
+  return {
+    food,
+    grams,
+    cal: Math.round(food.cal * multiplier),
+    carbs: Math.round(food.c * multiplier * 10) / 10,
+    protein: Math.round(food.p * multiplier * 10) / 10,
+    fat: Math.round(food.f * multiplier * 10) / 10,
+    raw: text,
+    quantityDisplay,
+  };
+}
+
 async function addMeal(raw) {
   const aiMsg = document.getElementById('ai-msg');
   const aiText = document.getElementById('ai-text');
@@ -349,17 +431,18 @@ async function addMeal(raw) {
   aiText.textContent = '⏳ מוסיף את כל המנות...';
 
   let added = 0;
+  let addedCal = 0;
   const failed = [];
   for (const part of parts) {
     const result = parseFood(part);
-    if (result) { log.push(result); added++; }
+    if (result) { log.push(result); added++; addedCal += result.cal; }
     else failed.push(part);
   }
   save();
   render();
 
-  let msg = added > 0 ? `נרשמו ${added} מנות! ` : '';
-  if (failed.length > 0) msg += `לא זיהיתי: ${failed.join(', ')}`;
+  let msg = added > 0 ? `נוספו ${added} מאכלים | סה״כ ${Math.round(addedCal)} קלוריות` : '';
+  if (failed.length > 0) msg += `${msg ? ' | ' : ''}לא זיהיתי: ${failed.join(', ')}`;
   aiText.textContent = msg;
   warnBox.innerHTML = '';
 
