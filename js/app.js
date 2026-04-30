@@ -148,21 +148,13 @@ function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').
    AUTO-COMPLETE
    ─────────────────────────────────────────────────────── */
 const _acInput = document.getElementById('food-input');
+const _acList = document.getElementById('ac-list');
 let _acSelected = false;
 let _acSelectedFood = null;
 let selectedManualFood = null;
 let selectingAutocomplete = false;
 let _acIgnoreNextInput = false;
 let _acSuppress = false;
-const _acList = document.createElement('div');
-_acList.id = 'ac-list';
-_acList.className = 'ac-list';
-_acList.style.display = 'none';
-const _acWrap = document.createElement('div');
-_acWrap.className = 'ac-wrap';
-_acInput.parentNode.replaceChild(_acWrap, _acInput);
-_acWrap.appendChild(_acInput);
-_acWrap.appendChild(_acList);
 
 function closeAutocomplete() {
   _acList.style.display = 'none';
@@ -188,16 +180,7 @@ function acSearch(val) {
   _acList.innerHTML = matches.map(f =>
     `<div class="ac-item" data-name="${escHtml(f.n[0])}">${escHtml(f.n[0])}<span class="ac-cat">${escHtml(f.cat)}</span></div>`
   ).join('');
-  const r = _acInput.getBoundingClientRect();
   _acList.style.display = 'block';
-  _acList.style.background = 'red';
-  _acList.style.height = '200px';
-  _acList.style.opacity = '1';
-  _acList.style.position = 'fixed';
-  _acList.style.top = (r.bottom + 6) + 'px';
-  _acList.style.left = r.left + 'px';
-  _acList.style.width = r.width + 'px';
-  _acList.style.zIndex = '999999';
   function selectAutocompleteItem(item) {
     if (selectedManualFood && _acInput.value === item.dataset.name) return;
     selectingAutocomplete = true;
