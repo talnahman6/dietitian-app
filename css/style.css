@@ -207,7 +207,6 @@ body::before{content:'';position:fixed;inset:0;background:
 }
 @media(max-width:600px){
   .input-row{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"search search" "qty unit" "mic cam" "add add";gap:10px}
-  .ac-wrap{grid-area:search;width:100%}
   #food-input{width:100%;box-sizing:border-box}
   #qty-num{grid-area:qty;width:100%}
   #plate-fraction{grid-area:qty;width:100%}
@@ -224,7 +223,7 @@ body::before{content:'';position:fixed;inset:0;background:
 /* ─── AUTO-COMPLETE ─── */
 .ac-wrap{position:relative;flex:1;min-width:0}
 .ac-wrap .food-input,.ac-wrap #food-input{flex:none;width:100%;box-sizing:border-box}
-.ac-list{position:fixed;z-index:9999;background:var(--card2);border:1px solid var(--bdr2);border-radius:10px;overflow:hidden;box-shadow:var(--sh)}
+.ac-list{position:fixed;z-index:999999;background:var(--card2);border:1px solid var(--bdr2);border-radius:10px;overflow:hidden;box-shadow:var(--sh)}
 .ac-item{padding:10px 16px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background .15s;color:var(--txt)}
 .ac-item:hover{background:var(--inp)}
 .ac-cat{font-size:.7rem;color:var(--txt3);background:var(--inp);border-radius:6px;padding:2px 7px;white-space:nowrap;flex-shrink:0}
@@ -337,12 +336,6 @@ body::before{content:'';position:fixed;inset:0;background:
     gap: 10px !important;
   }
 
-  #manual-section .ac-wrap {
-    grid-area: search !important;
-    width: 100% !important;
-    min-width: 0 !important;
-  }
-
   #manual-section #food-input {
     width: 100% !important;
     box-sizing: border-box !important;
@@ -387,14 +380,6 @@ body::before{content:'';position:fixed;inset:0;background:
     gap: 10px !important;
   }
 
-  #manual-section .ac-wrap,
-  #manual-section #food-input {
-    grid-area: search !important;
-    width: 100% !important;
-    max-width: none !important;
-    box-sizing: border-box !important;
-  }
-
   #manual-section #qty-num {
     grid-area: qty !important;
     width: 100% !important;
@@ -429,13 +414,6 @@ body::before{content:'';position:fixed;inset:0;background:
     gap: 10px !important;
   }
 
-  #manual-section .ac-wrap,
-  #manual-section #food-input {
-    grid-column: 1 / -1 !important;
-    width: 100% !important;
-    max-width: none !important;
-  }
-
   #manual-section #qty-num {
     grid-column: 1 / 2 !important;
     width: 100% !important;
@@ -462,3 +440,24 @@ body::before{content:'';position:fixed;inset:0;background:
     width: 100% !important;
   }
 }
+
+@media (max-width: 600px) {
+  #manual-section .input-row {
+    display: grid !important;
+    flex-direction: unset !important;
+    align-items: stretch !important;
+  }
+}
+
+#manual-section {
+  overflow: visible !important;
+}
+
+.input-area {
+  overflow: visible !important;
+}
+
+#manual-section .input-row {
+  overflow: visible !important;
+}
+

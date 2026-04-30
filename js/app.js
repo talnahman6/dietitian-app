@@ -158,7 +158,11 @@ const _acList = document.createElement('div');
 _acList.id = 'ac-list';
 _acList.className = 'ac-list';
 _acList.style.display = 'none';
-document.querySelector('.input-row').insertAdjacentElement('afterend', _acList);
+const _acWrap = document.createElement('div');
+_acWrap.className = 'ac-wrap';
+_acInput.parentNode.replaceChild(_acWrap, _acInput);
+_acWrap.appendChild(_acInput);
+_acWrap.appendChild(_acList);
 
 function closeAutocomplete() {
   _acList.style.display = 'none';
@@ -184,24 +188,29 @@ function acSearch(val) {
   _acList.innerHTML = matches.map(f =>
     `<div class="ac-item" data-name="${escHtml(f.n[0])}">${escHtml(f.n[0])}<span class="ac-cat">${escHtml(f.cat)}</span></div>`
   ).join('');
+  const r = _acInput.getBoundingClientRect();
   _acList.style.display = 'block';
+  _acList.style.position = 'fixed';
+  _acList.style.top = (r.bottom + 6) + 'px';
+  _acList.style.left = r.left + 'px';
+  _acList.style.width = r.width + 'px';
+  _acList.style.zIndex = '999999';
+  function selectAutocompleteItem(item) {
+    if (selectedManualFood && _acInput.value === item.dataset.name) return;
+    selectingAutocomplete = true;
+    _acInput.value = item.dataset.name;
+    _acSelected = true;
+    _acSelectedFood = DB.find(f => f.n && f.n.includes(item.dataset.name)) || null;
+    selectedManualFood = _acSelectedFood;
+    _acIgnoreNextInput = true;
+    closeAutocomplete();
+    _acSuppress = true;
+    setTimeout(() => { selectingAutocomplete = false; _acSuppress = false; }, 300);
+  }
+
   _acList.querySelectorAll('.ac-item').forEach(item => {
-    item.addEventListener('mousedown', e => {
-      e.preventDefault();
-      selectingAutocomplete = true;
-      _acInput.value = item.dataset.name;
-      _acSelected = true;
-      _acSelectedFood = DB.find(f => f.n && f.n.includes(item.dataset.name)) || null;
-      selectedManualFood = _acSelectedFood;
-      _acIgnoreNextInput = true;
-      closeAutocomplete();
-      _acSuppress = true;
-      setTimeout(() => { selectingAutocomplete = false; _acSuppress = false; }, 300);
-      requestAnimationFrame(() => {
-        _acList.style.display = 'none';
-        _acList.innerHTML = '';
-      });
-    });
+    item.addEventListener('mousedown', e => { e.preventDefault(); selectAutocompleteItem(item); });
+    item.addEventListener('touchstart', e => { e.preventDefault(); selectAutocompleteItem(item); });
   });
 }
 
@@ -429,7 +438,7 @@ async function addFood() {
   /* ── Manual search (autocomplete-selected item OR manual mode) ── */
   const _manualSec = document.getElementById('manual-section');
   const _isManual = _manualSec && _manualSec.style.display !== 'none';
-  if (_acSelected || _acSelectedFood || _isManual) {
+  if (selectedManualFood || _acSelectedFood || _isManual) {
     console.log('[manual-add] clicked add');
     console.log('[manual-add] input value:', raw);
     console.log('[manual-add] selectedManualFood:', selectedManualFood);
