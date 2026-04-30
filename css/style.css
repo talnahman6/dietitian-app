@@ -341,7 +341,7 @@ body::before{content:'';position:fixed;inset:0;background:
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
     grid-template-areas:
       "search search"
-      "qty unit"
+      "fraction unit"
       "cam mic"
       "add add" !important;
     gap: 10px !important;
@@ -365,13 +365,17 @@ body::before{content:'';position:fixed;inset:0;background:
 
 
   #manual-section #qty-num {
-    grid-area: qty !important;
+    grid-area: fraction !important;
     width: 100% !important;
   }
 
-  #manual-section #qty-sel,
-  #manual-section #plate-fraction {
+  #manual-section #qty-sel {
     grid-area: unit !important;
+    width: 100% !important;
+  }
+
+  #manual-section #plate-fraction {
+    grid-area: fraction !important;
     width: 100% !important;
   }
 
