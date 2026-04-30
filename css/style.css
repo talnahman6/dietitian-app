@@ -475,3 +475,47 @@ body::before{content:'';position:fixed;inset:0;background:
     box-sizing: border-box !important;
   }
 }
+
+#manual-section .ac-list {
+  background: var(--card2) !important;
+  border: 1px solid var(--bdr2) !important;
+  border-radius: 10px !important;
+  box-shadow: var(--sh) !important;
+  height: auto !important;
+  max-height: 240px !important;
+  overflow-y: auto !important;
+  z-index: 99999 !important;
+}
+
+#manual-section .ac-item {
+  background: transparent !important;
+  color: var(--txt) !important;
+}
+
+@media (max-width: 600px) {
+  #manual-section .ac-wrap {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    position: relative !important;
+    overflow: visible !important;
+  }
+
+  #manual-section #food-input {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  #manual-section .ac-list {
+    background: var(--card2) !important;
+    border: 1px solid var(--bdr2) !important;
+    border-radius: 10px !important;
+    box-shadow: var(--sh) !important;
+    height: auto !important;
+    max-height: 240px !important;
+    overflow-y: auto !important;
+    z-index: 99999 !important;
+  }
+}
