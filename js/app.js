@@ -326,95 +326,58 @@ function applyQtyUnit(raw) {
   return raw;
 }
 
-function normalizeAutoFoodText(text) {
-  return String(text || '')
-    .toLowerCase()
-    .replace(/["'״׳]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+function cleanAutoText(raw) {
+  return raw.replace(/^(אכלתי|אכלת|אכל|אכלה|שתיתי|שתית)\s+/, '').trim();
 }
 
-function stripAutoQty(text) {
-  return normalizeAutoFoodText(text)
-    .replace(/^(אכלתי|אכלת|אכל|אכלה|שתיתי|שתית)\s+/, '')
-    .replace(/\d+(?:[.,]\d+)?\s*(גרם|ג|מ"ל|מיליליטר|מל|כף|כפות|כפית|כפיות|כוס|כוסות|יחידה|יחידות)/g, ' ')
-    .replace(/(^|\s)(רבע|שליש|חצי|שלם|צלחת|גרם|ג|מ"ל|מיליליטר|מל|כף|כפות|כפית|כפיות|כוס|כוסות|יחידה|יחידות)(?=\s|$)/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function findFood(text) {
-  if (!text || typeof DB === 'undefined' || !Array.isArray(DB)) return null;
-  const q = stripAutoQty(text);
-  if (!q) return null;
-  let best = null;
-  let bestLen = 0;
-  for (const food of DB) {
-    if (!Array.isArray(food.n)) continue;
-    for (const name of food.n) {
-      const n = normalizeAutoFoodText(name);
-      if (!n) continue;
-      const match = q === n || q.includes(n) || n.includes(q);
-      if (match && n.length > bestLen) {
-        best = food;
-        bestLen = n.length;
-      }
-    }
+function parseAutoFood(part) {
+  const t = part.trim().toLowerCase();
+  if (!/(^|\s)צלחת(?=\s|$)/.test(t)) {
+    let result = parseFood(part);
+    if (result) return result;
   }
-  return best;
-}
-
-function getAutoFraction(text) {
-  const t = normalizeAutoFoodText(text);
-  if (/(^|\s)רבע(?=\s|$)/.test(t)) return 0.25;
-  if (/(^|\s)שליש(?=\s|$)/.test(t)) return 1 / 3;
-  if (/(^|\s)חצי(?=\s|$)/.test(t)) return 0.5;
-  return 1;
-}
-
-function parseFood(text) {
-  const food = findFood(text);
-  if (!food || food.cal === undefined || food.c === undefined || food.p === undefined || food.f === undefined) return null;
-  const t = normalizeAutoFoodText(text);
+  const cleaned = cleanAutoText(part)
+    .replace(/(^|\s)(רבע|שליש|חצי|שלם|צלחת|גרם|ג|מ"ל|מיליליטר|מל|כף|כפות|כפית|כפיות|כוס|כוסות|יחידה|יחידות)(?=\s|$)/g, ' ')
+    .replace(/\d+(?:[.,]\d+)?/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const food = findFood(cleaned);
+  if (!food) return null;
   let grams = 0;
   let quantityDisplay = '';
-
   const gramMatch = t.match(/(\d+(?:[.,]\d+)?)\s*(גרם|ג)(?=\s|$)/);
   if (gramMatch) {
     grams = parseFloat(gramMatch[1].replace(',', '.'));
     quantityDisplay = `${grams} גרם`;
   } else if (/(^|\s)צלחת(?=\s|$)/.test(t)) {
-    const fraction = getAutoFraction(t);
+    const fraction = /(^|\s)רבע(?=\s|$)/.test(t) ? 0.25 : /(^|\s)שליש(?=\s|$)/.test(t) ? 1 / 3 : /(^|\s)חצי(?=\s|$)/.test(t) ? 0.5 : 1;
     grams = getFullPlateGrams(food) * fraction;
     const fractionText = fraction === 0.25 ? 'רבע' : fraction === 1 / 3 ? 'שליש' : fraction === 0.5 ? 'חצי' : 'שלם';
     quantityDisplay = `${fractionText} צלחת`;
   } else {
-    const numMatch = t.match(/(\d+(?:[.,]\d+)?)/);
-    grams = numMatch ? parseFloat(numMatch[1].replace(',', '.')) : (food.dw || 100);
+    grams = food.dw || 100;
     quantityDisplay = `${grams} גרם`;
   }
-
-  if (!grams || grams <= 0) return null;
-  const multiplier = grams / 100;
+  const f = grams / 100;
   return {
     food,
     grams,
-    cal: Math.round(food.cal * multiplier),
-    carbs: Math.round(food.c * multiplier * 10) / 10,
-    protein: Math.round(food.p * multiplier * 10) / 10,
-    fat: Math.round(food.f * multiplier * 10) / 10,
-    raw: text,
+    cal: Math.round(food.cal * f),
+    carbs: Math.round(food.c * f * 10) / 10,
+    protein: Math.round(food.p * f * 10) / 10,
+    fat: Math.round(food.f * f * 10) / 10,
+    raw: part,
     quantityDisplay,
   };
 }
 
-async function addMeal(raw) {
+async function addMeal(raw, sourceInput) {
   const aiMsg = document.getElementById('ai-msg');
   const aiText = document.getElementById('ai-text');
   const warnBox = document.getElementById('warn-box');
-  const inp = document.getElementById('food-input');
+  const inp = sourceInput || document.getElementById('food-input');
 
-  let cleaned = raw.replace(/^(אכלתי|אכלת|אכל|אכלה|שתיתי|שתית)\s+/, '');
+  let cleaned = cleanAutoText(raw);
   const rawParts = cleaned.split(/,\s*|,/);
   const parts = [];
   for (const part of rawParts) {
@@ -434,7 +397,7 @@ async function addMeal(raw) {
   let addedCal = 0;
   const failed = [];
   for (const part of parts) {
-    const result = parseFood(part);
+    const result = parseAutoFood(part);
     if (result) { log.push(result); added++; addedCal += result.cal; }
     else failed.push(part);
   }
@@ -688,7 +651,7 @@ async function addFood() {
   /* ── Multi-food meal ── */
   const isMeal = /,|\n|\s+ו(?=[א-ת])/.test(raw) || /^(אכלתי|אכלת|אכל|אכלה|שתיתי|שתית)\s/.test(raw);
   if (isMeal) {
-    const handled = await addMeal(raw.replace(/\n/g, ','));
+    const handled = await addMeal(raw.replace(/\n/g, ','), inp);
     if (handled) return;
   }
 
@@ -714,6 +677,29 @@ async function addFood() {
   warnBox.innerHTML = '';
   aiMsg.classList.remove('show');
   showQtyPopup(food, origFoodText);
+}
+
+async function addAutoFood() {
+  const inp = document.getElementById('auto-input');
+  const aiMsg = document.getElementById('ai-msg');
+  const aiText = document.getElementById('ai-text');
+  const warnBox = document.getElementById('warn-box');
+  const raw = inp ? inp.value.trim() : '';
+  if (!raw) return;
+
+  const handled = await addMeal(raw.replace(/\n/g, ','), inp);
+  if (handled) return;
+
+  const result = parseAutoFood(cleanAutoText(raw));
+  if (result) {
+    inp.value = '';
+    _commitFoodEntry(result);
+    return;
+  }
+
+  warnBox.innerHTML = '';
+  aiMsg.classList.add('show');
+  aiText.textContent = `לא הצלחתי לחשב את "${raw}". נסה שם אחר או הוסף כמות.`;
 }
 
 function deleteItem(i) {
@@ -819,6 +805,42 @@ function toggleVoice() {
     document.getElementById('food-input').value = '';
     recognition.start();
   }
+}
+
+function toggleAutoVoice() {
+  if (!recognition) {
+    if (!initVoice()) {
+      alert('הדפדפן שלך לא תומך בהקלטה קולית. נסה Chrome.');
+      return;
+    }
+  }
+  if (isRecording) { recognition.stop(); return; }
+  const autoInput = document.getElementById('auto-input');
+  const autoBtn = document.getElementById('auto-mic-btn');
+  recognition.onstart = () => {
+    isRecording = true;
+    autoBtn.classList.add('rec');
+    autoBtn.textContent = '⏹ מקליט...';
+  };
+  recognition.onresult = (e) => {
+    let txt = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) txt += e.results[i][0].transcript;
+    autoInput.value = txt;
+  };
+  recognition.onend = () => {
+    isRecording = false;
+    autoBtn.classList.remove('rec');
+    autoBtn.textContent = '🎤';
+    if (autoInput.value.trim()) addAutoFood();
+  };
+  recognition.onerror = (e) => {
+    isRecording = false;
+    autoBtn.classList.remove('rec');
+    autoBtn.textContent = '🎤';
+    if (e.error === 'not-allowed') alert('יש לאשר גישה למיקרופון בדפדפן');
+  };
+  autoInput.value = '';
+  recognition.start();
 }
 
 function toggleMiriVoice() {
@@ -1635,5 +1657,21 @@ initVoice();
     _mbtn.textContent = 'הוספה';
     _mbtn.removeAttribute('onclick');
     _mbtn.addEventListener('click', addFood);
+  }
+  const _autoBtn = document.getElementById('auto-submit-btn');
+  const _autoInp = document.getElementById('auto-input');
+  const _autoMic = document.getElementById('auto-mic-btn');
+  if (_autoBtn && !_autoBtn.dataset.bound) {
+    _autoBtn.dataset.bound = '1';
+    _autoBtn.textContent = 'הוספה';
+    _autoBtn.addEventListener('click', addAutoFood);
+  }
+  if (_autoMic && !_autoMic.dataset.bound) {
+    _autoMic.dataset.bound = '1';
+    _autoMic.addEventListener('click', toggleAutoVoice);
+  }
+  if (_autoInp && !_autoInp.dataset.bound) {
+    _autoInp.dataset.bound = '1';
+    _autoInp.addEventListener('keydown', e => { if (e.key === 'Enter') addAutoFood(); });
   }
 })();

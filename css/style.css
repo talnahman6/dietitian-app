@@ -328,11 +328,21 @@ body::before{content:'';position:fixed;inset:0;background:
   overflow: visible !important;
 }
 
+#auto-section {
+  width: 100%;
+  overflow: visible !important;
+}
+
 .input-area {
   overflow: visible !important;
 }
 
 #manual-section .input-row {
+  width: 100%;
+  overflow: visible !important;
+}
+
+#auto-section .input-row {
   width: 100%;
   overflow: visible !important;
 }
@@ -426,6 +436,35 @@ body::before{content:'';position:fixed;inset:0;background:
   }
 
   #manual-section .btn-go {
+    grid-area: add !important;
+    width: 100% !important;
+  }
+
+  #auto-section .input-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 72px !important;
+    grid-template-areas:
+      "search mic"
+      "add add" !important;
+    gap: 10px !important;
+    overflow: visible !important;
+  }
+
+  #auto-section #auto-input {
+    grid-area: search !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  #auto-section #auto-mic-btn {
+    grid-area: mic !important;
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  #auto-section .btn-go {
     grid-area: add !important;
     width: 100% !important;
   }
