@@ -3,40 +3,6 @@ function toggleHelpPopup() {
   p.hidden = !p.hidden;
 }
 
-function syncDevMobileButton(active) {
-  const btn = document.getElementById('dev-mobile-toggle');
-  if (!btn) return;
-  btn.textContent = active ? '\u05ea\u05e6\u05d5\u05d2\u05ea \u05de\u05d7\u05e9\u05d1' : '\u05ea\u05e6\u05d5\u05d2\u05ea \u05e0\u05d9\u05d9\u05d3';
-  btn.classList.toggle('is-active', active);
-}
-
-function toggleDevMobileView() {
-  const existing = document.getElementById('dev-mobile-frame-overlay');
-  if (existing) {
-    existing.remove();
-    syncDevMobileButton(false);
-    return;
-  }
-  const overlay = document.createElement('div');
-  overlay.id = 'dev-mobile-frame-overlay';
-  overlay.className = 'dev-mobile-frame-overlay';
-  const closeBtn = document.createElement('button');
-  closeBtn.type = 'button';
-  closeBtn.className = 'dev-mobile-frame-close';
-  closeBtn.textContent = '\u05ea\u05e6\u05d5\u05d2\u05ea \u05de\u05d7\u05e9\u05d1';
-  closeBtn.addEventListener('click', toggleDevMobileView);
-  const frame = document.createElement('iframe');
-  frame.className = 'dev-mobile-frame';
-  const url = new URL(window.location.href);
-  url.searchParams.set('devMobileFrame', '1');
-  url.searchParams.set('v', Date.now().toString());
-  frame.src = url.toString();
-  overlay.appendChild(closeBtn);
-  overlay.appendChild(frame);
-  document.body.appendChild(overlay);
-  syncDevMobileButton(true);
-}
-
 function setSearchMode(mode) {
   const isManual = mode === 'manual';
   document.getElementById('manual-section').style.display = isManual ? '' : 'none';
@@ -2205,13 +2171,6 @@ function addManualFood() {
 render();
 initVoice();
 (function() {
-  const isDevMobileFrame = new URLSearchParams(window.location.search).get('devMobileFrame') === '1';
-  if (isDevMobileFrame) {
-    document.body.classList.add('dev-mobile-frame-page');
-    const devBtn = document.getElementById('dev-mobile-toggle');
-    if (devBtn) devBtn.style.display = 'none';
-  }
-  syncDevMobileButton(false);
   const _minp = document.getElementById('food-input');
   const _qtySel = document.getElementById('qty-sel');
   if (_qtySel && !_qtySel.dataset.plateBound) {

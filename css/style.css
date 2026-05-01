@@ -50,43 +50,6 @@ body {
   gap: 14px;
 }
 
-/* ─── DEV TOGGLE ─── */
-.dev-mobile-toggle {
-  position: sticky;
-  top: 8px;
-  align-self: flex-start;
-  z-index: 10000;
-  border: none;
-  border-radius: 12px;
-  background: var(--green);
-  color: white;
-  font-family: inherit;
-  font-size: .8rem;
-  font-weight: 800;
-  padding: 8px 14px;
-  box-shadow: 0 4px 14px rgba(74,155,127,.35);
-  cursor: pointer;
-}
-.dev-mobile-toggle.is-active { background: var(--coral); }
-.dev-mobile-frame-overlay {
-  position: fixed; inset: 0; z-index: 9999;
-  background: var(--bg);
-  display: flex; justify-content: center; align-items: flex-start;
-  padding: 78px 20px 20px; overflow: auto;
-}
-.dev-mobile-frame-close {
-  position: fixed; top: 16px; left: 20px; z-index: 10000;
-  border: none; border-radius: 12px; background: var(--green);
-  color: white; font-family: inherit; font-size: .8rem; font-weight: 800;
-  padding: 8px 14px; cursor: pointer;
-}
-.dev-mobile-frame {
-  width: 430px; max-width: calc(100vw - 40px);
-  height: 900px; max-height: calc(100vh - 40px);
-  border: 1px solid var(--bdr); border-radius: 22px;
-  background: var(--bg);
-}
-
 /* ─── HEADER ─── */
 .header {
   background: linear-gradient(135deg, #4a9b7f 0%, #3d8870 50%, #2e7060 100%);
