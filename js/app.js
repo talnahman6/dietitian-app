@@ -1016,9 +1016,16 @@ function toggleMiriVoice() {
     _miriRecording = false;
     chatBtn.classList.remove('rec');
     chatBtn.textContent = '🎤';
-    if (chatInput.value.trim()) miriSend();
+    const val = chatInput.value.trim();
+    if (val) setTimeout(() => miriSend(), 100);
   };
-  _miriRec.start();
+  try {
+    _miriRec.start();
+  } catch(e) {
+    _miriRecording = false;
+    chatBtn.textContent = '🎤';
+    setTimeout(() => toggleMiriVoice(), 400);
+  }
 }
 
 /* ─────────────────────────────────────────────────────────
