@@ -326,18 +326,29 @@ function applyQtyUnit(raw) {
   return raw;
 }
 
+const AUTO_PREFIX_RE = /^(?:\u05d0\u05db\u05dc\u05ea\u05d9|\u05d0\u05db\u05dc\u05ea|\u05d0\u05db\u05dc|\u05d0\u05db\u05dc\u05d4|\u05e9\u05ea\u05d9\u05ea\u05d9|\u05e9\u05ea\u05d9\u05ea)\s+/;
+const AUTO_PLATE_RE = /(^|\s)\u05e6\u05dc\u05d7\u05ea(?=\s|$)/;
+const AUTO_QUARTER_RE = /(^|\s)\u05e8\u05d1\u05e2(?=\s|$)/;
+const AUTO_THIRD_RE = /(^|\s)\u05e9\u05dc\u05d9\u05e9(?=\s|$)/;
+const AUTO_HALF_RE = /(^|\s)\u05d7\u05e6\u05d9(?=\s|$)/;
+const AUTO_QTY_WORDS_RE = /(^|\s)(?:\u05e8\u05d1\u05e2|\u05e9\u05dc\u05d9\u05e9|\u05d7\u05e6\u05d9|\u05e9\u05dc\u05dd|\u05e6\u05dc\u05d7\u05ea|\u05d2\u05e8\u05dd|\u05d2|\u05de\"\u05dc|\u05de\u05d9\u05dc\u05d9\u05dc\u05d9\u05d8\u05e8|\u05de\u05dc|\u05db\u05e3|\u05db\u05e4\u05d5\u05ea|\u05db\u05e4\u05d9\u05ea|\u05db\u05e4\u05d9\u05d5\u05ea|\u05db\u05d5\u05e1|\u05db\u05d5\u05e1\u05d5\u05ea|\u05d9\u05d7\u05d9\u05d3\u05d4|\u05d9\u05d7\u05d9\u05d3\u05d5\u05ea)(?=\s|$)/g;
+const AUTO_QTY_NUM_RE = /\d+(?:[.,]\d+)?\s*(?:\u05d2\u05e8\u05dd|\u05d2|\u05de\"\u05dc|\u05de\u05d9\u05dc\u05d9\u05dc\u05d9\u05d8\u05e8|\u05de\u05dc|\u05db\u05e3|\u05db\u05e4\u05d5\u05ea|\u05db\u05e4\u05d9\u05ea|\u05db\u05e4\u05d9\u05d5\u05ea|\u05db\u05d5\u05e1|\u05db\u05d5\u05e1\u05d5\u05ea|\u05d9\u05d7\u05d9\u05d3\u05d4|\u05d9\u05d7\u05d9\u05d3\u05d5\u05ea)/g;
+const AUTO_GRAMS_RE = /(\d+(?:[.,]\d+)?)\s*(?:\u05d2\u05e8\u05dd|\u05d2)(?=\s|$)/;
+const AUTO_SPLIT_AND_RE = /\s+\u05d5(?=[\u05d0-\u05ea])/;
+
 function cleanAutoText(raw) {
-  return raw.replace(/^(אכלתי|אכלת|אכל|אכלה|שתיתי|שתית)\s+/, '').trim();
+  return raw.replace(AUTO_PREFIX_RE, '').trim();
 }
 
 function parseAutoFood(part) {
   const t = part.trim().toLowerCase();
-  if (!/(^|\s)צלחת(?=\s|$)/.test(t)) {
+  if (!AUTO_PLATE_RE.test(t)) {
     let result = parseFood(part);
     if (result) return result;
   }
   const cleaned = cleanAutoText(part)
-    .replace(/(^|\s)(רבע|שליש|חצי|שלם|צלחת|גרם|ג|מ"ל|מיליליטר|מל|כף|כפות|כפית|כפיות|כוס|כוסות|יחידה|יחידות)(?=\s|$)/g, ' ')
+    .replace(AUTO_QTY_WORDS_RE, ' ')
+    .replace(AUTO_QTY_NUM_RE, ' ')
     .replace(/\d+(?:[.,]\d+)?/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
@@ -345,12 +356,12 @@ function parseAutoFood(part) {
   if (!food) return null;
   let grams = 0;
   let quantityDisplay = '';
-  const gramMatch = t.match(/(\d+(?:[.,]\d+)?)\s*(גרם|ג)(?=\s|$)/);
+  const gramMatch = t.match(AUTO_GRAMS_RE);
   if (gramMatch) {
     grams = parseFloat(gramMatch[1].replace(',', '.'));
     quantityDisplay = `${grams} גרם`;
-  } else if (/(^|\s)צלחת(?=\s|$)/.test(t)) {
-    const fraction = /(^|\s)רבע(?=\s|$)/.test(t) ? 0.25 : /(^|\s)שליש(?=\s|$)/.test(t) ? 1 / 3 : /(^|\s)חצי(?=\s|$)/.test(t) ? 0.5 : 1;
+  } else if (AUTO_PLATE_RE.test(t)) {
+    const fraction = AUTO_QUARTER_RE.test(t) ? 0.25 : AUTO_THIRD_RE.test(t) ? 1 / 3 : AUTO_HALF_RE.test(t) ? 0.5 : 1;
     grams = getFullPlateGrams(food) * fraction;
     const fractionText = fraction === 0.25 ? 'רבע' : fraction === 1 / 3 ? 'שליש' : fraction === 0.5 ? 'חצי' : 'שלם';
     quantityDisplay = `${fractionText} צלחת`;
@@ -382,7 +393,7 @@ async function addMeal(raw, sourceInput) {
   const parts = [];
   for (const part of rawParts) {
     /* split "X ו-Y" Hebrew conjunction into separate items */
-    const subParts = part.split(/\s+ו(?=[א-ת])/);
+    const subParts = part.split(AUTO_SPLIT_AND_RE);
     for (const sp of subParts) {
       const t = sp.trim();
       if (t) parts.push(t);
