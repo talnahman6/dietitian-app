@@ -160,6 +160,23 @@ function updateProfileView() {
   set('profile-calories', GOALS.cal ? `${GOALS.cal} קל׳` : '-');
 }
 
+function updateJournalDate() {
+  const el = document.getElementById('journal-date');
+  if (!el) return;
+  el.textContent = new Date().toLocaleDateString('he-IL', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+}
+
+function moveSearchToView(viewName) {
+  const search = document.querySelector('.input-area');
+  const target = document.getElementById(viewName === 'journal' ? 'journal-search-anchor' : 'home-search-anchor');
+  if (search && target) target.insertAdjacentElement('afterend', search);
+}
+
 function showView(viewName) {
   document.querySelectorAll('.app-view').forEach(view => {
     view.classList.toggle('active', view.id === `view-${viewName}`);
@@ -167,6 +184,8 @@ function showView(viewName) {
   document.querySelectorAll('.bn-tab').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.view === viewName);
   });
+  moveSearchToView(viewName);
+  if (viewName === 'journal') updateJournalDate();
   if (viewName === 'profile') updateProfileView();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -1313,12 +1332,15 @@ function renderTracker() {
   }
 }
 
-function showRemaining() {
-  _showRemaining = !_showRemaining;
-  const btn = document.getElementById('remaining-btn');
-  btn.textContent = _showRemaining ? 'כמה אכלתי היום?' : 'כמה נשאר לי לאכול היום?';
-  document.getElementById('tracker-title').textContent = _showRemaining ? 'כמה נשאר לי לאכול היום?' : 'כמה אכלתי היום?';
+function setTrackerMode(mode) {
+  _showRemaining = mode === 'remaining';
+  document.getElementById('consumed-btn')?.classList.toggle('active', !_showRemaining);
+  document.getElementById('remaining-btn')?.classList.toggle('active', _showRemaining);
   renderTracker();
+}
+
+function showRemaining() {
+  setTrackerMode(_showRemaining ? 'consumed' : 'remaining');
 }
 
 /* ─────────────────────────────────────────────────────────

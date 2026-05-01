@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מירי - הדיאטנית האישית שלך</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=28">
+<link rel="stylesheet" href="css/style.css?v=29">
 <style>
 .miri-fab-wrap{right:20px;left:auto;bottom:116px;z-index:9999;align-items:flex-start}
 @media (max-width:900px){
@@ -60,6 +60,7 @@
   <div class="sc fat"><div class="sc-icon">🥑</div><div class="sc-val" id="s-fat">0<span class="sc-unit">g</span></div><div class="sc-lbl">שומנים</div></div>
 </div>
 
+<div id="home-search-anchor"></div>
 <!-- INPUT -->
 <div class="input-area">
   <label>מה אכלת היום? 😊</label>
@@ -131,8 +132,8 @@
 <!-- PROGRESS -->
 <div class="progress-box">
   <div class="progress-hdr">
-    <h3 id="tracker-title">כמה אכלתי היום?</h3>
-    <button id="remaining-btn" class="btn-remaining" onclick="showRemaining()">כמה נשאר לי לאכול היום?</button>
+    <button id="consumed-btn" class="tracker-toggle active" onclick="setTrackerMode('consumed')">כמה אכלתי היום?</button>
+    <button id="remaining-btn" class="tracker-toggle" onclick="setTrackerMode('remaining')">כמה נשאר לי?</button>
   </div>
   <div class="pi">
     <div class="pi-hdr"><span>קלוריות</span><span id="pt-cal">0 / 2000 קל׳</span></div>
@@ -160,13 +161,7 @@
     <h2>היומן שלי</h2>
     <span>📅</span>
   </div>
-  <div class="diary-slots">
-    <div class="diary-slot"><span>07:00</span><strong>בוקר</strong><small>ארוחת פתיחה קלה</small></div>
-    <div class="diary-slot"><span>13:00</span><strong>צהריים</strong><small>ארוחה מרכזית</small></div>
-    <div class="diary-slot"><span>16:30</span><strong>ביניים</strong><small>משהו קטן ומאוזן</small></div>
-    <div class="diary-slot"><span>19:30</span><strong>ערב</strong><small>ארוחה מסודרת</small></div>
-    <div class="diary-slot"><span>22:00</span><strong>לילה</strong><small>רק אם רעבים</small></div>
-  </div>
+  <div class="journal-date" id="journal-date"></div>
 </div>
 
 <!-- FOOD LOG -->
@@ -183,6 +178,7 @@
     </div>
   </div>
 </div>
+<div id="journal-search-anchor"></div>
 </section>
 
 <section class="app-view" id="view-profile">
@@ -532,7 +528,7 @@
 <script src="js/avatar.js"></script>
 <script src="data/foods.js"></script>
 <script src="js/parser.js?v=4"></script>
-<script src="js/app.js?v=10054"></script>
+<script src="js/app.js?v=10055"></script>
 <script src="js/usda.js"></script>
 <script>
 (function() {

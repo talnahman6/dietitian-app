@@ -68,28 +68,11 @@ body {
   color: var(--txt);
 }
 .page-title-row span { font-size: 1.6rem; }
-.diary-slots {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.diary-slot {
-  display: grid;
-  grid-template-columns: 70px 1fr;
-  gap: 4px 14px;
-  align-items: center;
-  padding: 14px;
-  border: 1px solid var(--bdr);
-  border-radius: 14px;
-  background: var(--card2);
-}
-.diary-slot span {
-  grid-row: span 2;
+.journal-date {
   color: var(--green);
   font-weight: 900;
+  font-size: 1.1rem;
 }
-.diary-slot strong { font-size: 1.05rem; }
-.diary-slot small { color: var(--txt2); font-weight: 600; }
 .profile-list { display: flex; flex-direction: column; }
 .profile-row {
   display: grid;
@@ -508,18 +491,9 @@ body {
 .progress-hdr {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   margin-bottom: 16px;
-  flex-wrap: wrap;
   gap: 8px;
-}
-.progress-hdr h3 {
-  font-size: .88rem;
-  font-weight: 800;
-  color: var(--txt2);
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  margin: 0;
 }
 .pi { margin-bottom: 14px; }
 .pi:last-child { margin-bottom: 0; }
@@ -542,19 +516,34 @@ body {
   border-radius: 100px;
   transition: width .6s cubic-bezier(.4,0,.2,1);
 }
+.tracker-toggle,
 .btn-remaining {
+  flex: 1 1 0;
   background: var(--green);
   border: none;
   color: white;
   border-radius: 10px;
-  padding: 7px 14px;
+  padding: 9px 10px;
   font-family: 'Heebo', sans-serif;
   font-size: .8rem;
   font-weight: 700;
   cursor: pointer;
   transition: all .2s;
   box-shadow: 0 3px 10px rgba(74,155,127,.28);
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
+.tracker-toggle:not(.active),
+.btn-remaining:not(.active) {
+  background: var(--inp);
+  color: var(--txt2);
+  border: 1px solid var(--bdr);
+  box-shadow: none;
+}
+.tracker-toggle:hover,
 .btn-remaining:hover { transform: translateY(-1px); }
 
 /* ─── FOOD LOG ─── */
