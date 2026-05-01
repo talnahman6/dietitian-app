@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מירי - הדיאטנית האישית שלך</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=31">
+<link rel="stylesheet" href="css/style.css?v=32">
 <style>
 .miri-fab-wrap{right:20px;left:auto;bottom:116px;z-index:9999;align-items:flex-start}
 @media (max-width:900px){
@@ -333,9 +333,10 @@
     </div>
   </div>
   <button class="miri-fab" onclick="var p=document.getElementById('miri-popup');p.style.display=p.style.display==='flex'?'none':'flex'" aria-label="מירי ממליצה">
-    <span class="miri-fab-arc">
-      <span style="--i:0">מ</span><span style="--i:1">י</span><span style="--i:2">ר</span><span style="--i:3">י</span><span style="--i:4.35">&nbsp;</span><span style="--i:5.55">מ</span><span style="--i:6.75">מ</span><span style="--i:7.9">ל</span><span style="--i:9">י</span><span style="--i:10.05">צ</span><span style="--i:11.1">ה</span>
-    </span>
+    <svg class="miri-fab-arc" viewBox="0 0 112 56" aria-hidden="true">
+      <defs><path id="miriArcPath" d="M 14 52 A 42 42 0 0 1 98 52"></path></defs>
+      <text><textPath href="#miriArcPath" startOffset="50%" text-anchor="middle">מירי ממליצה</textPath></text>
+    </svg>
     <div class="miri-fab-avatar">
       <img src="images/מירי ממליצה חיוך 2.png" alt="מירי ממליצה">
     </div>

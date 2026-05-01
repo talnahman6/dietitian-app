@@ -710,7 +710,7 @@ body {
   left: 50%; top: 50%;
   transform: translate(-50%, -45%);
   z-index: 20000;
-  width: min(620px, calc(100vw - 24px));
+  width: min(580px, calc(100vw - 44px));
   background: var(--card);
   border: 1px solid rgba(74,155,127,.4);
   border-radius: 16px;
@@ -1165,22 +1165,16 @@ body {
 .miri-fab:hover { transform: scale(1.06); }
 .miri-fab-arc {
   position: absolute;
-  right: -20px;
-  top: -20px;
-  width: 104px;
-  height: 46px;
-  color: var(--green);
-  font-size: .74rem;
+  right: -24px;
+  top: -19px;
+  width: 112px;
+  height: 56px;
+  fill: var(--green);
+  font-family: 'Heebo', sans-serif;
+  font-size: 10px;
   font-weight: 900;
-  text-shadow: 0 0 8px rgba(255,255,255,1), 0 1px 2px rgba(0,0,0,.1);
+  filter: drop-shadow(0 0 5px rgba(255,255,255,1));
   pointer-events: none;
-}
-.miri-fab-arc span {
-  position: absolute;
-  right: 50%;
-  top: 0;
-  transform-origin: 50% 45px;
-  transform: translateX(50%) rotate(calc(62deg - (var(--i) * 12.1deg)));
 }
 .miri-fab-avatar {
   width: 64px; height: 64px;
