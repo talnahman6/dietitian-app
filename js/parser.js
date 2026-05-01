@@ -117,6 +117,21 @@ function extractGrams(txt, food) {
   return food ? food.dw : 100;
 }
 
+function extractQuantityDisplay(txt) {
+  const t = txt.trim().toLowerCase();
+  const plateM = t.match(/(?:^|\s)(רבע|שליש|חצי|שלם)\s+צלחת(?:\s|$)/);
+  if (plateM) return plateM[1] + ' צלחת';
+  const kgM = t.match(/(\d+(?:[.,]\d+)?)\s*(ק"?ג|קילוגרם)(?:\s|$)/);
+  if (kgM) return kgM[1].replace(',', '.') + ' ' + kgM[2];
+  const gramM = t.match(/(\d+(?:[.,]\d+)?)\s*(גרם|ג')(?:\s|$)/);
+  if (gramM) return gramM[1].replace(',', '.') + ' ' + gramM[2];
+  const mlM = t.match(/(\d+(?:[.,]\d+)?)\s*(מ"?ל|מיליליטר|מל|ליטר)(?:\s|$)/);
+  if (mlM) return mlM[1].replace(',', '.') + ' ' + mlM[2];
+  const volM = t.match(/(\d+(?:[.,]\d+)?)\s*(כפיות|כפית|כפות|כף|כוסות|כוס|יחידות|יחידה|פרוסות|פרוסה)(?:\s|$)/);
+  if (volM) return volM[1].replace(',', '.') + ' ' + volM[2];
+  return '';
+}
+
 function normalize(s) {
   return s.toLowerCase().replace(/['"״׳]/g,'').replace(/\s+/g,' ').trim();
 }
@@ -311,5 +326,6 @@ function parseFood(rawText) {
     protein: Math.round(food.p*f*10)/10,
     fat: Math.round(food.f*f*10)/10,
     raw: rawText,
+    quantityDisplay: extractQuantityDisplay(text),
   };
 }

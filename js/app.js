@@ -385,9 +385,22 @@ function hasAutoExplicitQuantity(text) {
 }
 
 function showAutoMissingQty(aiMsg, aiText, warnBox) {
+  const msg = 'שכחת להוסיף כמות ויחידת משקל. למשל: אכלתי 100 גרם חזה עוף ורבע צלחת אורז';
   if (warnBox) warnBox.innerHTML = '';
   aiMsg.classList.add('show');
-  aiText.textContent = 'שכחת להוסיף כמות ויחידת משקל. למשל: אכלתי 100 גרם חזה עוף ורבע צלחת אורז';
+  aiText.textContent = msg;
+  let toast = document.getElementById('auto-qty-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'auto-qty-toast';
+    toast.className = 'auto-qty-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(showAutoMissingQty._timer);
+  showAutoMissingQty._timer = setTimeout(() => toast.classList.remove('show'), 4500);
+  aiMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function splitAutoQuantityItems(text) {
