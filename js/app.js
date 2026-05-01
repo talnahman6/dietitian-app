@@ -20,12 +20,18 @@ function toggleDevMobileView() {
   const overlay = document.createElement('div');
   overlay.id = 'dev-mobile-frame-overlay';
   overlay.className = 'dev-mobile-frame-overlay';
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.className = 'dev-mobile-frame-close';
+  closeBtn.textContent = '\u05ea\u05e6\u05d5\u05d2\u05ea \u05de\u05d7\u05e9\u05d1';
+  closeBtn.addEventListener('click', toggleDevMobileView);
   const frame = document.createElement('iframe');
   frame.className = 'dev-mobile-frame';
   const url = new URL(window.location.href);
   url.searchParams.set('devMobileFrame', '1');
   url.searchParams.set('v', Date.now().toString());
   frame.src = url.toString();
+  overlay.appendChild(closeBtn);
   overlay.appendChild(frame);
   document.body.appendChild(overlay);
   syncDevMobileButton(true);
