@@ -3,6 +3,19 @@ function toggleHelpPopup() {
   p.hidden = !p.hidden;
 }
 
+function syncDevMobileButton(active) {
+  const btn = document.getElementById('dev-mobile-toggle');
+  if (!btn) return;
+  btn.textContent = active ? '\u05ea\u05e6\u05d5\u05d2\u05ea \u05de\u05d7\u05e9\u05d1' : '\u05ea\u05e6\u05d5\u05d2\u05ea \u05e0\u05d9\u05d9\u05d3';
+  btn.classList.toggle('is-active', active);
+}
+
+function toggleDevMobileView() {
+  const active = document.body.classList.toggle('dev-mobile-preview');
+  syncDevMobileButton(active);
+  try { localStorage.setItem('devMobilePreview', active ? '1' : '0'); } catch (e) {}
+}
+
 function setSearchMode(mode) {
   const isManual = mode === 'manual';
   document.getElementById('manual-section').style.display = isManual ? '' : 'none';
@@ -1666,6 +1679,9 @@ function addManualFood() {
 render();
 initVoice();
 (function() {
+  const devMobileActive = localStorage.getItem('devMobilePreview') === '1';
+  document.body.classList.toggle('dev-mobile-preview', devMobileActive);
+  syncDevMobileButton(devMobileActive);
   const _minp = document.getElementById('food-input');
   const _qtySel = document.getElementById('qty-sel');
   if (_qtySel && !_qtySel.dataset.plateBound) {

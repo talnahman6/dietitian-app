@@ -28,6 +28,10 @@ body::before{content:'';position:fixed;inset:0;background:
   radial-gradient(ellipse at 50% 50%,rgba(139,92,246,.04) 0%,transparent 70%);
   pointer-events:none;z-index:0}
 #app{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.dev-mobile-toggle{position:fixed;top:10px;left:10px;z-index:10000;border:1px solid rgba(139,92,246,.65);border-radius:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;font-family:inherit;font-size:.85rem;font-weight:800;padding:10px 14px;box-shadow:0 10px 26px rgba(99,102,241,.35);cursor:pointer}
+.dev-mobile-toggle.is-active{background:linear-gradient(135deg,#10b981,#6366f1)}
+body.dev-mobile-preview #app{width:390px;max-width:390px;min-height:844px;margin:0 auto;border-left:1px solid var(--bdr);border-right:1px solid var(--bdr);box-shadow:0 0 35px rgba(0,0,0,.35)}
+@media(max-width:600px){.dev-mobile-toggle{display:none}body.dev-mobile-preview #app{width:auto;max-width:920px;min-height:0;border:0;box-shadow:none}}
 
 /* ─── HEADER ─── */
 .header{display:flex;align-items:center;gap:24px;background:var(--card);border:1px solid var(--bdr);border-radius:20px;padding:22px 28px;box-shadow:var(--sh)}
