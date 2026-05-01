@@ -999,11 +999,20 @@ function toggleMiriVoice() {
     for (let i = e.resultIndex; i < e.results.length; i++) txt += e.results[i][0].transcript;
     chatInput.value = txt;
   };
+  recognition.onerror = (e) => {
+    isRecording = false;
+    chatBtn.classList.remove('rec');
+    chatBtn.textContent = '🎤';
+    if (e.error === 'no-speech') chatBtn.textContent = '🎤 לא שמעתי, נסה שוב';
+    setTimeout(() => { chatBtn.textContent = '🎤'; }, 2000);
+    initVoice();
+  };
   recognition.onend = () => {
     isRecording = false;
     chatBtn.classList.remove('rec');
     chatBtn.textContent = '🎤';
     initVoice();
+    if (chatInput.value.trim()) miriSend();
   };
   recognition.start();
 }
