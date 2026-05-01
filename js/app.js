@@ -1875,7 +1875,7 @@ function miriSend() {
 
   const typingDiv = document.createElement('div');
   typingDiv.className = 'miri-msg miri-msg-bot';
-  typingDiv.innerHTML = '<span class="miri-msg-label">מירי:</span><span class="miri-dots"><span>.</span><span>.</span><span>.</span></span>';
+  typingDiv.innerHTML = '<img class="miri-msg-avatar" src="images/מירי ממליצה חיוך 2.png"><div class="miri-msg-bot-inner"><span class="miri-msg-label">מירי:</span><span class="miri-dots"><span>.</span><span>.</span><span>.</span></span></div>';
   msgs.appendChild(typingDiv);
 
   msgs.scrollTop = msgs.scrollHeight;
@@ -1925,7 +1925,7 @@ function miriSend() {
   }
 
   setTimeout(() => {
-    typingDiv.innerHTML = '<span class="miri-msg-label">מירי:</span><span class="miri-msg-text"></span>';
+    typingDiv.innerHTML = '<img class="miri-msg-avatar" src="images/מירי ממליצה חיוך 2.png"><div class="miri-msg-bot-inner"><span class="miri-msg-label">מירי:</span><span class="miri-msg-text"></span></div>';
     typingDiv.querySelector('.miri-msg-text').textContent = replyText;
     msgs.scrollTop = msgs.scrollHeight;
   }, 3000);
