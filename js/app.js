@@ -166,16 +166,23 @@ function acSearch(val) {
   const norm = s => s.toLowerCase().replace(/['"״׳]/g,'').replace(/\s+/g,' ').trim();
   const t = norm(val);
   if (t.length < 2) { _acList.style.display = 'none'; return; }
-  const matches = [];
+  const scored = [];
   for (const f of DB) {
+    let score = 0;
     for (const n of f.n) {
-      if (norm(n).startsWith(t)) {
-        if (!matches.includes(f)) matches.push(f);
-        break;
-      }
+      const name = norm(n);
+      if (name === t) { score = Math.max(score, 100); continue; }
+      if (name.startsWith(t)) { score = Math.max(score, 80); continue; }
+      if (name.includes(t)) { score = Math.max(score, 60); continue; }
+      const words = name.split(' ');
+      if (words.some(w => w.startsWith(t))) score = Math.max(score, 50);
     }
-    if (matches.length >= 8) break;
+    if (score > 0) scored.push({ f, score });
   }
+  const matches = scored
+    .sort((a, b) => b.score - a.score || a.f.n[0].localeCompare(b.f.n[0], 'he'))
+    .slice(0, 8)
+    .map(x => x.f);
   if (matches.length === 0) { _acList.style.display = 'none'; return; }
   _acList.innerHTML = matches.map(f =>
     `<div class="ac-item" data-name="${escHtml(f.n[0])}">${escHtml(f.n[0])}<span class="ac-cat">${escHtml(f.cat)}</span></div>`
@@ -546,11 +553,8 @@ function qtyPopupSubmit() {
 }
 
 function manualFindFood(name) {
-  if (!name || typeof DB === 'undefined' || !Array.isArray(DB)) return null;
-  const q = name.trim().toLowerCase();
-  return DB.find(f => Array.isArray(f.n) && f.n.some(s => s && s.toLowerCase() === q))
-      || DB.find(f => Array.isArray(f.n) && f.n.some(s => s && s.toLowerCase().includes(q)))
-      || null;
+  if (!name || typeof findFood !== 'function') return null;
+  return findFood(name);
 }
 
 function _commitFoodEntry(result) {
@@ -710,6 +714,16 @@ async function addAutoFood() {
 
   warnBox.innerHTML = '';
   aiMsg.classList.add('show');
+  aiText.textContent = 'מחפש במאגר הרחב...';
+  if (typeof fetchFoodsDict === 'function' && typeof showServingPicker === 'function') {
+    const term = cleanAutoText(raw).trim();
+    const fd = await fetchFoodsDict(term);
+    if (fd && fd.food && fd.per100 && fd.per100.cal) {
+      inp.value = '';
+      showServingPicker(fd, raw);
+      return;
+    }
+  }
   aiText.textContent = `לא הצלחתי לחשב את "${raw}". נסה שם אחר או הוסף כמות.`;
 }
 
