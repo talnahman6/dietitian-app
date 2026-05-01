@@ -424,10 +424,9 @@ function showAutoMissingQty(aiMsg, aiText, warnBox) {
     toast.className = 'auto-qty-toast';
     document.body.appendChild(toast);
   }
-  toast.textContent = msg;
+  toast.innerHTML = `<div>${escHtml(msg)}</div><button type="button" class="auto-qty-toast-ok">אישור</button>`;
+  toast.querySelector('.auto-qty-toast-ok').addEventListener('click', () => toast.classList.remove('show'));
   toast.classList.add('show');
-  clearTimeout(showAutoMissingQty._timer);
-  showAutoMissingQty._timer = setTimeout(() => toast.classList.remove('show'), 4500);
   aiMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
