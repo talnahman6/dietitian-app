@@ -124,10 +124,10 @@ body {
   border: 3px solid rgba(255,255,255,.5);
   box-shadow: 0 4px 20px rgba(0,0,0,.2);
   position: relative; z-index: 1;
-  order: 2;
+  order: 0;
 }
 .avatar-wrap svg { width: 100%; height: 100%; }
-.hdr-text { position: relative; z-index: 1; flex: 1; order: 1; min-width: 0; }
+.hdr-text { position: relative; z-index: 1; flex: 1; order: 1; min-width: 0; text-align: right; }
 .hdr-text h1 {
   font-size: 1.45rem;
   font-weight: 900;
@@ -141,7 +141,7 @@ body {
   gap: 10px;
   margin-top: 14px;
 }
-.user-name { font-size: 1rem; color: rgba(255,255,255,.9); font-weight: 800; min-width: 0; }
+.user-name { font-size: 1.12rem; color: white; font-weight: 900; min-width: 0; }
 .badge {
   display: inline-flex;
   align-items: center;
@@ -158,10 +158,13 @@ body {
 }
 .badge::before {
   content: '';
-  width: 10px; height: 10px;
+  width: 12px; height: 12px;
+  flex: 0 0 12px;
+  display: block;
   border-radius: 50%;
-  background: #a8f0d0;
-  animation: blink 2s infinite;
+  background: #31e981;
+  box-shadow: 0 0 0 4px rgba(49,233,129,.18), 0 0 14px rgba(49,233,129,.85);
+  animation: greenPulse 1.6s infinite;
 }
 .calorie-goal {
   font-size: .78rem;
@@ -172,9 +175,13 @@ body {
   padding: 2px 10px;
 }
 @keyframes blink { 0%,100% { opacity: 1 } 50% { opacity: .3 } }
+@keyframes greenPulse {
+  0%,100% { box-shadow: 0 0 0 4px rgba(49,233,129,.18), 0 0 10px rgba(49,233,129,.65); }
+  50% { box-shadow: 0 0 0 7px rgba(49,233,129,.3), 0 0 20px rgba(49,233,129,1); }
+}
 .btn-logout {
-  background: #e45757;
-  border: 1px solid rgba(255,255,255,.25);
+  background: rgba(228,87,87,.72);
+  border: 1px solid rgba(255,255,255,.18);
   color: white;
   border-radius: 8px;
   padding: 6px 12px;
@@ -184,7 +191,7 @@ body {
   font-weight: 800;
   transition: all .2s;
 }
-.btn-logout:hover { background: #cf3f3f; }
+.btn-logout:hover { background: rgba(207,63,63,.82); }
 
 /* ─── STATS ─── */
 .stats {
