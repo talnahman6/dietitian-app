@@ -688,7 +688,7 @@ body {
   left: 50%; top: 50%;
   transform: translate(-50%, -45%);
   z-index: 20000;
-  width: min(580px, calc(100vw - 44px));
+  width: min(540px, calc(100vw - 64px));
   background: var(--card);
   border: 1px solid rgba(74,155,127,.4);
   border-radius: 16px;
@@ -1143,13 +1143,13 @@ body {
 .miri-fab:hover { transform: scale(1.06); }
 .miri-fab-arc {
   position: absolute;
-  right: -24px;
-  top: -19px;
-  width: 112px;
-  height: 56px;
+  right: -34px;
+  top: -20px;
+  width: 132px;
+  height: 70px;
   fill: var(--green);
   font-family: 'Heebo', sans-serif;
-  font-size: 10px;
+  font-size: 9.6px;
   font-weight: 900;
   filter: drop-shadow(0 0 5px rgba(255,255,255,1));
   pointer-events: none;
