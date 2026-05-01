@@ -666,15 +666,10 @@ function _commitFoodEntry(result) {
   if (!result.quantityDisplay && result.raw) result.quantityDisplay = extractAutoQuantityDisplay(result.raw);
   log.push(result);
   save();
-  const msgs = [
-    `נרשם! ${result.food.n[0]} (${Math.round(result.grams)}g) — ${result.cal} קלוריות, ${result.carbs}g פחמימות, ${result.protein}g חלבונים, ${result.fat}g שומנים.`,
-    `מצוין! הוספתי ${result.food.n[0]}. סה"כ ${result.cal} קלוריות על ${Math.round(result.grams)} גרם. 💪`,
-    `שמרתי! ${result.food.n[0]} (${Math.round(result.grams)}g) = ${result.cal} קל׳ | 🌾${result.carbs}g | 💪${result.protein}g | 🥑${result.fat}g`,
-  ];
   const aiMsg  = document.getElementById('ai-msg');
   const aiText = document.getElementById('ai-text');
   aiMsg.classList.add('show');
-  aiText.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+  aiText.textContent = `נרשם! ${result.food.n[0]} (${Math.round(result.grams)}g) — ${result.cal} קלוריות, ${result.carbs}g פחמימות, ${result.protein}g חלבונים, ${result.fat}g שומנים.\n${getMiriFeedback()}`;
   const warnBox = document.getElementById('warn-box');
   const total   = totals();
   const warns   = [];
@@ -1316,37 +1311,29 @@ function showRemaining() {
 function getMiriFeedback() {
   const t = totals();
   const hour = new Date().getHours();
-  const expectedPct = hour / 24;
-  const calPct = GOALS.cal > 0 ? t.cal / GOALS.cal : 0;
-  const sentences = [];
+  const caloriesLeft = Math.max(0, GOALS.cal - t.cal);
+  const proteinLeft = Math.max(0, GOALS.protein - t.protein);
+  const carbsLeft = Math.max(0, GOALS.carbs - t.carbs);
+  const fatLeft = Math.max(0, GOALS.fat - t.fat);
+  const caloriesConsumedPercent = GOALS.cal > 0 ? t.cal / GOALS.cal : 0;
+  const expectedProgress = hour / 24;
 
-  if (t.fat > GOALS.fat) {
-    sentences.push('שמי לב — צריכת השומן עברה את היעד היומי, עדיף לבחור מאכלים דלי שומן.');
-  } else if (t.carbs > GOALS.carbs) {
-    sentences.push('כמות הפחמימות היום גבוהה מהיעד, כדאי להימנע ממזונות עמילניים.');
-  } else if (t.cal > GOALS.cal) {
-    sentences.push('עברת את יעד הקלוריות היומי — שימי לב לכמויות בשאר היום.');
+  if (t.cal > GOALS.cal) {
+    return 'עברת את היעד הקלורי להיום. מעכשיו עדיף ללכת על מזון קל מאוד או לעצור כאן.';
   }
-
-  if (sentences.length < 2) {
-    if (t.protein < GOALS.protein * 0.5) {
-      sentences.push('רמת החלבון נמוכה — נסי להוסיף מנת חלבון כמו ביצה, קוטג׳ או עוף.');
-    } else if (t.protein >= GOALS.protein * 0.95) {
-      sentences.push('כל הכבוד — הגעת ליעד החלבון היומי! 💪');
-    }
+  if (caloriesConsumedPercent > expectedProgress + 0.2) {
+    return 'אתה מתקדם מהר מדי ביחס לשעה. כדאי להאט כדי לא להיתקע בערב.';
   }
-
-  if (sentences.length < 2) {
-    if (calPct > expectedPct + 0.15) {
-      sentences.push('קצב האכילה היום גבוה יחסית לשעה — שימי לב לכמויות בהמשך.');
-    } else if (calPct < expectedPct - 0.15 && hour >= 8) {
-      sentences.push('עדיין אכלת מעט יחסית לשעה — אל תשכחי לאכול ארוחות מסודרות.');
-    } else if (sentences.length === 0) {
-      sentences.push('את בדרך הנכונה היום — המשיכי כך! 🌟');
-    }
+  if (proteinLeft > Math.max(20, GOALS.protein * 0.35)) {
+    return 'חסר לך חלבון, זה זמן טוב להוסיף מקור חלבון איכותי 💪';
   }
-
-  return sentences.slice(0, 2).join(' ');
+  if (caloriesConsumedPercent < expectedProgress - 0.2 && hour >= 8) {
+    return 'אתה יכול לאכול יותר כרגע ולהתקדם בקצב נכון.';
+  }
+  if (caloriesLeft <= GOALS.cal * 0.15 && proteinLeft <= GOALS.protein * 0.2 && carbsLeft <= GOALS.carbs * 0.2 && fatLeft <= GOALS.fat * 0.2) {
+    return 'אתה בדיוק על המסלול, תמשיך ככה 👌';
+  }
+  return 'אתה בדיוק על המסלול, תמשיך ככה 👌';
 }
 
 function getMiriRecommendation(excluded = []) {
@@ -1482,15 +1469,26 @@ function _proteinFoodSuggest(grams) {
 }
 
 function _coachLine(rem, over, pct, t) {
-  if (over.cal > 300) return `גם יום כזה קורה 😊 מחר מתחילים מחדש!`;
-  if (over.cal > 0)   return `${over.cal} קל׳ מעל היעד — קורה לכולם, מחר יותר מדויק 🎯`;
-  if (rem.cal === 0)  return `עמדת ביעד היום! מדהים אתה! 🌟🎉`;
-  if (rem.cal <= 80)  return `רק עוד ${rem.cal} קל׳ ואז עמדת ביעד! כמעט שם 🎯`;
-  if (rem.cal <= 200 && pct.cal >= 70) return `${pct.cal}% ביעד — ממשיכים חזק! 💪`;
-  if (rem.protein > 0 && rem.protein <= 30) return `נשאר לך ${rem.protein}g חלבון — ${_proteinFoodSuggest(rem.protein)}`;
-  if (rem.protein === 0 && rem.cal > 0) return `חלבון ✅ השגת! עכשיו רק להשלים את הקלוריות 🔥`;
-  if (t.protein < GOALS.protein * 0.3 && pct.cal > 50) return `💪 שים לב — עדיין חסר הרבה חלבון להיום!`;
-  return null;
+  const hour = new Date().getHours();
+  const caloriesConsumedPercent = GOALS.cal > 0 ? t.cal / GOALS.cal : 0;
+  const expectedProgress = hour / 24;
+
+  if (t.cal > GOALS.cal) {
+    return 'עברת את היעד הקלורי להיום. מעכשיו עדיף ללכת על מזון קל מאוד או לעצור כאן.';
+  }
+  if (caloriesConsumedPercent > expectedProgress + 0.2) {
+    return 'אתה מתקדם מהר מדי ביחס לשעה. כדאי להאט כדי לא להיתקע בערב.';
+  }
+  if (rem.protein > Math.max(20, GOALS.protein * 0.35)) {
+    return 'חסר לך חלבון, זה זמן טוב להוסיף מקור חלבון איכותי 💪';
+  }
+  if (caloriesConsumedPercent < expectedProgress - 0.2 && hour >= 8) {
+    return 'אתה יכול לאכול יותר כרגע ולהתקדם בקצב נכון.';
+  }
+  if (rem.cal <= GOALS.cal * 0.15 && rem.protein <= GOALS.protein * 0.2 && rem.carbs <= GOALS.carbs * 0.2 && rem.fat <= GOALS.fat * 0.2) {
+    return 'אתה בדיוק על המסלול, תמשיך ככה 👌';
+  }
+  return 'אתה בדיוק על המסלול, תמשיך ככה 👌';
 }
 
 function _miriCtx() {
