@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מירי - הדיאטנית האישית שלך</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=21">
+<link rel="stylesheet" href="css/style.css?v=22">
 <style>
 .miri-fab-wrap{right:20px;left:auto;bottom:20px;z-index:9999;align-items:flex-start}
 @media (max-width:900px){
@@ -46,8 +46,10 @@
     <h1>מירי — הדיאטנית האישית שלך</h1>
     <div class="hdr-bottom">
       <span class="user-name" id="user-name"></span>
-      <span class="badge">מחוברת</span>
-      <button class="btn-logout" onclick="logout()">התנתק</button>
+      <div class="hdr-actions">
+        <span class="badge">מחוברת</span>
+        <button class="btn-logout" onclick="logout()">התנתק</button>
+      </div>
     </div>
   </div>
 </header>
