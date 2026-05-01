@@ -857,7 +857,7 @@ function initVoice() {
     isRecording = true;
     const btn = document.getElementById('mic-btn');
     btn.classList.add('rec');
-    btn.textContent = '⏹ מקליט...';
+    btn.textContent = 'מקליט';
   };
 
   recognition.onresult = (e) => {
@@ -917,7 +917,7 @@ function toggleAutoVoice() {
   recognition.onstart = () => {
     isRecording = true;
     autoBtn.classList.add('rec');
-    autoBtn.textContent = '⏹ מקליט...';
+    autoBtn.textContent = 'מקליט';
   };
   recognition.onresult = (e) => {
     let txt = '';
@@ -960,7 +960,7 @@ function toggleMiriVoice() {
   _miriRec.onstart = () => {
     _miriRecording = true;
     chatBtn.classList.add('rec');
-    chatBtn.textContent = '⏹ מקליט...';
+    chatBtn.textContent = 'מקליט';
   };
   _miriRec.onresult = (e) => {
     let txt = '';
