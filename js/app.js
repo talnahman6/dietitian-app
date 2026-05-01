@@ -926,12 +926,33 @@ function toggleVoice() {
       return;
     }
   }
-  if (isRecording) {
-    recognition.stop();
-  } else {
-    document.getElementById('food-input').value = '';
-    recognition.start();
-  }
+  if (isRecording) { recognition.stop(); return; }
+  const manualInput = document.getElementById('food-input');
+  const manualBtn = document.getElementById('mic-btn');
+  recognition.onstart = () => {
+    isRecording = true;
+    manualBtn.classList.add('rec');
+    manualBtn.textContent = 'מקליט';
+  };
+  recognition.onresult = (e) => {
+    let txt = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) txt += e.results[i][0].transcript;
+    manualInput.value = txt;
+  };
+  recognition.onend = () => {
+    isRecording = false;
+    manualBtn.classList.remove('rec');
+    manualBtn.textContent = '🎤';
+    if (manualInput.value.trim()) addFood();
+  };
+  recognition.onerror = (e) => {
+    isRecording = false;
+    manualBtn.classList.remove('rec');
+    manualBtn.textContent = '🎤';
+    if (e.error === 'not-allowed') alert('יש לאשר גישה למיקרופון בדפדפן');
+  };
+  manualInput.value = '';
+  recognition.start();
 }
 
 function toggleAutoVoice() {
