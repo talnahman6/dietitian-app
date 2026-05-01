@@ -1144,13 +1144,13 @@ body {
 .miri-fab:hover { transform: scale(1.06); }
 .miri-fab-arc {
   position: absolute;
-  right: -34px;
-  top: -20px;
-  width: 132px;
-  height: 70px;
+  right: -27px;
+  top: -12px;
+  width: 118px;
+  height: 56px;
   fill: var(--green);
   font-family: 'Heebo', sans-serif;
-  font-size: 9.6px;
+  font-size: 10px;
   font-weight: 900;
   filter: drop-shadow(0 0 5px rgba(255,255,255,1));
   pointer-events: none;
