@@ -119,6 +119,17 @@ function extractGrams(txt, food) {
 
 function extractQuantityDisplay(txt) {
   const t = txt.trim().toLowerCase();
+  const plural = {
+    'כף': 'כפות',
+    'כפית': 'כפיות',
+    'כוס': 'כוסות',
+    'יחידה': 'יחידות',
+    'פרוסה': 'פרוסות',
+  };
+  const unitText = (qty, unit) => {
+    const n = parseFloat(qty);
+    return qty + ' ' + (n === 1 ? unit : (plural[unit] || unit));
+  };
   const plateM = t.match(/(?:^|\s)(רבע|שליש|חצי|שלם)\s+צלחת(?:\s|$)/);
   if (plateM) return plateM[1] + ' צלחת';
   const kgM = t.match(/(\d+(?:[.,]\d+)?)\s*(ק"?ג|קילוגרם)(?:\s|$)/);
@@ -128,7 +139,7 @@ function extractQuantityDisplay(txt) {
   const mlM = t.match(/(\d+(?:[.,]\d+)?)\s*(מ"?ל|מיליליטר|מל|ליטר)(?:\s|$)/);
   if (mlM) return mlM[1].replace(',', '.') + ' ' + mlM[2];
   const volM = t.match(/(\d+(?:[.,]\d+)?)\s*(כפיות|כפית|כפות|כף|כוסות|כוס|יחידות|יחידה|פרוסות|פרוסה)(?:\s|$)/);
-  if (volM) return volM[1].replace(',', '.') + ' ' + volM[2];
+  if (volM) return unitText(volM[1].replace(',', '.'), volM[2]);
   return '';
 }
 

@@ -364,6 +364,23 @@ function applyQtyUnit(raw) {
   return raw;
 }
 
+function displayUnit(qty, unit) {
+  const n = parseFloat(qty);
+  if (n === 1) return unit;
+  const plural = {
+    'כף': 'כפות',
+    'כפית': 'כפיות',
+    'כוס': 'כוסות',
+    'יחידה': 'יחידות',
+    'פרוסה': 'פרוסות',
+  };
+  return plural[unit] || unit;
+}
+
+function formatQuantityDisplay(qty, unit) {
+  return `${qty} ${displayUnit(qty, unit)}`;
+}
+
 const AUTO_PREFIX_RE = /^(?:\u05d0\u05db\u05dc\u05ea\u05d9|\u05d0\u05db\u05dc\u05ea|\u05d0\u05db\u05dc|\u05d0\u05db\u05dc\u05d4|\u05e9\u05ea\u05d9\u05ea\u05d9|\u05e9\u05ea\u05d9\u05ea)\s+/;
 const AUTO_PLATE_RE = /(^|\s)\u05e6\u05dc\u05d7\u05ea(?=\s|$)/;
 const AUTO_QUARTER_RE = /(^|\s)\u05e8\u05d1\u05e2(?=\s|$)/;
@@ -722,7 +739,7 @@ async function addFood() {
       protein: Math.round(food.p   * multiplier * 10) / 10,
       fat:     Math.round(food.f   * multiplier * 10) / 10,
       raw,
-      quantityDisplay: isPlateUnit(unit) ? document.getElementById('plate-fraction').selectedOptions[0].text + " צלחת" : qtyNum + " " + unit,
+      quantityDisplay: isPlateUnit(unit) ? document.getElementById('plate-fraction').selectedOptions[0].text + " צלחת" : formatQuantityDisplay(qtyNum, unit),
     };
     console.log('[manual-add] created entry:', entry);
     _acSelected = false;
@@ -1729,7 +1746,7 @@ function addManualFood() {
     protein: Math.round(food.p   * multiplier * 10) / 10,
     fat:     Math.round(food.f   * multiplier * 10) / 10,
     raw,
-    quantityDisplay: isPlateUnit(unit) ? document.getElementById('plate-fraction').selectedOptions[0].text + " צלחת" : qtyNum + " " + unit,
+    quantityDisplay: isPlateUnit(unit) ? document.getElementById('plate-fraction').selectedOptions[0].text + " צלחת" : formatQuantityDisplay(qtyNum, unit),
   };
   selectedManualFood = null;
   _acSelected = false;
