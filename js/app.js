@@ -1534,6 +1534,7 @@ function _getMiriAnswer(text) {
 
     [/כמה נשאר|מה נשאר|עוד כמה קלורי/, () => {
       const coach = _coachLine(rem, over, pct, t);
+      if (over.cal > 0) return coach;
       if (rem.cal === 0) return `הגעת ליעד! ${over.cal > 0 ? `עברת ב-${over.cal} קל׳.` : 'בדיוק על הגבול'} ${coach || ''}`.trim();
       let msg = `נשאר לך:\n• ${rem.cal} קל׳\n• ${rem.protein}g חלבון\n• ${rem.carbs}g פחמימות\n• ${rem.fat}g שומן`;
       if (coach) msg += `\n\n${coach}`;
