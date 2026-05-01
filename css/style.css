@@ -1181,6 +1181,9 @@ body {
 
 /* ─── MIRI MSG BUBBLES ─── */
 .miri-msg { display: flex; flex-direction: column; gap: 2px; }
+.miri-msg-name-row { display: inline-flex; align-items: center; gap: 6px; }
+.miri-msg-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+.miri-msg-bot-inner { display: flex; flex-direction: column; gap: 4px; }
 .miri-msg-label { font-size: .68rem; font-weight: 800; color: var(--green); }
 .miri-msg-user .miri-msg-label { color: var(--lavender); }
 .miri-msg-text {

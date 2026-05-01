@@ -1534,7 +1534,7 @@ function _getMiriAnswer(text) {
       return msg;
     }],
 
-    [/כמה נשאר|עוד כמה קלורי/, () => {
+    [/כמה נשאר|מה נשאר|עוד כמה קלורי/, () => {
       const coach = _coachLine(rem, over, pct, t);
       if (rem.cal === 0) return `הגעת ליעד! ${over.cal > 0 ? `עברת ב-${over.cal} קל׳.` : 'בדיוק על הגבול'} ${coach || ''}`.trim();
       let msg = `נשאר לך:\n• ${rem.cal} קל׳\n• ${rem.protein}g חלבון\n• ${rem.carbs}g פחמימות\n• ${rem.fat}g שומן`;
@@ -1865,7 +1865,7 @@ function miriSend() {
 
   const typingDiv = document.createElement('div');
   typingDiv.className = 'miri-msg miri-msg-bot';
-  typingDiv.innerHTML = '<img class="miri-msg-avatar" src="images/מירי ממליצה חיוך 2.png"><div class="miri-msg-bot-inner"><span class="miri-msg-label">מירי:</span><span class="miri-dots"><span>.</span><span>.</span><span>.</span></span></div>';
+  typingDiv.innerHTML = '<div class="miri-msg-bot-inner"><span class="miri-msg-name-row"><img class="miri-msg-avatar" src="images/מירי ממליצה חיוך 2.png"><span class="miri-msg-label">מירי:</span></span><span class="miri-dots"><span>.</span><span>.</span><span>.</span></span></div>';
   msgs.appendChild(typingDiv);
 
   msgs.scrollTop = msgs.scrollHeight;
@@ -1915,7 +1915,7 @@ function miriSend() {
   }
 
   setTimeout(() => {
-    typingDiv.innerHTML = '<img class="miri-msg-avatar" src="images/מירי ממליצה חיוך 2.png"><div class="miri-msg-bot-inner"><span class="miri-msg-label">מירי:</span><span class="miri-msg-text"></span></div>';
+    typingDiv.innerHTML = '<div class="miri-msg-bot-inner"><span class="miri-msg-name-row"><img class="miri-msg-avatar" src="images/מירי ממליצה חיוך 2.png"><span class="miri-msg-label">מירי:</span></span><span class="miri-msg-text"></span></div>';
     typingDiv.querySelector('.miri-msg-text').textContent = replyText;
     msgs.scrollTop = msgs.scrollHeight;
   }, 3000);
