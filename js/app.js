@@ -424,10 +424,9 @@ function showAutoMissingQty(aiMsg, aiText, warnBox) {
     toast.className = 'auto-qty-toast';
     document.body.appendChild(toast);
   }
-  toast.innerHTML = `<div>${escHtml(msg)}</div><button type="button" class="auto-qty-toast-ok">אישור</button>`;
+  toast.innerHTML = `<div class="auto-qty-toast-box"><div>${escHtml(msg)}</div><button type="button" class="auto-qty-toast-ok">אישור</button></div>`;
   toast.querySelector('.auto-qty-toast-ok').addEventListener('click', () => toast.classList.remove('show'));
   toast.classList.add('show');
-  aiMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function splitAutoQuantityItems(text) {
@@ -1470,26 +1469,31 @@ function miriSend() {
 
   const userDiv = document.createElement('div');
   userDiv.className = 'miri-msg miri-msg-user';
-  userDiv.textContent = text;
+  userDiv.innerHTML = '<span class="miri-msg-label">אתה:</span><span class="miri-msg-text"></span>';
+  userDiv.querySelector('.miri-msg-text').textContent = text;
   msgs.appendChild(userDiv);
 
-  const replyDiv = document.createElement('div');
-  replyDiv.className = 'miri-msg miri-msg-bot';
-  replyDiv.textContent = 'אני מחשבת את הנתונים שלך...';
-  msgs.appendChild(replyDiv);
+  const sep = document.createElement('div');
+  sep.className = 'miri-msg-sep';
+  msgs.appendChild(sep);
+
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'miri-msg miri-msg-bot';
+  typingDiv.innerHTML = '<span class="miri-msg-label">מירי:</span><span class="miri-dots"><span>.</span><span>.</span><span>.</span></span>';
+  msgs.appendChild(typingDiv);
 
   msgs.scrollTop = msgs.scrollHeight;
   input.value = '';
 
   const isRecommendRequest = /המלצ|מה לאכול|מה כדאי|תמליצ|מה אפשר|תציעי|תציע|מה עוד|מה נשאר/.test(text);
-
   const isRejection = /לא בא לי|לא רוצה|לא אוהב|אין לי|תחליף|בלי/.test(text);
 
+  let replyText;
   if (isRejection && _lastRecommendedFoods.length > 0) {
-    replyDiv.textContent = _handleRejection(text);
+    replyText = _handleRejection(text);
   } else if (isRecommendRequest) {
     _rejectedFoods = [];
-    replyDiv.textContent = getMiriRecommendation();
+    replyText = getMiriRecommendation();
   } else {
     const t = totals();
     const rem = {
@@ -1505,10 +1509,14 @@ function miriSend() {
     if (t.fat > GOALS.fat * 0.85) reply += '\n⚠️ שימי לב — צריכת השומן גבוהה.';
     if (t.protein < GOALS.protein * 0.5) reply += '\n💪 כדאי להוסיף מקור חלבון.';
 
-    replyDiv.textContent = reply;
+    replyText = reply;
   }
 
-  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(() => {
+    typingDiv.innerHTML = '<span class="miri-msg-label">מירי:</span><span class="miri-msg-text"></span>';
+    typingDiv.querySelector('.miri-msg-text').textContent = replyText;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 3000);
 }
 
 document.querySelector('.miri-chat-voice').addEventListener('click', toggleMiriVoice);

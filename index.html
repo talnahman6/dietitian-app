@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מירי - הדיאטנית האישית שלך</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=11">
+<link rel="stylesheet" href="css/style.css?v=12">
 <style>
 .miri-fab-wrap{right:20px;left:auto;bottom:20px;z-index:9999;align-items:flex-start}
 @media (min-width:600px){
@@ -14,6 +14,15 @@
   .miri-chat-msgs{min-height:0;overflow-y:auto}
   .miri-chat-input-row{flex-shrink:0}
 }
+.miri-msg{display:flex;flex-direction:column;gap:2px}
+.miri-msg-label{font-size:.72rem;font-weight:700;color:var(--green)}
+.miri-msg-user .miri-msg-label{color:#818cf8}
+.miri-msg-text{font-size:.88rem;white-space:pre-wrap}
+.miri-msg-sep{border:none;border-top:1px solid rgba(255,255,255,.1);margin:2px 0}
+.miri-dots span{display:inline-block;animation:miriBlink 1.2s infinite}
+.miri-dots span:nth-child(2){animation-delay:.2s}
+.miri-dots span:nth-child(3){animation-delay:.4s}
+@keyframes miriBlink{0%,80%,100%{opacity:.2}40%{opacity:1}}
 </style>
 </head>
 <body>
@@ -461,7 +470,7 @@
 <script src="js/avatar.js"></script>
 <script src="data/foods.js"></script>
 <script src="js/parser.js?v=4"></script>
-<script src="js/app.js?v=10027"></script>
+<script src="js/app.js?v=10028"></script>
 <script src="js/usda.js"></script>
 <script>
 (function() {
