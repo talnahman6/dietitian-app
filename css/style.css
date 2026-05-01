@@ -322,11 +322,11 @@ body {
   border: 1.5px solid var(--bdr);
   border-radius: 12px;
   padding: 13px 10px;
-  color: var(--txt);
+  color: var(--txt2);
   font-family: 'Heebo', sans-serif;
   font-size: .88rem;
   outline: none;
-  width: 68px;
+  width: 100%;
   flex-shrink: 0;
   text-align: center;
   transition: border-color .2s;
@@ -334,6 +334,7 @@ body {
   appearance: textfield;
 }
 .qty-num:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(74,155,127,.12); }
+.qty-num::placeholder { color: var(--txt3); opacity: 1; }
 .qty-num::-webkit-inner-spin-button, .qty-num::-webkit-outer-spin-button { -webkit-appearance: none; }
 
 .qty-sel {
@@ -371,8 +372,8 @@ body {
   background: var(--inp);
   border: 1.5px solid var(--bdr);
   border-radius: 12px;
-  padding: 13px 30px 13px 12px;
-  color: var(--txt);
+  padding: 13px 28px 13px 10px;
+  color: var(--txt2);
   font-family: 'Heebo', sans-serif;
   font-size: .85rem;
   outline: none;
@@ -1571,8 +1572,8 @@ body {
 @media(max-width: 600px) {
   #manual-section .input-row {
     display: grid !important;
-    grid-template-columns: repeat(3, minmax(0,1fr)) !important;
-    grid-template-areas: "search search search" "meal fraction unit" "cam mic mic" "add add add" !important;
+    grid-template-columns: repeat(6, minmax(0,1fr)) !important;
+    grid-template-areas: "search search search search search search" "meal meal fraction fraction unit unit" "cam cam cam mic mic mic" "add add add add add add" !important;
     gap: 10px !important;
     overflow: visible !important;
   }
