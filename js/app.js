@@ -141,6 +141,36 @@ function render() {
 
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
+function _safeDietData() {
+  try { return JSON.parse(localStorage.getItem(_DIET_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+function updateProfileView() {
+  const d = _safeDietData();
+  const firstName = ((_currentUser.fullName || '').trim().split(/\s+/)[0] || '-');
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val || '-';
+  };
+  set('profile-name', firstName);
+  set('profile-weight', d.weight ? `${d.weight} ק"ג` : '-');
+  set('profile-height', d.height ? `${d.height} ס"מ` : '-');
+  set('profile-activity', d.activity ? String(d.activity) : '-');
+  set('profile-calories', GOALS.cal ? `${GOALS.cal} קל׳` : '-');
+}
+
+function showView(viewName) {
+  document.querySelectorAll('.app-view').forEach(view => {
+    view.classList.toggle('active', view.id === `view-${viewName}`);
+  });
+  document.querySelectorAll('.bn-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.view === viewName);
+  });
+  if (viewName === 'profile') updateProfileView();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 /* ─────────────────────────────────────────────────────────
    AUTO-COMPLETE
    ─────────────────────────────────────────────────────── */
@@ -2170,6 +2200,7 @@ function addManualFood() {
    ─────────────────────────────────────────────────────── */
 render();
 initVoice();
+updateProfileView();
 (function() {
   const _minp = document.getElementById('food-input');
   const _qtySel = document.getElementById('qty-sel');

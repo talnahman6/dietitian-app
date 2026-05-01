@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מירי - הדיאטנית האישית שלך</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=22">
+<link rel="stylesheet" href="css/style.css?v=25">
 <style>
-.miri-fab-wrap{right:20px;left:auto;bottom:20px;z-index:9999;align-items:flex-start}
+.miri-fab-wrap{right:20px;left:auto;bottom:116px;z-index:9999;align-items:flex-start}
 @media (max-width:900px){
   .miri-fab-wrap{inset:0;bottom:0;right:0;left:0;align-items:stretch;justify-content:flex-end;pointer-events:none}
-  .miri-fab-wrap .miri-fab{pointer-events:auto;position:fixed;right:18px;bottom:18px}
+  .miri-fab-wrap .miri-fab{pointer-events:auto;position:fixed;right:18px;bottom:112px}
   .miri-chat{width:calc(100vw - 16px);height:calc(100dvh - 24px);margin:8px;max-height:none;border-radius:18px;pointer-events:auto}
   .miri-chat-msgs{min-height:0;overflow-y:auto}
   .miri-chat-input-row{flex-shrink:0;padding-bottom:max(12px,env(safe-area-inset-bottom))}
@@ -39,17 +39,15 @@
 <body>
 <div id="v2-marker" style="display:none">MIRI_CHAT_UI_V2_ACTIVE</div>
 <div id="app">
+<section class="app-view active" id="view-home">
 <!-- HEADER -->
 <header class="header">
   <div class="avatar-wrap" id="main-avatar"><img src="images/yamu_jay-ai-generated-9044938.png" alt="מירי" style="width:100%; height:100%; object-fit:cover; object-position:50% 30%; transform:scale(1.3);"></div>
   <div class="hdr-text">
-    <h1>מירי — הדיאטנית האישית שלך</h1>
+    <h1><span>מירי — הדיאטנית האישית שלך</span><span class="miri-status-dot" aria-hidden="true"></span></h1>
     <div class="hdr-bottom">
       <span class="user-name" id="user-name"></span>
-      <div class="hdr-actions">
-        <span class="badge">מחוברת</span>
-        <button class="btn-logout" onclick="logout()">התנתק</button>
-      </div>
+      <button class="btn-logout" onclick="logout()">התנתק</button>
     </div>
   </div>
 </header>
@@ -154,6 +152,23 @@
   </div>
 </div>
 
+</section>
+
+<section class="app-view" id="view-journal">
+<div class="page-panel diary-page">
+  <div class="page-title-row">
+    <h2>היומן שלי</h2>
+    <span>📅</span>
+  </div>
+  <div class="diary-slots">
+    <div class="diary-slot"><span>07:00</span><strong>בוקר</strong><small>ארוחת פתיחה קלה</small></div>
+    <div class="diary-slot"><span>13:00</span><strong>צהריים</strong><small>ארוחה מרכזית</small></div>
+    <div class="diary-slot"><span>16:30</span><strong>ביניים</strong><small>משהו קטן ומאוזן</small></div>
+    <div class="diary-slot"><span>19:30</span><strong>ערב</strong><small>ארוחה מסודרת</small></div>
+    <div class="diary-slot"><span>22:00</span><strong>לילה</strong><small>רק אם רעבים</small></div>
+  </div>
+</div>
+
 <!-- FOOD LOG -->
 <div class="food-log">
   <div class="log-hdr">
@@ -168,6 +183,26 @@
     </div>
   </div>
 </div>
+</section>
+
+<section class="app-view" id="view-profile">
+<div class="page-panel profile-page">
+  <div class="page-title-row">
+    <h2>אזור אישי</h2>
+    <span>👤</span>
+  </div>
+  <div class="profile-list">
+    <div class="profile-row"><span>👤</span><strong>יצירת משתמש</strong><em id="profile-name">-</em></div>
+    <div class="profile-row"><span>🌐</span><strong>שפות</strong><em>עברית</em></div>
+    <div class="profile-row"><span>⚙️</span><strong>הגדרות פרופיל</strong><em>פעיל</em></div>
+    <div class="profile-row"><span>⚖️</span><strong>משקל</strong><em id="profile-weight">-</em></div>
+    <div class="profile-row"><span>📏</span><strong>גובה</strong><em id="profile-height">-</em></div>
+    <div class="profile-row"><span>🏃</span><strong>רמת פעילות</strong><em id="profile-activity">-</em></div>
+    <div class="profile-row"><span>🔥</span><strong>מטרת קלוריות</strong><em id="profile-calories">-</em></div>
+    <div class="profile-row"><span>💧</span><strong>מטרת מים</strong><em>3000 מ״ל</em></div>
+  </div>
+</div>
+</section>
 
 <!-- AI RESPONSE -->
 <div class="ai-msg" id="ai-msg">
@@ -262,19 +297,17 @@
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <button class="bn-tab active" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <button class="bn-tab active" data-view="home" onclick="showView('home')">
     <span class="bn-icon">🏠</span>
     <span>ראשי</span>
   </button>
-  <button class="bn-tab" onclick="var p=document.getElementById('miri-popup');p.style.display=p.style.display==='flex'?'none':'flex'">
-    <span class="bn-center">
-      <span class="bn-icon">✨</span>
-      <span class="bn-lbl">מירי</span>
-    </span>
+  <button class="bn-tab" data-view="journal" onclick="showView('journal')">
+    <span class="bn-icon">📅</span>
+    <span>היומן שלי</span>
   </button>
-  <button class="bn-tab" onclick="document.getElementById('food-list').scrollIntoView({behavior:'smooth'})">
-    <span class="bn-icon">🍽️</span>
-    <span>יומן</span>
+  <button class="bn-tab" data-view="profile" onclick="showView('profile')">
+    <span class="bn-icon">👤</span>
+    <span>אזור אישי</span>
   </button>
 </nav>
 
@@ -293,6 +326,7 @@
     </div>
   </div>
   <button class="miri-fab" onclick="var p=document.getElementById('miri-popup');p.style.display=p.style.display==='flex'?'none':'flex'" aria-label="מירי ממליצה">
+    <span class="miri-fab-arc">מירי ממליצה</span>
     <div class="miri-fab-avatar">
       <img src="images/מירי ממליצה חיוך 2.png" alt="מירי ממליצה">
     </div>
@@ -496,7 +530,7 @@
 <script src="js/avatar.js"></script>
 <script src="data/foods.js"></script>
 <script src="js/parser.js?v=4"></script>
-<script src="js/app.js?v=10050"></script>
+<script src="js/app.js?v=10051"></script>
 <script src="js/usda.js"></script>
 <script>
 (function() {
