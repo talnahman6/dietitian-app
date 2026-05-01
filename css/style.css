@@ -163,6 +163,7 @@ body {
   width: 15px;
   height: 15px;
   flex: 0 0 15px;
+  margin-top: -3px;
   border-radius: 50%;
   background: #31e981;
   box-shadow: 0 0 0 5px rgba(49,233,129,.2), 0 0 20px rgba(49,233,129,.95);
