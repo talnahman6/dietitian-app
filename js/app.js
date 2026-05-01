@@ -408,8 +408,8 @@ function hasAutoExplicitQuantity(text) {
   return AUTO_EXPLICIT_QTY_RE.test(text.trim().toLowerCase());
 }
 
-function showAutoMissingQty(aiMsg, aiText, warnBox) {
-  const msg = 'בחיפוש אוטומטי יש לרשום כמות + יחידת משקל. למשל: אכלתי 100 גרם חזה עוף, אכלתי רבע צלחת אורז';
+function showAutoMissingQty(aiMsg, aiText, warnBox, customMsg) {
+  const msg = customMsg || 'בחיפוש אוטומטי יש לרשום כמות + יחידת משקל. למשל: אכלתי 100 גרם חזה עוף, אכלתי רבע צלחת אורז';
   if (warnBox) warnBox.innerHTML = '';
   aiMsg.classList.add('show');
   aiText.textContent = msg;
@@ -701,8 +701,7 @@ async function addFood() {
     const unit = document.getElementById('qty-sel').value;
     const qtyNum = parseFloat(document.getElementById('qty-num').value);
     if (!isPlateUnit(unit) && (!qtyNum || qtyNum <= 0)) {
-      aiMsg.classList.add('show');
-      aiText.textContent = 'יש להזין כמות לפני הוספת המאכל';
+      showAutoMissingQty(aiMsg, aiText, warnBox, 'יש להזין כמות לפני הוספת המאכל. למשל: 100 גרם אורז או חצי צלחת אורז');
       return;
     }
     const food = selectedManualFood || _acSelectedFood || manualFindFood(raw);
@@ -2172,8 +2171,7 @@ function addManualFood() {
   const qtyNum = parseFloat(document.getElementById('qty-num').value);
   const unit = document.getElementById('qty-sel').value;
   if (!isPlateUnit(unit) && (!qtyNum || qtyNum <= 0)) {
-    aiMsg.classList.add('show');
-    aiText.textContent = 'יש להזין כמות לפני הוספת המאכל';
+    showAutoMissingQty(aiMsg, aiText, document.getElementById('warn-box'), 'יש להזין כמות לפני הוספת המאכל. למשל: 100 גרם אורז או חצי צלחת אורז');
     return;
   }
   const food = selectedManualFood || manualFindFood(raw);

@@ -155,15 +155,17 @@ body {
   font-weight: 900;
   color: white;
   line-height: 1.2;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+  display: block;
+  position: relative;
+  padding-right: 24px;
 }
 .miri-status-dot {
+  position: absolute;
+  right: 0;
+  top: .2em;
   width: 15px;
   height: 15px;
   flex: 0 0 15px;
-  margin-top: -3px;
   border-radius: 50%;
   background: #31e981;
   box-shadow: 0 0 0 5px rgba(49,233,129,.2), 0 0 20px rgba(49,233,129,.95);
@@ -377,11 +379,12 @@ body {
 
 .custom-select-wrap { position: relative; min-width: 0; flex-shrink: 0; }
 .custom-select-btn {
+  position: relative;
   width: 100%;
   background: var(--inp);
   border: 1.5px solid var(--bdr);
   border-radius: 12px;
-  padding: 13px 12px;
+  padding: 13px 30px 13px 12px;
   color: var(--txt);
   font-family: 'Heebo', sans-serif;
   font-size: .85rem;
@@ -391,6 +394,17 @@ body {
   text-align: center;
   transition: border-color .2s;
   touch-action: manipulation;
+}
+.custom-select-btn::after {
+  content: '⌄';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-54%);
+  color: var(--txt2);
+  font-size: .95rem;
+  font-weight: 900;
+  pointer-events: none;
 }
 .custom-select-btn:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(74,155,127,.12); }
 .custom-select-list {
@@ -1126,10 +1140,10 @@ body {
 .miri-fab:hover { transform: scale(1.06); }
 .miri-fab-arc {
   position: absolute;
-  right: -20px;
-  top: -34px;
+  right: -16px;
+  top: -20px;
   width: 104px;
-  height: 58px;
+  height: 46px;
   color: var(--green);
   font-size: .74rem;
   font-weight: 900;
@@ -1140,8 +1154,8 @@ body {
   position: absolute;
   right: 50%;
   top: 0;
-  transform-origin: 50% 56px;
-  transform: translateX(50%) rotate(calc(-58deg + (var(--i) * 11.6deg)));
+  transform-origin: 50% 45px;
+  transform: translateX(50%) rotate(calc(58deg - (var(--i) * 11.6deg)));
 }
 .miri-fab-avatar {
   width: 64px; height: 64px;
