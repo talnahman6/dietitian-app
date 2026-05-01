@@ -541,10 +541,14 @@ async function addMeal(raw, sourceInput) {
   }
   save();
   render();
-
-  let msg = added > 0 ? `נוספו ${added} מאכלים | סה״כ ${Math.round(addedCal)} קלוריות` : '';
-  if (failed.length > 0) msg += `${msg ? ' | ' : ''}לא זיהיתי: ${failed.join(', ')}`;
-  aiText.textContent = msg;
+  if (added > 0) playRegisterSound();
+  if (failed.length > 0) {
+    aiMsg.classList.add('show');
+    aiText.textContent = `לא זיהיתי: ${failed.join(', ')}`;
+  } else {
+    aiMsg.classList.remove('show');
+    aiText.textContent = '';
+  }
   warnBox.innerHTML = '';
 
   const total = totals();
@@ -677,14 +681,42 @@ function manualFindFood(name) {
   return findFood(name);
 }
 
+function playRegisterSound() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.0001, ctx.currentTime);
+    master.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.02);
+    master.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.38);
+    master.connect(ctx.destination);
+    [880, 1320, 1760].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = i === 2 ? 'triangle' : 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.055);
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime + i * 0.055);
+      gain.gain.exponentialRampToValueAtTime(0.5, ctx.currentTime + i * 0.055 + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + i * 0.055 + 0.16);
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start(ctx.currentTime + i * 0.055);
+      osc.stop(ctx.currentTime + i * 0.055 + 0.18);
+    });
+    setTimeout(() => ctx.close(), 600);
+  } catch {}
+}
+
 function _commitFoodEntry(result) {
   if (!result.quantityDisplay && result.raw) result.quantityDisplay = extractAutoQuantityDisplay(result.raw);
   log.push(result);
   save();
   const aiMsg  = document.getElementById('ai-msg');
   const aiText = document.getElementById('ai-text');
-  aiMsg.classList.add('show');
-  aiText.textContent = `נרשם! ${result.food.n[0]} (${Math.round(result.grams)}g) — ${result.cal} קלוריות, ${result.carbs}g פחמימות, ${result.protein}g חלבונים, ${result.fat}g שומנים.\n${getMiriFeedback()}`;
+  aiMsg.classList.remove('show');
+  aiText.textContent = '';
+  playRegisterSound();
   const warnBox = document.getElementById('warn-box');
   const total   = totals();
   const warns   = [];
@@ -1143,8 +1175,9 @@ function fpAdd() {
   save();
   const aiMsg = document.getElementById('ai-msg');
   const aiText = document.getElementById('ai-text');
-  aiMsg.classList.add('show');
-  aiText.textContent = `נרשם! ${fpFood.n[0]} (${g}g) — ${entry.cal} קלוריות, ${entry.carbs}g פחמימות, ${entry.protein}g חלבונים, ${entry.fat}g שומנים.`;
+  aiMsg.classList.remove('show');
+  aiText.textContent = '';
+  playRegisterSound();
   document.getElementById('warn-box').innerHTML = '';
   const t = totals();
   let warns = [];
@@ -1288,8 +1321,9 @@ function fdAdd() {
 
   const aiMsg  = document.getElementById('ai-msg');
   const aiText = document.getElementById('ai-text');
-  aiMsg.classList.add('show');
-  aiText.textContent = `נרשם! ${entry.food.n[0]} (${grams}g) — ${entry.cal} קלוריות, ${entry.carbs}g פחמימות, ${entry.protein}g חלבונים, ${entry.fat}g שומנים.`;
+  aiMsg.classList.remove('show');
+  aiText.textContent = '';
+  playRegisterSound();
 
   const warnBox = document.getElementById('warn-box');
   const total = totals();
