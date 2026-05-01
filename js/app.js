@@ -381,6 +381,17 @@ function formatQuantityDisplay(qty, unit) {
   return `${qty} ${displayUnit(qty, unit)}`;
 }
 
+function extractAutoQuantityDisplay(text) {
+  const t = text.trim().toLowerCase();
+  const plateM = t.match(/(?:^|\s)(\u05e8\u05d1\u05e2|\u05e9\u05dc\u05d9\u05e9|\u05d7\u05e6\u05d9|\u05e9\u05dc\u05dd)\s+\u05e6\u05dc\u05d7\u05ea(?:\s|$)/);
+  if (plateM) return plateM[1] + ' \u05e6\u05dc\u05d7\u05ea';
+  const qtyM = t.match(/(\d+(?:[.,]\d+)?)\s*(\u05d2\u05e8\u05dd|\u05d2|\u05de\"\u05dc|\u05de\u05d9\u05dc\u05d9\u05dc\u05d9\u05d8\u05e8|\u05de\u05dc|\u05db\u05e3|\u05db\u05e4\u05d5\u05ea|\u05db\u05e4\u05d9\u05ea|\u05db\u05e4\u05d9\u05d5\u05ea|\u05db\u05d5\u05e1|\u05db\u05d5\u05e1\u05d5\u05ea|\u05d9\u05d7\u05d9\u05d3\u05d4|\u05d9\u05d7\u05d9\u05d3\u05d5\u05ea|\u05e4\u05e8\u05d5\u05e1\u05d4|\u05e4\u05e8\u05d5\u05e1\u05d5\u05ea)(?:\s|$)/);
+  if (!qtyM) return '';
+  const qty = qtyM[1].replace(',', '.');
+  const unit = qtyM[2] === '\u05d2' ? '\u05d2\u05e8\u05dd' : qtyM[2];
+  return formatQuantityDisplay(qty, unit);
+}
+
 const AUTO_PREFIX_RE = /^(?:\u05d0\u05db\u05dc\u05ea\u05d9|\u05d0\u05db\u05dc\u05ea|\u05d0\u05db\u05dc|\u05d0\u05db\u05dc\u05d4|\u05e9\u05ea\u05d9\u05ea\u05d9|\u05e9\u05ea\u05d9\u05ea)\s+/;
 const AUTO_PLATE_RE = /(^|\s)\u05e6\u05dc\u05d7\u05ea(?=\s|$)/;
 const AUTO_QUARTER_RE = /(^|\s)\u05e8\u05d1\u05e2(?=\s|$)/;
@@ -402,7 +413,7 @@ function hasAutoExplicitQuantity(text) {
 }
 
 function showAutoMissingQty(aiMsg, aiText, warnBox) {
-  const msg = 'שכחת להוסיף כמות ויחידת משקל. למשל: אכלתי 100 גרם חזה עוף ורבע צלחת אורז';
+  const msg = 'יש לרשום כמות + יחידת משקל. למשל: אכלתי 100 גרם חזה עוף, אכלתי רבע צלחת אורז';
   if (warnBox) warnBox.innerHTML = '';
   aiMsg.classList.add('show');
   aiText.textContent = msg;
@@ -438,7 +449,10 @@ function parseAutoFood(part) {
   if (!hasAutoExplicitQuantity(t)) return null;
   if (!AUTO_PLATE_RE.test(t)) {
     let result = parseFood(part);
-    if (result) return result;
+    if (result) {
+      result.quantityDisplay = result.quantityDisplay || extractAutoQuantityDisplay(part);
+      return result;
+    }
   }
   const cleaned = cleanAutoText(part)
     .replace(AUTO_QTY_WORDS_RE, ' ')
@@ -651,6 +665,7 @@ function manualFindFood(name) {
 }
 
 function _commitFoodEntry(result) {
+  if (!result.quantityDisplay && result.raw) result.quantityDisplay = extractAutoQuantityDisplay(result.raw);
   log.push(result);
   save();
   const msgs = [
@@ -795,13 +810,13 @@ async function addAutoFood() {
   const raw = inp ? inp.value.trim() : '';
   if (!raw) return;
 
-  const handled = await addMeal(raw.replace(/\n/g, ','), inp);
-  if (handled) return;
-
   if (!hasAutoExplicitQuantity(cleanAutoText(raw))) {
     showAutoMissingQty(aiMsg, aiText, warnBox);
     return;
   }
+
+  const handled = await addMeal(raw.replace(/\n/g, ','), inp);
+  if (handled) return;
 
   const result = parseAutoFood(cleanAutoText(raw));
   if (result) {
