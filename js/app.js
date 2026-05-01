@@ -1352,54 +1352,44 @@ function getMiriFeedback() {
 function getMiriRecommendation(excluded = []) {
   const t = totals();
   const rem = {
-    cal:     Math.max(0, GOALS.cal     - t.cal),
-    carbs:   Math.max(0, GOALS.carbs   - t.carbs),
-    protein: Math.max(0, GOALS.protein - t.protein),
-    fat:     Math.max(0, GOALS.fat     - t.fat),
+    cal:     Math.max(0, Math.round(GOALS.cal     - t.cal)),
+    carbs:   Math.max(0, Math.round(GOALS.carbs   - t.carbs)),
+    protein: Math.max(0, Math.round(GOALS.protein - t.protein)),
+    fat:     Math.max(0, Math.round(GOALS.fat     - t.fat)),
   };
 
-  if (rem.cal < 50) return 'הגעת ליעד הקלוריות שלך להיום! כל הכבוד 💪';
+  const excludedNames = new Set(excluded.map(f => f.n[0]));
+  const findFood = names => DB.find(f =>
+    !excludedNames.has(f.n[0]) && names.some(name => f.n.some(n => n.includes(name)))
+  );
+  const gramsFor = (food, macro, amount) => {
+    const per100 = macro === 'protein' ? food.p : macro === 'carbs' ? food.c : food.f;
+    if (!per100) return 100;
+    const byMacro = amount / per100 * 100;
+    const byCal = rem.cal > 0 && food.cal ? rem.cal / food.cal * 100 : byMacro;
+    return Math.max(30, Math.min(300, Math.round(Math.min(byMacro, byCal) / 10) * 10));
+  };
 
-  const proteinLow = t.protein < GOALS.protein * 0.6;
-  const fatHigh    = t.fat     > GOALS.fat     * 0.8;
-  const carbsHigh  = t.carbs   > GOALS.carbs   * 0.8;
-
-  function scoreFood(f) {
-    if (!f.cal) return -1;
-    const cal100 = f.cal;
-    let s = 5;
-    if (proteinLow) s += (f.p / cal100) * 200;
-    if (fatHigh)    s -= (f.f / cal100) * 100;
-    if (carbsHigh)  s -= (f.c / cal100) * 80;
-    return s;
+  if (rem.cal < 50 && rem.protein < 5 && rem.carbs < 10 && rem.fat < 5) {
+    return 'הגעת ליעדים שלך להיום. כל הכבוד!';
   }
 
-  const _excSet = new Set(excluded.map(f => f.n[0]));
-  const picks = DB
-    .map(f => ({ f, s: scoreFood(f) }))
-    .filter(x => x.s > 0 && !_excSet.has(x.f.n[0]))
-    .sort((a, b) => b.s - a.s)
-    .slice(0, 3);
-  _lastRecommendedFoods = picks.map(x => x.f);
+  const options = [
+    rem.protein > 0 && { food: findFood(['חזה עוף', 'עוף', 'טונה', 'ביצה']), macro: 'protein', amount: rem.protein },
+    rem.carbs > 0 && { food: findFood(['אורז', 'תפוח אדמה', 'תפו"א', 'תפוחי אדמה']), macro: 'carbs', amount: rem.carbs },
+    rem.fat > 0 && { food: findFood(['אבוקדו', 'טחינה']), macro: 'fat', amount: rem.fat },
+  ].filter(x => x && x.food).slice(0, 3);
 
-  if (picks.length === 0) return 'כל הכבוד — הגעת ליעדי התזונה שלך!';
+  _lastRecommendedFoods = options.map(x => x.food);
 
-  const _mf = getMiriFeedback();
-  let msg = (_mf ? _mf + '\n\n' : '') + 'היי! הנה ההמלצות שלי:\n\n';
-  let totCal = 0, totProt = 0, totCarbs = 0, totFat = 0;
+  if (options.length === 0) return 'לא מצאתי כרגע המלצה מתאימה לפי הנתונים הקיימים.';
 
-  for (const { f } of picks) {
-    const g = Math.min(Math.max(f.dw || 100, 50), 300);
-    const fac = g / 100;
-    const c  = Math.round(f.cal * fac);
-    const p  = Math.round(f.p   * fac);
-    const h  = Math.round(f.c   * fac);
-    const ft = Math.round(f.f   * fac);
-    msg += `• ${f.n[0]} — ${g}g (${c} קל׳, חלבון ${p}g)\n`;
-    totCal += c; totProt += p; totCarbs += h; totFat += ft;
+  let msg = `נשאר לך:\n${rem.cal} קלוריות\n${rem.protein} חלבון\n${rem.carbs} פחמימות\n${rem.fat} שומן\n\nהייתי ממליצה:`;
+
+  for (const item of options) {
+    msg += `\n- ${gramsFor(item.food, item.macro, item.amount)} גרם ${item.food.n[0]}`;
   }
 
-  msg += `\nסה"כ: ${totCal} קל׳ | חלבון ${totProt}g | פחמימות ${totCarbs}g | שומן ${totFat}g`;
   return msg;
 }
 
