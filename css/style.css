@@ -1179,6 +1179,40 @@ body {
 .miri-chat-voice { padding: 0 10px; font-size: 1.05rem; border-radius: 10px; height: 36px; }
 .miri-chat-send { padding: 0 12px; font-size: .82rem; border-radius: 10px; height: 36px; }
 
+@media(max-width: 599px) {
+  .miri-fab-wrap {
+    inset: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    align-items: stretch;
+    justify-content: flex-end;
+    pointer-events: none;
+  }
+  .miri-fab-wrap .miri-fab {
+    pointer-events: auto;
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+  }
+  .miri-chat {
+    width: calc(100vw - 16px);
+    height: calc(100dvh - 24px);
+    margin: 8px;
+    max-height: none;
+    border-radius: 18px;
+    pointer-events: auto;
+  }
+  .miri-chat-msgs {
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .miri-chat-input-row {
+    flex-shrink: 0;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+}
+
 /* ─── MIRI MSG BUBBLES ─── */
 .miri-msg { display: flex; flex-direction: column; gap: 2px; }
 .miri-msg-name-row { display: inline-flex; align-items: center; gap: 6px; }
