@@ -51,6 +51,7 @@ body {
 }
 .app-view { display: none; flex-direction: column; gap: 14px; }
 .app-view.active { display: flex; }
+#view-journal.app-view.active { gap: 8px; }
 .page-panel {
   background: var(--card);
   border-radius: 22px;
@@ -243,6 +244,31 @@ body {
   color: var(--txt2);
   margin-bottom: 10px;
   font-weight: 700;
+}
+.meal-select-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.meal-select-row label {
+  margin: 0;
+  font-size: .86rem;
+  color: var(--txt2);
+  white-space: nowrap;
+}
+.meal-select-row select {
+  width: 100%;
+  background: var(--inp);
+  border: 1.5px solid var(--bdr);
+  border-radius: 12px;
+  padding: 11px 14px;
+  color: var(--txt);
+  font-family: 'Heebo', sans-serif;
+  font-size: .9rem;
+  font-weight: 800;
+  outline: none;
 }
 .manual-search-hdr {
   display: flex;
@@ -579,15 +605,23 @@ body {
   min-height: 80px;
   max-height: 360px;
   overflow-y: auto;
-  padding: 10px 12px;
+  padding: 8px 12px;
+}
+.meal-group { margin-bottom: 10px; }
+.meal-group:last-child { margin-bottom: 0; }
+.meal-group-title {
+  color: var(--green);
+  font-size: .88rem;
+  font-weight: 900;
+  margin: 6px 4px 6px;
 }
 .fi {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 11px 14px;
-  border-radius: 12px;
-  margin-bottom: 8px;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  margin-bottom: 5px;
   background: var(--card2);
   border: 1px solid var(--bdr);
   animation: slideIn .3s ease;
@@ -595,8 +629,8 @@ body {
 .fi:last-child { margin-bottom: 0; }
 @keyframes slideIn { from { opacity: 0; transform: translateY(-6px) } to { opacity: 1; transform: translateY(0) } }
 .fi-info { flex: 1; min-width: 0; }
-.fi-name { font-weight: 700; font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--txt); }
-.fi-qty { font-size: .72rem; color: var(--txt3); margin-top: 2px; }
+.fi-name { font-weight: 800; font-size: .86rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--txt); }
+.fi-qty { color: var(--txt2); font-size: .78rem; font-weight: 800; white-space: nowrap; }
 .fi-nutrients { display: flex; gap: 6px; flex-shrink: 0; }
 .nb {
   display: flex;

@@ -120,6 +120,8 @@ function render() {
     return;
   }
   el.innerHTML = '';
+  renderMealGroups(el);
+  return;
   log.forEach((e, i) => {
     const div = document.createElement('div');
     div.className = 'fi';
@@ -137,6 +139,50 @@ function render() {
       <button class="btn-del" onclick="deleteItem(${i})" title="מחק">✕</button>`;
     el.appendChild(div);
   });
+}
+
+function renderMealGroups(el) {
+  const meals = [
+    ['breakfast', 'ארוחת בוקר'],
+    ['lunch', 'ארוחת צהריים'],
+    ['snack', 'ארוחת ביניים'],
+    ['dinner', 'ארוחת ערב'],
+    ['night', 'ארוחת לילה'],
+    ['none', 'ללא שיוך']
+  ];
+  meals.forEach(([meal, title]) => {
+    const items = log.map((entry, index) => ({ entry, index })).filter(item => (item.entry.mealType || 'none') === meal);
+    if (!items.length) return;
+    const group = document.createElement('div');
+    group.className = 'meal-group';
+    group.innerHTML = `<div class="meal-group-title">${title}</div>`;
+    items.forEach(({ entry: e, index: i }) => {
+      const div = document.createElement('div');
+      div.className = 'fi';
+      div.innerHTML = `
+        <div class="fi-info">
+          <div class="fi-name">${escHtml(e.food.n[0])}${e.quantityDisplay ? ' - ' + escHtml(e.quantityDisplay) : ''}</div>
+        </div>
+        <div class="fi-qty">${Math.round(e.grams)} גרם</div>
+        <button class="btn-del" onclick="deleteItem(${i})" title="מחק">✕</button>`;
+      group.appendChild(div);
+    });
+    el.appendChild(group);
+  });
+}
+
+function getSelectedMealType() {
+  return document.getElementById('meal-type')?.value || '';
+}
+
+function requireMealType() {
+  const mealType = getSelectedMealType();
+  if (mealType) return mealType;
+  const aiMsg = document.getElementById('ai-msg');
+  const aiText = document.getElementById('ai-text');
+  const warnBox = document.getElementById('warn-box');
+  showAutoMissingQty(aiMsg, aiText, warnBox, 'יש לבחור סוג ארוחה לפני הוספת המאכל');
+  return '';
 }
 
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
@@ -523,6 +569,8 @@ async function addMeal(raw, sourceInput) {
     }
   }
   if (parts.length < 2) return false;
+  const mealType = requireMealType();
+  if (!mealType) return true;
   if (parts.some(part => !hasAutoExplicitQuantity(part))) {
     showAutoMissingQty(aiMsg, aiText, warnBox);
     return true;
@@ -536,7 +584,7 @@ async function addMeal(raw, sourceInput) {
   const failed = [];
   for (const part of parts) {
     const result = parseAutoFood(part);
-    if (result) { log.push(result); added++; addedCal += result.cal; }
+    if (result) { result.mealType = mealType; log.push(result); added++; addedCal += result.cal; }
     else failed.push(part);
   }
   save();
@@ -710,6 +758,9 @@ function playRegisterSound() {
 
 function _commitFoodEntry(result) {
   if (!result.quantityDisplay && result.raw) result.quantityDisplay = extractAutoQuantityDisplay(result.raw);
+  const mealType = requireMealType();
+  if (!mealType) return false;
+  result.mealType = mealType;
   log.push(result);
   save();
   const aiMsg  = document.getElementById('ai-msg');
@@ -725,6 +776,7 @@ function _commitFoodEntry(result) {
   warnBox.innerHTML = warns.map(w => `<div class="warn-box">${w}</div>`).join('');
   render();
   document.getElementById('food-list').scrollTop = document.getElementById('food-list').scrollHeight;
+  return true;
 }
 
 async function addFood() {
@@ -1160,6 +1212,8 @@ function fpUpdate() {
 
 function fpAdd() {
   if (!fpFood) { alert('יש לבחור מאכל תחילה'); return; }
+  const mealType = requireMealType();
+  if (!mealType) return;
   const g = parseFloat(document.getElementById('fp-qty').value) || 0;
   if (g <= 0) { alert('יש להזין כמות חיובית'); return; }
   const f = g / 100;
@@ -1170,6 +1224,7 @@ function fpAdd() {
     protein: Math.round(fpFood.p * f * 10) / 10,
     fat: Math.round(fpFood.f * f * 10) / 10,
     raw: `${fpFood.n[0]} ${g}g`,
+    mealType,
   };
   log.push(entry);
   save();
@@ -1293,6 +1348,8 @@ function fdServingChange() {
 
 function fdAdd() {
   if (!_fdPickerData) return;
+  const mealType = requireMealType();
+  if (!mealType) return;
   const idx  = parseInt(document.getElementById('fd-serving-sel').value);
   const size = _fdPickerData._sizes[idx];
 
@@ -1314,6 +1371,7 @@ function fdAdd() {
     protein: Math.round(p.protein * f * 10) / 10,
     fat:     Math.round(p.fat     * f * 10) / 10,
     raw:     _fdPickerData._rawInput,
+    mealType,
   };
   log.push(entry);
   save();

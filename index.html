@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מירי - הדיאטנית האישית שלך</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=30">
+<link rel="stylesheet" href="css/style.css?v=31">
 <style>
 .miri-fab-wrap{right:20px;left:auto;bottom:116px;z-index:9999;align-items:flex-start}
 @media (max-width:900px){
@@ -71,6 +71,17 @@
       <button class="stgl-btn" id="toggle-auto" onclick="setSearchMode('auto')">חיפוש אוטומטי</button>
     </div>
     <button class="btn-help" onclick="toggleHelpPopup()">?</button>
+  </div>
+  <div class="meal-select-row">
+    <label for="meal-type">סוג ארוחה</label>
+    <select id="meal-type">
+      <option value="">בחר ארוחה</option>
+      <option value="breakfast">בוקר</option>
+      <option value="lunch">צהריים</option>
+      <option value="snack">ביניים</option>
+      <option value="dinner">ערב</option>
+      <option value="night">לילה</option>
+    </select>
   </div>
   <div id="manual-section">
     <div class="input-row">
@@ -528,7 +539,7 @@
 <script src="js/avatar.js"></script>
 <script src="data/foods.js"></script>
 <script src="js/parser.js?v=4"></script>
-<script src="js/app.js?v=10056"></script>
+<script src="js/app.js?v=10057"></script>
 <script src="js/usda.js"></script>
 <script>
 (function() {
