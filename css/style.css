@@ -118,6 +118,7 @@ body {
   color: white;
   font-weight: 800;
   white-space: nowrap;
+  min-width: 0;
 }
 .badge::before {
   content: '';
@@ -1466,8 +1467,11 @@ body {
   .header { text-align: right; padding: 20px 18px; }
   .fi-nutrients { flex-wrap: wrap; }
   .hdr-text h1 { font-size: 1.2rem; }
-  .hdr-bottom { gap: 6px; }
-  .user-name, .badge, .btn-logout { font-size: .74rem; }
+  .hdr-bottom { gap: 6px; grid-template-columns: 1.25fr 1fr 1fr; }
+  .user-name { font-size: 1.02rem; }
+  .badge { font-size: .76rem; padding: 5px 8px; gap: 4px; }
+  .badge::before { width: 10px; height: 10px; flex-basis: 10px; }
+  .btn-logout { font-size: .74rem; }
   .sc-val { font-size: 1.4rem; }
 }
 @media(max-width: 420px) {

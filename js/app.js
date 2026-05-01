@@ -14,7 +14,7 @@ function setSearchMode(mode) {
 /* ─── AUTH GATE ─── */
 requireAuth();
 const _currentUser = getLoggedUser();
-document.getElementById('user-name').textContent = 'שלום, ' + _currentUser.fullName;
+document.getElementById('user-name').textContent = 'שלום, ' + ((_currentUser.fullName || '').split(' ')[0] || '');
 
 /* inject avatar into AI message mini icon only */
 document.getElementById('mini-av').innerHTML = AVATAR_SVG;
