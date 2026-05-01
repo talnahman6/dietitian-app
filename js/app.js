@@ -979,42 +979,46 @@ function toggleAutoVoice() {
   recognition.start();
 }
 
+let _miriRec = null;
+let _miriRecording = false;
+
 function toggleMiriVoice() {
-  if (!recognition) {
-    if (!initVoice()) {
-      alert('הדפדפן שלך לא תומך בהקלטה קולית. נסה Chrome.');
-      return;
-    }
-  }
-  if (isRecording) { recognition.stop(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('הדפדפן שלך לא תומך בהקלטה קולית. נסה Chrome.'); return; }
+
   const chatInput = document.querySelector('.miri-chat-input');
   const chatBtn = document.querySelector('.miri-chat-voice');
-  recognition.onstart = () => {
-    isRecording = true;
+
+  if (_miriRecording && _miriRec) { _miriRec.stop(); return; }
+
+  _miriRec = new SR();
+  _miriRec.lang = 'he-IL';
+  _miriRec.continuous = false;
+  _miriRec.interimResults = true;
+
+  _miriRec.onstart = () => {
+    _miriRecording = true;
     chatBtn.classList.add('rec');
     chatBtn.textContent = '⏹ מקליט...';
   };
-  recognition.onresult = (e) => {
+  _miriRec.onresult = (e) => {
     let txt = '';
     for (let i = e.resultIndex; i < e.results.length; i++) txt += e.results[i][0].transcript;
     chatInput.value = txt;
   };
-  recognition.onerror = (e) => {
-    isRecording = false;
+  _miriRec.onerror = (e) => {
+    _miriRecording = false;
     chatBtn.classList.remove('rec');
-    chatBtn.textContent = '🎤';
-    if (e.error === 'no-speech') chatBtn.textContent = '🎤 לא שמעתי, נסה שוב';
+    chatBtn.textContent = e.error === 'no-speech' ? '🎤 לא שמעתי' : '🎤';
     setTimeout(() => { chatBtn.textContent = '🎤'; }, 2000);
-    initVoice();
   };
-  recognition.onend = () => {
-    isRecording = false;
+  _miriRec.onend = () => {
+    _miriRecording = false;
     chatBtn.classList.remove('rec');
     chatBtn.textContent = '🎤';
-    initVoice();
     if (chatInput.value.trim()) miriSend();
   };
-  recognition.start();
+  _miriRec.start();
 }
 
 /* ─────────────────────────────────────────────────────────
