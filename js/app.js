@@ -352,7 +352,7 @@ const AUTO_QTY_WORDS_RE = /(^|\s)(?:\u05e8\u05d1\u05e2|\u05e9\u05dc\u05d9\u05e9|
 const AUTO_QTY_NUM_RE = /\d+(?:[.,]\d+)?\s*(?:\u05d2\u05e8\u05dd|\u05d2|\u05de\"\u05dc|\u05de\u05d9\u05dc\u05d9\u05dc\u05d9\u05d8\u05e8|\u05de\u05dc|\u05db\u05e3|\u05db\u05e4\u05d5\u05ea|\u05db\u05e4\u05d9\u05ea|\u05db\u05e4\u05d9\u05d5\u05ea|\u05db\u05d5\u05e1|\u05db\u05d5\u05e1\u05d5\u05ea|\u05d9\u05d7\u05d9\u05d3\u05d4|\u05d9\u05d7\u05d9\u05d3\u05d5\u05ea)/g;
 const AUTO_GRAMS_RE = /(\d+(?:[.,]\d+)?)\s*(?:\u05d2\u05e8\u05dd|\u05d2)(?=\s|$)/;
 const AUTO_SPLIT_AND_RE = /\s+\u05d5(?=[\u05d0-\u05ea])/;
-const AUTO_ITEM_QTY_START_RE = /(^|\s)\d+(?:[.,]\d+)?\s*(?:\u05d2\u05e8\u05dd|\u05d2|\u05de\"\u05dc|\u05de\u05d9\u05dc\u05d9\u05dc\u05d9\u05d8\u05e8|\u05de\u05dc|\u05db\u05e3|\u05db\u05e4\u05d5\u05ea|\u05db\u05e4\u05d9\u05ea|\u05db\u05e4\u05d9\u05d5\u05ea|\u05db\u05d5\u05e1|\u05db\u05d5\u05e1\u05d5\u05ea|\u05d9\u05d7\u05d9\u05d3\u05d4|\u05d9\u05d7\u05d9\u05d3\u05d5\u05ea)(?=\s|$)/g;
+const AUTO_ITEM_QTY_START_RE = /(^|\s)\u05d5?\d+(?:[.,]\d+)?\s*(?:\u05d2\u05e8\u05dd|\u05d2|\u05de\"\u05dc|\u05de\u05d9\u05dc\u05d9\u05dc\u05d9\u05d8\u05e8|\u05de\u05dc|\u05db\u05e3|\u05db\u05e4\u05d5\u05ea|\u05db\u05e4\u05d9\u05ea|\u05db\u05e4\u05d9\u05d5\u05ea|\u05db\u05d5\u05e1|\u05db\u05d5\u05e1\u05d5\u05ea|\u05d9\u05d7\u05d9\u05d3\u05d4|\u05d9\u05d7\u05d9\u05d3\u05d5\u05ea)(?=\s|$)/g;
 
 function cleanAutoText(raw) {
   return raw.replace(AUTO_PREFIX_RE, '').trim();
@@ -363,7 +363,9 @@ function splitAutoQuantityItems(text) {
   let match;
   AUTO_ITEM_QTY_START_RE.lastIndex = 0;
   while ((match = AUTO_ITEM_QTY_START_RE.exec(text)) !== null) {
-    starts.push(match.index + match[1].length);
+    let start = match.index + match[1].length;
+    if (text[start] === '\u05d5') start++;
+    starts.push(start);
   }
   if (starts.length < 2) return [text];
   return starts.map((start, i) => text.slice(start, starts[i + 1] || text.length).trim()).filter(Boolean);
