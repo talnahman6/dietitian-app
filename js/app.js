@@ -413,7 +413,7 @@ function hasAutoExplicitQuantity(text) {
 }
 
 function showAutoMissingQty(aiMsg, aiText, warnBox) {
-  const msg = 'יש לרשום כמות + יחידת משקל. למשל: אכלתי 100 גרם חזה עוף, אכלתי רבע צלחת אורז';
+  const msg = 'בחיפוש אוטומטי יש לרשום כמות + יחידת משקל. למשל: אכלתי 100 גרם חזה עוף, אכלתי רבע צלחת אורז';
   if (warnBox) warnBox.innerHTML = '';
   aiMsg.classList.add('show');
   aiText.textContent = msg;
@@ -979,33 +979,53 @@ function toggleAutoVoice() {
   recognition.start();
 }
 
+let _miriRec = null;
+let _miriRecording = false;
+
 function toggleMiriVoice() {
-  if (!recognition) {
-    if (!initVoice()) {
-      alert('הדפדפן שלך לא תומך בהקלטה קולית. נסה Chrome.');
-      return;
-    }
-  }
-  if (isRecording) { recognition.stop(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('הדפדפן שלך לא תומך בהקלטה קולית. נסה Chrome.'); return; }
+
   const chatInput = document.querySelector('.miri-chat-input');
   const chatBtn = document.querySelector('.miri-chat-voice');
-  recognition.onstart = () => {
-    isRecording = true;
+
+  if (_miriRecording && _miriRec) { _miriRec.stop(); return; }
+
+  _miriRec = new SR();
+  _miriRec.lang = 'he-IL';
+  _miriRec.continuous = false;
+  _miriRec.interimResults = true;
+
+  _miriRec.onstart = () => {
+    _miriRecording = true;
     chatBtn.classList.add('rec');
     chatBtn.textContent = '⏹ מקליט...';
   };
-  recognition.onresult = (e) => {
+  _miriRec.onresult = (e) => {
     let txt = '';
     for (let i = e.resultIndex; i < e.results.length; i++) txt += e.results[i][0].transcript;
     chatInput.value = txt;
   };
-  recognition.onend = () => {
-    isRecording = false;
+  _miriRec.onerror = (e) => {
+    _miriRecording = false;
+    chatBtn.classList.remove('rec');
+    chatBtn.textContent = e.error === 'no-speech' ? '🎤 לא שמעתי' : '🎤';
+    setTimeout(() => { chatBtn.textContent = '🎤'; }, 2000);
+  };
+  _miriRec.onend = () => {
+    _miriRecording = false;
     chatBtn.classList.remove('rec');
     chatBtn.textContent = '🎤';
-    initVoice();
+    const val = chatInput.value.trim();
+    if (val) setTimeout(() => miriSend(), 100);
   };
-  recognition.start();
+  try {
+    _miriRec.start();
+  } catch(e) {
+    _miriRecording = false;
+    chatBtn.textContent = '🎤';
+    setTimeout(() => toggleMiriVoice(), 400);
+  }
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -1652,7 +1672,7 @@ function _getMiriAnswer(text) {
     [/פחמימות ב?בטטה|כמה פחמימ.*בטטה/, () => `בטטה (100g): ~20g פחמימות, ~86 קל׳.`],
     [/פחמימות ב?בננה|כמה פחמימ.*בננה/, () => `בננה בינונית: ~27g פחמימות, ~105 קל׳.`],
 
-    [/עברתי.*יעד|עברתי.*קלורי|אכלתי יותר מדי|אכלתי הרבה/, () =>
+    [/עברתי.*יעד|עברתי.*קלורי|אכלתי יותר מדי|אכלתי הרבה|חרגתי|חריגה היום/, () =>
       calOver
         ? `עברת ב-${over.cal} קל׳ — גם יום כזה קורה 😊 לא לפצות מחר, פשוט חוזרים למסלול!`
         : calDone
@@ -1855,7 +1875,7 @@ function miriSend() {
 
   const typingDiv = document.createElement('div');
   typingDiv.className = 'miri-msg miri-msg-bot';
-  typingDiv.innerHTML = '<span class="miri-msg-label">מירי:</span><span class="miri-dots"><span>.</span><span>.</span><span>.</span></span>';
+  typingDiv.innerHTML = '<img class="miri-msg-avatar" src="images/מירי ממליצה חיוך 2.png"><div class="miri-msg-bot-inner"><span class="miri-msg-label">מירי:</span><span class="miri-dots"><span>.</span><span>.</span><span>.</span></span></div>';
   msgs.appendChild(typingDiv);
 
   msgs.scrollTop = msgs.scrollHeight;
@@ -1905,7 +1925,7 @@ function miriSend() {
   }
 
   setTimeout(() => {
-    typingDiv.innerHTML = '<span class="miri-msg-label">מירי:</span><span class="miri-msg-text"></span>';
+    typingDiv.innerHTML = '<img class="miri-msg-avatar" src="images/מירי ממליצה חיוך 2.png"><div class="miri-msg-bot-inner"><span class="miri-msg-label">מירי:</span><span class="miri-msg-text"></span></div>';
     typingDiv.querySelector('.miri-msg-text').textContent = replyText;
     msgs.scrollTop = msgs.scrollHeight;
   }, 3000);
