@@ -405,6 +405,7 @@ function splitAutoQuantityItems(text) {
 
 function parseAutoFood(part) {
   const t = part.trim().toLowerCase();
+  if (!hasAutoExplicitQuantity(t)) return null;
   if (!AUTO_PLATE_RE.test(t)) {
     let result = parseFood(part);
     if (result) return result;
