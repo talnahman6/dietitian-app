@@ -11,9 +11,24 @@ function syncDevMobileButton(active) {
 }
 
 function toggleDevMobileView() {
-  const active = document.body.classList.toggle('dev-mobile-preview');
-  syncDevMobileButton(active);
-  try { localStorage.setItem('devMobilePreview', active ? '1' : '0'); } catch (e) {}
+  const existing = document.getElementById('dev-mobile-frame-overlay');
+  if (existing) {
+    existing.remove();
+    syncDevMobileButton(false);
+    return;
+  }
+  const overlay = document.createElement('div');
+  overlay.id = 'dev-mobile-frame-overlay';
+  overlay.className = 'dev-mobile-frame-overlay';
+  const frame = document.createElement('iframe');
+  frame.className = 'dev-mobile-frame';
+  const url = new URL(window.location.href);
+  url.searchParams.set('devMobileFrame', '1');
+  url.searchParams.set('v', Date.now().toString());
+  frame.src = url.toString();
+  overlay.appendChild(frame);
+  document.body.appendChild(overlay);
+  syncDevMobileButton(true);
 }
 
 function setSearchMode(mode) {
@@ -1692,9 +1707,13 @@ function addManualFood() {
 render();
 initVoice();
 (function() {
-  const devMobileActive = localStorage.getItem('devMobilePreview') === '1';
-  document.body.classList.toggle('dev-mobile-preview', devMobileActive);
-  syncDevMobileButton(devMobileActive);
+  const isDevMobileFrame = new URLSearchParams(window.location.search).get('devMobileFrame') === '1';
+  if (isDevMobileFrame) {
+    document.body.classList.add('dev-mobile-frame-page');
+    const devBtn = document.getElementById('dev-mobile-toggle');
+    if (devBtn) devBtn.style.display = 'none';
+  }
+  syncDevMobileButton(false);
   const _minp = document.getElementById('food-input');
   const _qtySel = document.getElementById('qty-sel');
   if (_qtySel && !_qtySel.dataset.plateBound) {

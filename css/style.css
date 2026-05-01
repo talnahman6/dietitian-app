@@ -30,8 +30,31 @@ body::before{content:'';position:fixed;inset:0;background:
 #app{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:20px;display:flex;flex-direction:column;gap:16px}
 .dev-mobile-toggle{position:sticky;top:8px;align-self:flex-start;z-index:10000;border:1px solid rgba(139,92,246,.65);border-radius:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;font-family:inherit;font-size:.85rem;font-weight:800;padding:10px 14px;box-shadow:0 10px 26px rgba(99,102,241,.35);cursor:pointer}
 .dev-mobile-toggle.is-active{background:linear-gradient(135deg,#10b981,#6366f1)}
+.dev-mobile-frame-overlay{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;justify-content:center;align-items:flex-start;padding:20px;overflow:auto}
+.dev-mobile-frame{width:430px;max-width:calc(100vw - 40px);height:900px;max-height:calc(100vh - 40px);border:1px solid var(--bdr);border-radius:22px;background:var(--bg);box-shadow:0 18px 60px rgba(0,0,0,.55)}
+body.dev-mobile-frame-page #app{max-width:920px;width:auto;min-height:0;border:0;box-shadow:none}
 body.dev-mobile-preview #app{width:390px;max-width:390px;min-height:844px;margin:0 auto;border-left:1px solid var(--bdr);border-right:1px solid var(--bdr);box-shadow:0 0 35px rgba(0,0,0,.35)}
 @media(max-width:600px){body.dev-mobile-preview #app{width:auto;max-width:920px;min-height:0;border:0;box-shadow:none}}
+body.dev-mobile-preview .stats{grid-template-columns:repeat(2,1fr)}
+body.dev-mobile-preview .header{flex-direction:column;text-align:center;padding:18px}
+body.dev-mobile-preview .fi-nutrients{flex-wrap:wrap}
+body.dev-mobile-preview .hdr-text h1{font-size:1.5rem}
+body.dev-mobile-preview .sc-val{font-size:1.6rem}
+body.dev-mobile-preview #manual-section .input-row{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;grid-template-areas:"search search" "fraction unit" "cam mic" "add add"!important;gap:10px!important;overflow:visible!important}
+body.dev-mobile-preview #manual-section .ac-wrap{grid-area:search!important;width:100%!important;min-width:0!important;position:relative!important;overflow:visible!important}
+body.dev-mobile-preview #manual-section #food-input{width:100%!important;max-width:none!important;min-width:0!important;box-sizing:border-box!important}
+body.dev-mobile-preview #manual-section #qty-num{grid-area:fraction!important;width:100%!important}
+body.dev-mobile-preview #manual-section #qty-sel{display:none!important}
+body.dev-mobile-preview #manual-section #qty-unit-ui{grid-area:unit!important;width:100%!important}
+body.dev-mobile-preview #manual-section #plate-fraction{display:none!important}
+body.dev-mobile-preview #manual-section #plate-fraction-ui{grid-area:fraction!important;width:100%!important}
+body.dev-mobile-preview #manual-section #cam-btn{grid-area:cam!important;width:100%!important}
+body.dev-mobile-preview #manual-section #mic-btn{grid-area:mic!important;width:100%!important}
+body.dev-mobile-preview #manual-section .btn-go{grid-area:add!important;width:100%!important}
+body.dev-mobile-preview #auto-section .input-row{display:grid!important;grid-template-columns:minmax(0,1fr) 72px!important;grid-template-areas:"search mic" "add add"!important;gap:10px!important;overflow:visible!important}
+body.dev-mobile-preview #auto-section #auto-input{grid-area:search!important;width:100%!important;max-width:none!important;min-width:0!important;box-sizing:border-box!important}
+body.dev-mobile-preview #auto-section #auto-mic-btn{grid-area:mic!important;width:100%!important;justify-content:center!important}
+body.dev-mobile-preview #auto-section .btn-go{grid-area:add!important;width:100%!important}
 
 /* ─── HEADER ─── */
 .header{display:flex;align-items:center;gap:24px;background:var(--card);border:1px solid var(--bdr);border-radius:20px;padding:22px 28px;box-shadow:var(--sh)}
