@@ -1461,6 +1461,28 @@ function _handleRejection(text) {
   return msg;
 }
 
+function _proteinFoodSuggest(grams) {
+  if (grams <= 6)  return `מה אם תאכל ביצה אחת? בדיוק ~6g חלבון! 🥚`;
+  if (grams <= 10) return `יוגורט יווני 100g — בדיוק בשבילך! ~10g חלבון 🥛`;
+  if (grams <= 12) return `מה אתה אומר על קוטג׳ 100g? יש שם ~12g חלבון 😊`;
+  if (grams <= 17) return `יוגורט יווני 170g יסגור לך את זה יפה! ~17g 🥛`;
+  if (grams <= 25) return `קופסת טונה תסגור לך את הכל — ~25g חלבון! 🐟`;
+  if (grams <= 31) return `100g חזה עוף ויסיים! ~31g חלבון 🍗`;
+  return `כדאי מנת חלבון טובה — עוף, טונה או ביצים 💪`;
+}
+
+function _coachLine(rem, over, pct, t) {
+  if (over.cal > 300) return `גם יום כזה קורה 😊 מחר מתחילים מחדש!`;
+  if (over.cal > 0)   return `${over.cal} קל׳ מעל היעד — קורה לכולם, מחר יותר מדויק 🎯`;
+  if (rem.cal === 0)  return `עמדת ביעד היום! מדהים אתה! 🌟🎉`;
+  if (rem.cal <= 80)  return `רק עוד ${rem.cal} קל׳ ואז עמדת ביעד! כמעט שם 🎯`;
+  if (rem.cal <= 200 && pct.cal >= 70) return `${pct.cal}% ביעד — ממשיכים חזק! 💪`;
+  if (rem.protein > 0 && rem.protein <= 30) return `נשאר לך ${rem.protein}g חלבון — ${_proteinFoodSuggest(rem.protein)}`;
+  if (rem.protein === 0 && rem.cal > 0) return `חלבון ✅ השגת! עכשיו רק להשלים את הקלוריות 🔥`;
+  if (t.protein < GOALS.protein * 0.3 && pct.cal > 50) return `💪 שים לב — עדיין חסר הרבה חלבון להיום!`;
+  return null;
+}
+
 function _miriCtx() {
   const t = totals();
   const rem = {
@@ -1495,25 +1517,40 @@ function _getMiriAnswer(text) {
   const calOver = t.cal > GOALS.cal * 1.05;
 
   const Q = [
-    [/כמה קלורי.*אכלתי|כמה אכלתי|סה"כ קלורי|סך הכל קלורי/, () =>
-      `אכלת ${Math.round(t.cal)} קל׳ מתוך ${GOALS.cal}. נשאר לך ${rem.cal} קל׳ להיום.`],
+    [/כמה קלורי.*אכלתי|כמה אכלתי|סה"כ קלורי|סך הכל קלורי/, () => {
+      const coach = _coachLine(rem, over, pct, t);
+      let msg = `אכלת ${Math.round(t.cal)} קל׳ מתוך ${GOALS.cal}. נשאר לך ${rem.cal} קל׳ להיום.`;
+      if (coach) msg += `\n${coach}`;
+      return msg;
+    }],
 
-    [/כמה נשאר|עוד כמה קלורי/, () =>
-      rem.cal > 0
-        ? `נשאר לך:\n• ${rem.cal} קל׳\n• ${rem.protein}g חלבון\n• ${rem.carbs}g פחמימות\n• ${rem.fat}g שומן`
-        : `הגעת ליעד! ${over.cal > 0 ? `עברת ב-${over.cal} קל׳.` : 'בדיוק על הגבול 👏'}`],
+    [/כמה נשאר|עוד כמה קלורי/, () => {
+      const coach = _coachLine(rem, over, pct, t);
+      if (rem.cal === 0) return `הגעת ליעד! ${over.cal > 0 ? `עברת ב-${over.cal} קל׳.` : 'בדיוק על הגבול'} ${coach || ''}`.trim();
+      let msg = `נשאר לך:\n• ${rem.cal} קל׳\n• ${rem.protein}g חלבון\n• ${rem.carbs}g פחמימות\n• ${rem.fat}g שומן`;
+      if (coach) msg += `\n\n${coach}`;
+      return msg;
+    }],
 
     [/כמה פחמימ.*אכלתי|פחמימות שאכלתי|כמה פחמימ.*היום/, () =>
       `אכלת ${Math.round(t.carbs)}g פחמימות מתוך ${GOALS.carbs}g. נשאר ${rem.carbs}g.`],
 
-    [/כמה חלבון.*אכלתי|חלבונים שאכלתי|כמה חלבון.*היום/, () =>
-      `אכלת ${Math.round(t.protein)}g חלבון מתוך ${GOALS.protein}g. נשאר ${rem.protein}g.`],
+    [/כמה חלבון.*אכלתי|חלבונים שאכלתי|כמה חלבון.*היום/, () => {
+      let msg = `אכלת ${Math.round(t.protein)}g חלבון מתוך ${GOALS.protein}g. נשאר ${rem.protein}g.`;
+      if (rem.protein === 0) msg += `\n✅ הגעת לחלבון — כל הכבוד!`;
+      else if (rem.protein <= 30) msg += `\n${_proteinFoodSuggest(rem.protein)}`;
+      return msg;
+    }],
 
     [/כמה שומן.*אכלתי|שומנים שאכלתי|כמה שומן.*היום/, () =>
       `אכלת ${Math.round(t.fat)}g שומן מתוך ${GOALS.fat}g. נשאר ${rem.fat}g.`],
 
-    [/מה המצב|איך המצב|עדכני|עדכן אותי|איפה אני עומד|מה הסטטוס/, () =>
-      `${timeGreet} ${name}! 📊\n• קלוריות: ${Math.round(t.cal)}/${GOALS.cal} (${pct.cal}%)\n• חלבון: ${Math.round(t.protein)}/${GOALS.protein}g (${pct.protein}%)\n• פחמימות: ${Math.round(t.carbs)}/${GOALS.carbs}g\n• שומן: ${Math.round(t.fat)}/${GOALS.fat}g`],
+    [/מה המצב|איך המצב|עדכני|עדכן אותי|איפה אני עומד|מה הסטטוס/, () => {
+      const coach = _coachLine(rem, over, pct, t);
+      let msg = `${timeGreet} ${name}! 📊\n• קלוריות: ${Math.round(t.cal)}/${GOALS.cal} (${pct.cal}%)\n• חלבון: ${Math.round(t.protein)}/${GOALS.protein}g (${pct.protein}%)\n• פחמימות: ${Math.round(t.carbs)}/${GOALS.carbs}g\n• שומן: ${Math.round(t.fat)}/${GOALS.fat}g`;
+      if (coach) msg += `\n\n${coach}`;
+      return msg;
+    }],
 
     [/כמה אחוז|מה האחוז/, () =>
       `השגת ${pct.cal}% מיעד הקלוריות. חלבון: ${pct.protein}%.`],
@@ -1617,10 +1654,10 @@ function _getMiriAnswer(text) {
 
     [/עברתי.*יעד|עברתי.*קלורי|אכלתי יותר מדי|אכלתי הרבה/, () =>
       calOver
-        ? `עברת ב-${over.cal} קל׳. לא לפצות מחר בהשמטת ארוחות — פשוט חוזר ליעד.`
+        ? `עברת ב-${over.cal} קל׳ — גם יום כזה קורה 😊 לא לפצות מחר, פשוט חוזרים למסלול!`
         : calDone
-          ? `הגעת בדיוק ליעד — ${Math.round(t.cal)} קל׳. כל הכבוד! 🎉`
-          : `לא — נשאר ${rem.cal} קל׳ להיום.`],
+          ? `הגעת בדיוק ליעד — ${Math.round(t.cal)} קל׳. מדהים! 🎉🌟`
+          : `לא עברת — נשאר לך עוד ${rem.cal} קל׳ להיום.`],
 
     [/כמה עברתי|ב.?כמה עברתי/, () =>
       over.cal > 0 ? `עברת ב-${over.cal} קל׳.` : `לא עברת. נשאר ${rem.cal} קל׳.`],
@@ -1753,6 +1790,35 @@ function _getMiriAnswer(text) {
 
     [/תודה|תודה רבה/, () =>
       `בשמחה ${name}! 💚 אני כאן אם תצטרך עוד.`],
+
+    [/איך אני סוגר.*חלבון|מה אוכל.*לסגור|מה אכול.*חלבון|מה עוד.*חלבון/, () =>
+      rem.protein <= 0
+        ? `כבר סגרת את החלבון! ✅ ${Math.round(t.protein)}g — יופי!`
+        : `נשאר ${rem.protein}g — ${_proteinFoodSuggest(rem.protein)}`],
+
+    [/כמה עוד.*חלבון|עוד כמה.*חלבון/, () =>
+      rem.protein <= 0
+        ? `סיימת את החלבון! ✅ כל הכבוד!`
+        : `נשאר ${rem.protein}g חלבון — ${_proteinFoodSuggest(rem.protein)}`],
+
+    [/עמדתי ביעד|הגעתי ליעד/, () =>
+      rem.cal === 0
+        ? `כן!! עמדת ביעד היום! 🌟🎉 ${Math.round(t.cal)} קל׳ — מדהים אתה!`
+        : over.cal > 0
+          ? `כמעט — עברת ב-${over.cal} קל׳ בלבד. בפעם הבאה תהיה מדויק 🎯`
+          : `עוד לא — נשאר ${rem.cal} קל׳. כמעט שם! 💪`],
+
+    [/האם אני בכיוון|אני בסדר.*תזונה|עושה.*טוב.*היום/, () => {
+      const ok = pct.cal <= 105 && t.protein >= GOALS.protein * 0.7;
+      const coach = _coachLine(rem, over, pct, t);
+      let msg = ok
+        ? `כן, בכיוון מצוין! ✅ ${pct.cal}% קלוריות, ${Math.round(t.protein)}g חלבון.`
+        : pct.cal > 105
+          ? `עברת מעט (${pct.cal}%). לא נורא — מחר תפצה 😊`
+          : `קלוריות בסדר, חזק את החלבון — עוד ${rem.protein}g.`;
+      if (coach) msg += `\n${coach}`;
+      return msg;
+    }],
 
     [/כן\b|אוקי|מעולה|ממשיכ|בסדר גמור/, () =>
       `מצוין! ${rem.cal > 0 ? `נשאר לך ${rem.cal} קל׳ להיום.` : `הגעת ליעד! 👏`}`],
