@@ -253,6 +253,24 @@
 
 </div><!-- end #app -->
 
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="bn-tab active" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <span class="bn-icon">🏠</span>
+    <span>ראשי</span>
+  </button>
+  <button class="bn-tab" onclick="var p=document.getElementById('miri-popup');p.style.display=p.style.display==='flex'?'none':'flex'">
+    <span class="bn-center">
+      <span class="bn-icon">✨</span>
+      <span class="bn-lbl">מירי</span>
+    </span>
+  </button>
+  <button class="bn-tab" onclick="document.getElementById('food-list').scrollIntoView({behavior:'smooth'})">
+    <span class="bn-icon">🍽️</span>
+    <span>יומן</span>
+  </button>
+</nav>
+
 <!-- MIRI FLOATING CHAT -->
 <div class="miri-fab-wrap" id="miri-fab-wrap">
   <div class="miri-chat" id="miri-popup" style="display:none">
