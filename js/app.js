@@ -56,7 +56,7 @@ function save() {
 
 const GOALS = {cal:2000,carbs:250,protein:60,fat:65};
 let _showRemaining = false;
-
+const _emptyState = document.getElementById('empty-state');
 /* load calorie goal from onboarding; redirect if profile not set */
 async function _initGoals() {
   let d = JSON.parse(localStorage.getItem(_DIET_KEY) || '{}');
@@ -88,9 +88,6 @@ function totals() {
     protein: a.protein+e.protein, fat: a.fat+e.fat
   }), {cal:0,carbs:0,protein:0,fat:0});
 }
-
-/* persistent reference — innerHTML clearing must not destroy it */
-const _emptyState = document.getElementById('empty-state');
 
 /* ─────────────────────────────────────────────────────────
    RENDER
