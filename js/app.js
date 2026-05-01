@@ -1327,8 +1327,8 @@ function getMiriFeedback() {
   if (t.fat > GOALS.fat) {
     return 'עברת את יעד השומן להיום. עדיף להמשיך עם מזון קל ודל שומן.';
   }
-  if (t.protein > GOALS.protein && caloriesLeft < GOALS.cal * 0.25) {
-    return 'החלבון כבר גבוה והקלוריות כמעט נגמרו. עדיף להמשיך קל עם ירקות או לעצור כאן.';
+  if (t.protein > GOALS.protein) {
+    return 'עברת את יעד החלבון להיום. אין צורך להוסיף עוד חלבון כרגע.';
   }
   if (caloriesConsumedPercent > expectedProgress + 0.2) {
     return 'אתה מתקדם מהר מדי ביחס לשעה. כדאי להאט ולבחור מזון קל יותר.';
@@ -1491,8 +1491,8 @@ function _coachLine(rem, over, pct, t) {
   if (t.fat > GOALS.fat) {
     return 'עברת את יעד השומן להיום. עדיף להמשיך עם מזון קל ודל שומן.';
   }
-  if (t.protein > GOALS.protein && rem.cal < GOALS.cal * 0.25) {
-    return 'החלבון כבר גבוה והקלוריות כמעט נגמרו. עדיף להמשיך קל עם ירקות או לעצור כאן.';
+  if (t.protein > GOALS.protein) {
+    return 'עברת את יעד החלבון להיום. אין צורך להוסיף עוד חלבון כרגע.';
   }
   if (caloriesConsumedPercent > expectedProgress + 0.2) {
     return 'אתה מתקדם מהר מדי ביחס לשעה. כדאי להאט ולבחור מזון קל יותר.';
