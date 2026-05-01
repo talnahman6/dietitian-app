@@ -9,6 +9,7 @@ function setSearchMode(mode) {
   document.getElementById('auto-section').style.display = isManual ? 'none' : '';
   document.getElementById('toggle-manual').classList.toggle('stgl-active', isManual);
   document.getElementById('toggle-auto').classList.toggle('stgl-active', !isManual);
+  moveMealSelectToMode(mode);
 }
 
 /* ─── AUTH GATE ─── */
@@ -183,6 +184,12 @@ function requireMealType() {
   const warnBox = document.getElementById('warn-box');
   showAutoMissingQty(aiMsg, aiText, warnBox, 'יש לבחור סוג ארוחה לפני הוספת המאכל');
   return '';
+}
+
+function moveMealSelectToMode(mode) {
+  const ui = document.getElementById('meal-type-ui');
+  const target = mode === 'auto' ? document.getElementById('auto-meal-anchor') : document.getElementById('qty-num');
+  if (ui && target) target.insertAdjacentElement(mode === 'auto' ? 'afterend' : 'beforebegin', ui);
 }
 
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
@@ -365,10 +372,11 @@ function closeCustomSelect(id) {
 function closeAllCustomSelects() {
   closeCustomSelect('qty-unit');
   closeCustomSelect('plate-fraction');
+  closeCustomSelect('meal-type');
 }
 
 function buildCustomSelect(id, onChange) {
-  const select = document.getElementById(id === 'qty-unit' ? 'qty-sel' : 'plate-fraction');
+  const select = document.getElementById(id === 'qty-unit' ? 'qty-sel' : id === 'meal-type' ? 'meal-type' : 'plate-fraction');
   const btn = document.getElementById(id + '-btn');
   const list = document.getElementById(id + '-list');
   if (!select || !btn || !list || btn.dataset.bound) return;
@@ -476,8 +484,8 @@ function hasAutoExplicitQuantity(text) {
 function showAutoMissingQty(aiMsg, aiText, warnBox, customMsg) {
   const msg = customMsg || 'בחיפוש אוטומטי יש לרשום כמות + יחידת משקל. למשל: אכלתי 100 גרם חזה עוף, אכלתי רבע צלחת אורז';
   if (warnBox) warnBox.innerHTML = '';
-  aiMsg.classList.add('show');
-  aiText.textContent = msg;
+  if (aiMsg) aiMsg.classList.remove('show');
+  if (aiText) aiText.textContent = '';
   let toast = document.getElementById('auto-qty-toast');
   if (!toast) {
     toast = document.createElement('div');
@@ -2344,6 +2352,8 @@ updateProfileView();
   }
   buildCustomSelect('qty-unit', handleQtyUnitChange);
   buildCustomSelect('plate-fraction');
+  buildCustomSelect('meal-type');
+  moveMealSelectToMode('manual');
   document.addEventListener('click', closeAllCustomSelects);
   const _mbtn = document.querySelector('#manual-section .btn-go');
   if (_mbtn && !_mbtn.dataset.bound) {

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מירי - הדיאטנית האישית שלך</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=32">
+<link rel="stylesheet" href="css/style.css?v=33">
 <style>
 .miri-fab-wrap{right:20px;left:auto;bottom:116px;z-index:9999;align-items:flex-start}
 @media (max-width:900px){
@@ -72,17 +72,6 @@
     </div>
     <button class="btn-help" onclick="toggleHelpPopup()">?</button>
   </div>
-  <div class="meal-select-row">
-    <label for="meal-type">סוג ארוחה</label>
-    <select id="meal-type">
-      <option value="">בחר ארוחה</option>
-      <option value="breakfast">בוקר</option>
-      <option value="lunch">צהריים</option>
-      <option value="snack">ביניים</option>
-      <option value="dinner">ערב</option>
-      <option value="night">לילה</option>
-    </select>
-  </div>
   <div id="manual-section">
     <div class="input-row">
       <div class="ac-wrap">
@@ -90,6 +79,18 @@
           placeholder="הוסף מאכל אחד בכל פעם"
           onkeydown="if(event.key==='Enter')addFood()">
         <div id="ac-list" class="ac-list" style="display:none"></div>
+      </div>
+      <select id="meal-type" aria-hidden="true" tabindex="-1">
+        <option value="">בחר ארוחה</option>
+        <option value="breakfast">בוקר</option>
+        <option value="lunch">צהריים</option>
+        <option value="snack">ביניים</option>
+        <option value="dinner">ערב</option>
+        <option value="night">לילה</option>
+      </select>
+      <div class="custom-select-wrap" id="meal-type-ui">
+        <button type="button" class="custom-select-btn" id="meal-type-btn">בחר ארוחה</button>
+        <div class="custom-select-list" id="meal-type-list" style="display:none"></div>
       </div>
       <input type="number" class="qty-num" id="qty-num" min="1" max="9999" placeholder="כמות">
       <select id="plate-fraction" style="display:none" aria-hidden="true" tabindex="-1">
@@ -122,6 +123,7 @@
   </div>
   <div id="auto-section" style="display:none">
     <div class="input-row">
+      <div id="auto-meal-anchor"></div>
       <button class="btn-mic" id="auto-mic-btn" title="הקלטה בעברית">🎤</button>
       <input type="text" class="food-input" id="auto-input"
         placeholder="לדוגמא: אכלתי שניצל, חצי פיתה וסלט">
@@ -176,6 +178,7 @@
 </div>
 
 <!-- FOOD LOG -->
+<div id="journal-search-anchor"></div>
 <div class="food-log">
   <div class="log-hdr">
     <h3>🍽️ יומן האכילה שלי</h3>
@@ -189,7 +192,6 @@
     </div>
   </div>
 </div>
-<div id="journal-search-anchor"></div>
 </section>
 
 <section class="app-view" id="view-profile">
@@ -540,7 +542,7 @@
 <script src="js/avatar.js"></script>
 <script src="data/foods.js"></script>
 <script src="js/parser.js?v=4"></script>
-<script src="js/app.js?v=10057"></script>
+<script src="js/app.js?v=10058"></script>
 <script src="js/usda.js"></script>
 <script>
 (function() {
