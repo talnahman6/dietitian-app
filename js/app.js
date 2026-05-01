@@ -413,7 +413,7 @@ function hasAutoExplicitQuantity(text) {
 }
 
 function showAutoMissingQty(aiMsg, aiText, warnBox) {
-  const msg = 'יש לרשום כמות + יחידת משקל. למשל: אכלתי 100 גרם חזה עוף, אכלתי רבע צלחת אורז';
+  const msg = 'בחיפוש אוטומטי יש לרשום כמות + יחידת משקל. למשל: אכלתי 100 גרם חזה עוף, אכלתי רבע צלחת אורז';
   if (warnBox) warnBox.innerHTML = '';
   aiMsg.classList.add('show');
   aiText.textContent = msg;
