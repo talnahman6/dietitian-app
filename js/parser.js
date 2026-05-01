@@ -33,7 +33,7 @@ function unitGrams(food, unit) {
   return {כפית:5, כף:15, כוס:240}[unit] ?? 5;
 }
 
-const UNIT_WEIGHTS = {
+const PARSER_UNIT_WEIGHTS = {
   'תפוח אדמה': { sizes: { קטן: 130, בינוני: 170, גדול: 230 } },
   'בטטה':      { sizes: { קטן: 130, בינוני: 200, גדול: 675 } },
 };
@@ -44,7 +44,7 @@ function extractGrams(txt, food) {
   const isSizedFood = /תפוח\s*אדמה|תפוחי\s*אדמה|בטטה/.test(t) || /תפוח\s*אדמה|בטטה/.test(fname);
   if (isSizedFood) {
     const foodKey = /בטטה/.test(t) ? 'בטטה' : 'תפוח אדמה';
-    const sizeMap = UNIT_WEIGHTS[foodKey].sizes;
+    const sizeMap = PARSER_UNIT_WEIGHTS[foodKey].sizes;
     const sizeM = t.match(/קטנ|בינונ|גדול/);
     const size = sizeM ? (sizeM[0].startsWith('קטנ') ? 'קטן' : sizeM[0].startsWith('בינונ') ? 'בינוני' : 'גדול') : 'בינוני';
     let qty = 1;
