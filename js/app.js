@@ -1545,7 +1545,7 @@ function _getMiriAnswer(text) {
     [/כמה שומן.*אכלתי|שומנים שאכלתי|כמה שומן.*היום/, () =>
       `אכלת ${Math.round(t.fat)}g שומן מתוך ${GOALS.fat}g. נשאר ${rem.fat}g.`],
 
-    [/מה המצב|איך המצב|עדכני|עדכן אותי|איפה אני עומד|מה הסטטוס/, () => {
+    [/מה המצב|איך המצב|עדכני|עדכן אותי|איפה אני עומד|מה הסטטוס|איך אני היום|איך אני עומד|ספרי לי|מה קורה|איך הולך/, () => {
       const coach = _coachLine(rem, over, pct, t);
       let msg = `${timeGreet} ${name}! 📊\n• קלוריות: ${Math.round(t.cal)}/${GOALS.cal} (${pct.cal}%)\n• חלבון: ${Math.round(t.protein)}/${GOALS.protein}g (${pct.protein}%)\n• פחמימות: ${Math.round(t.carbs)}/${GOALS.carbs}g\n• שומן: ${Math.round(t.fat)}/${GOALS.fat}g`;
       if (coach) msg += `\n\n${coach}`;
@@ -1758,10 +1758,11 @@ function _getMiriAnswer(text) {
     [/סיבים תזונתיים|כמה סיבים/, () =>
       `מומלץ 25-35g סיבים ביום — ירקות, קטניות, דגנים מלאים.`],
 
-    [/רעב\b|מרגיש רעב|אני רעב/, () =>
-      rem.cal > 200
-        ? `יש ${rem.cal} קל׳ — מותר לאכול! עדיף חלבון + ירקות.`
-        : `נשאר ${rem.cal} קל׳. שתה מים קודם — לפעמים צמא נדמה כרעב.`],
+    [/רעב\b|מרגיש רעב|אני רעב/, () => {
+      if (rem.cal > 400) return `אוקי אוקי, מותר לאכול! 😄 נשאר לך ${rem.cal} קל׳ — עדיף לשלב חלבון עם ירקות, זה ישביע אותך הכי טוב 💪`;
+      if (rem.cal > 150) return `יש לך עוד ${rem.cal} קל׳ — אפשר לאכול בהחלט! ${_proteinFoodSuggest(rem.protein > 0 ? rem.protein : 15)}`;
+      return `אממ, נשאר לך רק ${rem.cal} קל׳ להיום 😊 לפני שאתה אוכל — שתה כוס מים, לפעמים הגוף מתבלבל בין צמא לרעב. אם עדיין רעב — ירקות חופשיים!`;
+    }],
 
     [/לא רעב|אין תיאבון/, () =>
       isLoss
@@ -1785,8 +1786,14 @@ function _getMiriAnswer(text) {
     [/חתונה|אירוע|שבת|חג/, () =>
       `בארוחות חגיגיות — תהנה! התמקד בחלבון, הגבל לחם וקינוח, שתה מים בין מנות.`],
 
-    [/שלום|היי|הי\b|בוקר טוב|ערב טוב|מה שלומ/, () =>
-      `${timeGreet} ${name}! 😊 איך אני יכולה לעזור לך?`],
+    [/שלום|היי|הי\b|בוקר טוב|ערב טוב|מה שלומ/, () => {
+      const coach = _coachLine(rem, over, pct, t);
+      let msg = `${timeGreet} ${name}! 😊 `;
+      if (pct.cal === 0) msg += `עדיין לא רשמת כלום היום — בוא נתחיל!`;
+      else if (coach) msg += coach;
+      else msg += `אתה ב-${pct.cal}% מהיעד היומי. איך אני יכולה לעזור?`;
+      return msg;
+    }],
 
     [/תודה|תודה רבה/, () =>
       `בשמחה ${name}! 💚 אני כאן אם תצטרך עוד.`],
@@ -1873,11 +1880,25 @@ function miriSend() {
           protein: Math.max(0, Math.round(GOALS.protein - t.protein)),
           fat:     Math.max(0, Math.round(GOALS.fat     - t.fat)),
         };
-        let reply = `קלוריות: ${Math.round(t.cal)} מתוך ${GOALS.cal} — נשאר לך ${rem.cal} קל׳.\n`;
-        reply += `חלבונים: ${Math.round(t.protein)}g מתוך ${GOALS.protein}g — נשאר ${rem.protein}g.\n`;
-        reply += `שומנים: ${Math.round(t.fat)}g מתוך ${GOALS.fat}g.`;
-        if (t.fat > GOALS.fat * 0.85) reply += '\n⚠️ שימי לב — צריכת השומן גבוהה.';
-        if (t.protein < GOALS.protein * 0.5) reply += '\n💪 כדאי להוסיף מקור חלבון.';
+        const _t = totals();
+        const _rem = {
+          cal:     Math.max(0, Math.round(GOALS.cal     - _t.cal)),
+          protein: Math.max(0, Math.round(GOALS.protein - _t.protein)),
+          carbs:   Math.max(0, Math.round(GOALS.carbs   - _t.carbs)),
+          fat:     Math.max(0, Math.round(GOALS.fat     - _t.fat)),
+        };
+        const _over = {
+          cal: Math.max(0, Math.round(_t.cal - GOALS.cal)),
+          fat: Math.max(0, Math.round(_t.fat - GOALS.fat)),
+        };
+        const _pct = { cal: Math.round(_t.cal / GOALS.cal * 100), protein: Math.round(_t.protein / GOALS.protein * 100) };
+        let reply = `הנה הסיכום שלך ${_currentUser.fullName.split(' ')[0]} 📊\n`;
+        reply += `• קלוריות: ${Math.round(_t.cal)} / ${GOALS.cal} קל׳\n`;
+        reply += `• חלבון: ${Math.round(_t.protein)}g / ${GOALS.protein}g\n`;
+        reply += `• פחמימות: ${Math.round(_t.carbs)}g / ${GOALS.carbs}g\n`;
+        reply += `• שומן: ${Math.round(_t.fat)}g / ${GOALS.fat}g`;
+        const coach = _coachLine(_rem, _over, _pct, _t);
+        if (coach) reply += `\n\n${coach}`;
         replyText = reply;
       }
     }
