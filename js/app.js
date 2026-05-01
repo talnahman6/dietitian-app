@@ -368,9 +368,20 @@ const AUTO_QTY_NUM_RE = /\d+(?:[.,]\d+)?\s*(?:\u05d2\u05e8\u05dd|\u05d2|\u05de\"
 const AUTO_GRAMS_RE = /(\d+(?:[.,]\d+)?)\s*(?:\u05d2\u05e8\u05dd|\u05d2)(?=\s|$)/;
 const AUTO_SPLIT_AND_RE = /\s+\u05d5(?=[\u05d0-\u05ea])/;
 const AUTO_ITEM_QTY_START_RE = /(^|\s)\u05d5?\d+(?:[.,]\d+)?\s*(?:\u05d2\u05e8\u05dd|\u05d2|\u05de\"\u05dc|\u05de\u05d9\u05dc\u05d9\u05dc\u05d9\u05d8\u05e8|\u05de\u05dc|\u05db\u05e3|\u05db\u05e4\u05d5\u05ea|\u05db\u05e4\u05d9\u05ea|\u05db\u05e4\u05d9\u05d5\u05ea|\u05db\u05d5\u05e1|\u05db\u05d5\u05e1\u05d5\u05ea|\u05d9\u05d7\u05d9\u05d3\u05d4|\u05d9\u05d7\u05d9\u05d3\u05d5\u05ea)(?=\s|$)/g;
+const AUTO_EXPLICIT_QTY_RE = /(?:\d+(?:[.,]\d+)?\s*(?:\u05d2\u05e8\u05dd|\u05d2|\u05de\"\u05dc|\u05de\u05d9\u05dc\u05d9\u05dc\u05d9\u05d8\u05e8|\u05de\u05dc|\u05db\u05e3|\u05db\u05e4\u05d5\u05ea|\u05db\u05e4\u05d9\u05ea|\u05db\u05e4\u05d9\u05d5\u05ea|\u05db\u05d5\u05e1|\u05db\u05d5\u05e1\u05d5\u05ea|\u05d9\u05d7\u05d9\u05d3\u05d4|\u05d9\u05d7\u05d9\u05d3\u05d5\u05ea)|(?:\u05e8\u05d1\u05e2|\u05e9\u05dc\u05d9\u05e9|\u05d7\u05e6\u05d9|\u05e9\u05dc\u05dd)\s+\u05e6\u05dc\u05d7\u05ea)/;
 
 function cleanAutoText(raw) {
   return raw.replace(AUTO_PREFIX_RE, '').trim();
+}
+
+function hasAutoExplicitQuantity(text) {
+  return AUTO_EXPLICIT_QTY_RE.test(text.trim().toLowerCase());
+}
+
+function showAutoMissingQty(aiMsg, aiText, warnBox) {
+  if (warnBox) warnBox.innerHTML = '';
+  aiMsg.classList.add('show');
+  aiText.textContent = 'שכחת להוסיף כמות ויחידת משקל. למשל: אכלתי 100 גרם חזה עוף ורבע צלחת אורז';
 }
 
 function splitAutoQuantityItems(text) {
@@ -448,6 +459,10 @@ async function addMeal(raw, sourceInput) {
     }
   }
   if (parts.length < 2) return false;
+  if (parts.some(part => !hasAutoExplicitQuantity(part))) {
+    showAutoMissingQty(aiMsg, aiText, warnBox);
+    return true;
+  }
 
   aiMsg.classList.add('show');
   aiText.textContent = '⏳ מוסיף את כל המנות...';
@@ -745,6 +760,11 @@ async function addAutoFood() {
 
   const handled = await addMeal(raw.replace(/\n/g, ','), inp);
   if (handled) return;
+
+  if (!hasAutoExplicitQuantity(cleanAutoText(raw))) {
+    showAutoMissingQty(aiMsg, aiText, warnBox);
+    return;
+  }
 
   const result = parseAutoFood(cleanAutoText(raw));
   if (result) {
