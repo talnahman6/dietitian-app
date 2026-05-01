@@ -1321,8 +1321,17 @@ function getMiriFeedback() {
   if (t.cal > GOALS.cal) {
     return 'עברת את היעד הקלורי להיום. מעכשיו עדיף ללכת על מזון קל מאוד או לעצור כאן.';
   }
+  if (t.carbs > GOALS.carbs) {
+    return 'עברת את יעד הפחמימות להיום. מעכשיו עדיף לבחור חלבון רזה וירקות.';
+  }
+  if (t.fat > GOALS.fat) {
+    return 'עברת את יעד השומן להיום. עדיף להמשיך עם מזון קל ודל שומן.';
+  }
+  if (t.protein > GOALS.protein && caloriesLeft < GOALS.cal * 0.25) {
+    return 'החלבון כבר גבוה והקלוריות כמעט נגמרו. עדיף להמשיך קל עם ירקות או לעצור כאן.';
+  }
   if (caloriesConsumedPercent > expectedProgress + 0.2) {
-    return 'אתה מתקדם מהר מדי ביחס לשעה. כדאי להאט כדי לא להיתקע בערב.';
+    return 'אתה מתקדם מהר מדי ביחס לשעה. כדאי להאט ולבחור מזון קל יותר.';
   }
   if (proteinLeft > Math.max(20, GOALS.protein * 0.35)) {
     return 'חסר לך חלבון, זה זמן טוב להוסיף מקור חלבון איכותי 💪';
@@ -1476,8 +1485,17 @@ function _coachLine(rem, over, pct, t) {
   if (t.cal > GOALS.cal) {
     return 'עברת את היעד הקלורי להיום. מעכשיו עדיף ללכת על מזון קל מאוד או לעצור כאן.';
   }
+  if (t.carbs > GOALS.carbs) {
+    return 'עברת את יעד הפחמימות להיום. מעכשיו עדיף לבחור חלבון רזה וירקות.';
+  }
+  if (t.fat > GOALS.fat) {
+    return 'עברת את יעד השומן להיום. עדיף להמשיך עם מזון קל ודל שומן.';
+  }
+  if (t.protein > GOALS.protein && rem.cal < GOALS.cal * 0.25) {
+    return 'החלבון כבר גבוה והקלוריות כמעט נגמרו. עדיף להמשיך קל עם ירקות או לעצור כאן.';
+  }
   if (caloriesConsumedPercent > expectedProgress + 0.2) {
-    return 'אתה מתקדם מהר מדי ביחס לשעה. כדאי להאט כדי לא להיתקע בערב.';
+    return 'אתה מתקדם מהר מדי ביחס לשעה. כדאי להאט ולבחור מזון קל יותר.';
   }
   if (rem.protein > Math.max(20, GOALS.protein * 0.35)) {
     return 'חסר לך חלבון, זה זמן טוב להוסיף מקור חלבון איכותי 💪';
