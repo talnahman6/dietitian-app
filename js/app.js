@@ -3,6 +3,71 @@ function toggleHelpPopup() {
   p.hidden = !p.hidden;
 }
 
+function showCustomFoodHelp() {
+  showAutoMissingQty(null, null, null, 'הוסף מאכל שלא מצאת ברשימה.');
+}
+
+function openCustomFoodModal() {
+  const modal = document.getElementById('custom-food-modal');
+  if (!modal) return;
+  modal.hidden = false;
+  toggleCustomFoodGrams();
+}
+
+function closeCustomFoodModal() {
+  const modal = document.getElementById('custom-food-modal');
+  if (modal) modal.hidden = true;
+}
+
+function toggleCustomFoodGrams() {
+  const serving = document.getElementById('custom-food-serving');
+  const grams = document.getElementById('custom-food-grams');
+  if (!serving || !grams) return;
+  grams.style.display = serving.value === 'custom' ? '' : 'none';
+}
+
+function saveCustomFood() {
+  const name = document.getElementById('custom-food-name').value.trim();
+  const serving = document.getElementById('custom-food-serving').value;
+  const gramsByServing = { '100': 100, small: 80, medium: 120, large: 180 };
+  const grams = serving === 'custom'
+    ? parseFloat(document.getElementById('custom-food-grams').value)
+    : gramsByServing[serving];
+  const cal = parseFloat(document.getElementById('custom-food-cal').value);
+  const carbs = parseFloat(document.getElementById('custom-food-carbs').value);
+  const protein = parseFloat(document.getElementById('custom-food-protein').value);
+  const fat = parseFloat(document.getElementById('custom-food-fat').value);
+  if (!name || !grams || grams <= 0 || [cal, carbs, protein, fat].some(v => Number.isNaN(v) || v < 0)) {
+    showAutoMissingQty(null, null, null, 'יש למלא שם מאכל וכל הערכים התזונתיים.');
+    return;
+  }
+  const factor = 100 / grams;
+  const food = {
+    n: [name],
+    cat: 'מאכלים שהוספו',
+    cal: round1(cal * factor),
+    c: round1(carbs * factor),
+    p: round1(protein * factor),
+    f: round1(fat * factor),
+    dw: Math.round(grams),
+    custom: true
+  };
+  const foods = getCustomFoods().filter(item => !(item.n && item.n.includes(name)));
+  foods.unshift(food);
+  localStorage.setItem(CUSTOM_FOODS_KEY, JSON.stringify(foods));
+  if (typeof DB !== 'undefined' && Array.isArray(DB)) {
+    const existing = DB.findIndex(item => item.n && item.n.includes(name));
+    if (existing >= 0) DB.splice(existing, 1);
+    DB.unshift(food);
+  }
+  ['custom-food-name','custom-food-grams','custom-food-cal','custom-food-carbs','custom-food-protein','custom-food-fat'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  closeCustomFoodModal();
+  showAutoMissingQty(null, null, null, 'המאכל נוסף למאגר ונמצא בחיפוש.');
+}
+
 function setSearchMode(mode) {
   const isManual = mode === 'manual';
   document.getElementById('manual-section').style.display = isManual ? '' : 'none';
@@ -45,6 +110,26 @@ function save() {
 const GOALS = {cal:2000,carbs:250,protein:60,fat:65};
 let _showRemaining = false;
 const _emptyState = document.getElementById('empty-state');
+const CUSTOM_FOODS_KEY = 'miri_custom_foods_v1';
+
+function round1(v) {
+  return Math.round(v * 10) / 10;
+}
+
+function getCustomFoods() {
+  try { return JSON.parse(localStorage.getItem(CUSTOM_FOODS_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function loadCustomFoods() {
+  if (typeof DB === 'undefined' || !Array.isArray(DB)) return;
+  getCustomFoods().forEach(food => {
+    const name = food && food.n && food.n[0];
+    if (name && !DB.some(item => item.n && item.n.includes(name))) DB.unshift(food);
+  });
+}
+
+loadCustomFoods();
 /* load calorie goal from onboarding; redirect if profile not set */
 async function _initGoals() {
   let d = JSON.parse(localStorage.getItem(_DIET_KEY) || '{}');

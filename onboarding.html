@@ -59,8 +59,8 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
   font-family:'Heebo',sans-serif;font-size:1rem;font-weight:700;transition:all .2s}
 .gender-btns:not(.goal-btn-grid) .gender-btn{flex-direction:column;justify-content:center;min-height:118px;background:#fff;border:2px solid var(--bdr);border-radius:18px;padding:20px 18px;color:var(--txt);font-size:1.1rem;font-weight:900;box-shadow:0 10px 18px rgba(28,31,35,.07),0 2px 4px rgba(28,31,35,.04)}
 .gender-btn:hover{border-color:var(--green);background:var(--green-light);color:var(--txt)}
-.gender-btn:active{transform:translateY(4px) scale(.97);background:#edf4f0;box-shadow:inset 0 7px 18px rgba(26,26,42,.16)}
-.gender-btn.selected{border-color:var(--green);background:#edf4f0;color:var(--txt);transform:translateY(4px) scale(.97);box-shadow:inset 0 7px 20px rgba(26,26,42,.16),0 1px 3px rgba(26,26,42,.04)}
+.gender-btn:active{transform:translateY(6px) scale(.955);background:#e7e7e7;box-shadow:inset 0 9px 22px rgba(26,26,42,.2)}
+.gender-btn.selected{border-color:#d5d5d5;background:#e7e7e7;color:var(--txt);transform:translateY(6px) scale(.955);box-shadow:inset 0 9px 24px rgba(26,26,42,.2),0 1px 2px rgba(26,26,42,.03)}
 .gender-icon{font-size:2.2rem}
 .gender-btns:not(.goal-btn-grid) .gender-icon{width:auto;height:auto;margin:0;font-size:2.2rem;line-height:1;background:none;box-shadow:none}
 .gender-icon.male,.gender-icon.female{color:inherit;background:none}
@@ -68,8 +68,8 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
 .goal-btn-grid .gender-btn{min-height:132px;border-radius:22px}
 .goal-btn-grid .gender-icon{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--green);font-size:1.65rem;box-shadow:0 7px 18px rgba(26,26,42,.08)}
 .birth-copy{max-width:360px;margin:0 auto 86px;color:var(--txt2);font-size:.95rem;font-weight:500;line-height:1.55;text-align:center}
-.birth-wheel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;direction:ltr;align-items:stretch}
-.birth-col{height:210px;overflow-y:auto;scroll-snap-type:y mandatory;padding:84px 0;direction:rtl;scrollbar-width:none;overscroll-behavior:contain}
+.birth-wheel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;direction:ltr;align-items:stretch;min-height:210px}
+.birth-col{height:210px;min-height:210px;max-height:210px;overflow-y:auto;scroll-snap-type:y mandatory;padding:84px 0;direction:rtl;scrollbar-width:none;overscroll-behavior:contain;align-self:stretch}
 .birth-col::-webkit-scrollbar{display:none}
 .birth-option{height:42px;display:grid;place-items:center;font-size:1.34rem;font-weight:400;color:#8a8f98;scroll-snap-align:center;border-radius:12px;opacity:.22;transition:opacity .08s,color .08s,background .08s}
 .birth-option.near-2{opacity:.38}
@@ -327,7 +327,15 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
         <h2>תוך כמה זמן את/ה רוצה להגיע ליעד?</h2>
         <div class="num-input-wrap">
           <input type="number" class="ob-num-input" id="loss-months-input" min="1" max="30" placeholder="0" style="width:150px">
-          <span class="num-unit">חודשים</span>
+          <div class="time-unit-wrap">
+            <button type="button" class="time-unit-btn" id="loss-timeframe-unit-btn" onclick="toggleLossTimeUnitList()">חודשים</button>
+            <div class="time-unit-list" id="loss-timeframe-unit-list" style="display:none">
+              <div class="time-unit-item" onclick="selectLossTimeUnit('חודשים')">חודשים</div>
+              <div class="time-unit-item" onclick="selectLossTimeUnit('שבועות')">שבועות</div>
+              <div class="time-unit-item" onclick="selectLossTimeUnit('ימים')">ימים</div>
+            </div>
+            <input type="hidden" id="loss-timeframe-unit-select" value="חודשים">
+          </div>
         </div>
       </div>
       <div id="step-8-target-gain" style="display:none">
@@ -506,6 +514,23 @@ function selectTimeUnit(unit) {
   document.getElementById('timeframe-unit-list').style.display = 'none';
 }
 
+function toggleLossTimeUnitList() {
+  const list = document.getElementById('loss-timeframe-unit-list');
+  if (list) list.style.display = list.style.display === 'none' ? 'block' : 'none';
+}
+
+function selectLossTimeUnit(unit) {
+  document.getElementById('loss-timeframe-unit-select').value = unit;
+  document.getElementById('loss-timeframe-unit-btn').textContent = unit;
+  document.getElementById('loss-timeframe-unit-list').style.display = 'none';
+}
+
+function timeAmountToWeeks(amount, unit) {
+  if (unit === 'ימים') return amount / 7;
+  if (unit === 'שבועות') return amount;
+  return amount * 4;
+}
+
 function updateUI() {
   for (let i = 1; i <= TOTAL; i++) {
     document.getElementById('step-' + i).style.display = i === currentStep ? '' : 'none';
@@ -527,7 +552,10 @@ function updateUI() {
   if (currentStep === 9) {
     document.getElementById('step-8-loss-timeframe').style.display = answers.goal === 'ירידה במשקל' ? '' : 'none';
     document.getElementById('step-8-target-gain').style.display = 'none';
-    if (answers.goal === 'ירידה במשקל') document.getElementById('loss-months-input').value = '';
+    if (answers.goal === 'ירידה במשקל') {
+      document.getElementById('loss-months-input').value = '';
+      selectLossTimeUnit('חודשים');
+    }
   }
   if (currentStep === 10) {
     answers.targetTimeAmount = null;
@@ -575,7 +603,11 @@ function validate() {
     if (answers.goal === 'ירידה במשקל') {
       const v = parseInt(document.getElementById('loss-months-input').value);
       if (!v || v < 1 || v > 30) { err.textContent = 'יש להזין מספר בין 1 ל-30'; return false; }
-      answers.goalMonths = v;
+      const unit = document.getElementById('loss-timeframe-unit-select').value;
+      answers.goalTimeAmount = v;
+      answers.goalTimeUnit = unit;
+      answers.goalWeeks = timeAmountToWeeks(v, unit);
+      answers.goalMonths = answers.goalWeeks / 4;
     } else {
       const v = parseFloat(document.getElementById('target-gain-input').value);
       if (!v || v <= 0) { err.textContent = 'יש להזין כמות תקינה בק״ג'; return false; }
@@ -626,7 +658,7 @@ function calcBMR() {
 }
 
 function showLossConfirm() {
-  const weeks = answers.goalMonths * 4;
+  const weeks = answers.goalWeeks || (answers.goalMonths * 4);
   answers.weeklyGoal = parseFloat((answers.totalGoalKg / weeks).toFixed(2));
   document.getElementById('confirm-weekly-text').textContent = 'זה אומר יעד שבועי של ' + answers.weeklyGoal + ' ק״ג';
   for (let i = 1; i <= TOTAL; i++) document.getElementById('step-' + i).style.display = 'none';
@@ -654,7 +686,7 @@ function showResults() {
     dailyDelta = 0;
     dailyCal = tdee;
   } else if (answers.goal === 'ירידה במשקל') {
-    const weeks = answers.goalMonths * 4;
+    const weeks = answers.goalWeeks || (answers.goalMonths * 4);
     answers.weeklyGoal = parseFloat((answers.totalGoalKg / weeks).toFixed(2));
     answers.weekly_target = answers.weeklyGoal;
     const totalDeficit = answers.totalGoalKg * 7500;
@@ -664,7 +696,7 @@ function showResults() {
   } else {
     const unit = answers.targetTimeUnit || 'חודשים';
     const amount = answers.targetTimeAmount || 1;
-    const weeks = unit === 'ימים' ? amount / 7 : unit === 'שבועות' ? amount : amount * 4;
+    const weeks = timeAmountToWeeks(amount, unit);
     answers.weekly_target = parseFloat((answers.targetKg / weeks).toFixed(2));
     dailyDelta = Math.round((answers.weekly_target * 7500) / 7);
     dailyCal = tdee + dailyDelta;

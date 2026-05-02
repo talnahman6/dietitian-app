@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מירי - הדיאטנית האישית שלך</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=43">
+<link rel="stylesheet" href="css/style.css?v=44">
 <style>
-.miri-fab-wrap{right:20px;left:auto;bottom:116px;z-index:9999;align-items:flex-start}
+.miri-fab-wrap{left:16px;right:auto;bottom:84px;z-index:9999;align-items:flex-start}
 @media (max-width:900px){
   .miri-fab-wrap{inset:0;bottom:0;right:0;left:0;align-items:stretch;justify-content:flex-end;pointer-events:none}
-  .miri-fab-wrap .miri-fab{pointer-events:auto;position:fixed;right:18px;bottom:112px}
+  .miri-fab-wrap .miri-fab{pointer-events:auto;position:fixed;left:16px;right:auto;bottom:84px}
   .miri-chat{width:calc(100vw - 16px);height:calc(100dvh - 44px);margin:8px;max-height:none;border-radius:18px;pointer-events:auto;z-index:2}
   .miri-chat-msgs{min-height:0;overflow-y:auto}
   .miri-chat-input-row{flex-shrink:0;padding-bottom:max(12px,env(safe-area-inset-bottom))}
@@ -59,6 +59,14 @@
   <div class="sc prt"><div class="sc-icon">💪</div><div class="sc-val" id="s-prt">0<span class="sc-unit">g</span></div><div class="sc-lbl">חלבונים</div></div>
   <div class="sc fat"><div class="sc-icon">🥑</div><div class="sc-val" id="s-fat">0<span class="sc-unit">g</span></div><div class="sc-lbl">שומנים</div></div>
 </div>
+
+<section class="custom-food-card">
+  <div class="custom-food-text">
+    <strong>חיפשת מאכל ולא מצאת?</strong>
+    <button class="btn-help" onclick="showCustomFoodHelp()">?</button>
+  </div>
+  <button class="custom-food-open" onclick="openCustomFoodModal()">הוסף מאכל</button>
+</section>
 
 <div id="home-search-anchor"></div>
 <!-- INPUT -->
@@ -166,6 +174,14 @@
 </div>
 
 <!-- FOOD LOG -->
+<section class="custom-food-card">
+  <div class="custom-food-text">
+    <strong>חיפשת מאכל ולא מצאת?</strong>
+    <button class="btn-help" onclick="showCustomFoodHelp()">?</button>
+  </div>
+  <button class="custom-food-open" onclick="openCustomFoodModal()">הוסף מאכל</button>
+</section>
+
 <div id="journal-search-anchor"></div>
 <div class="food-log">
   <div class="log-hdr">
@@ -312,6 +328,32 @@
     <div class="confirm-modal-actions">
       <button class="confirm-modal-ok" onclick="confirmClearAll()">אישור</button>
       <button class="confirm-modal-cancel" onclick="closeClearConfirm()">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOM FOOD MODAL -->
+<div class="custom-food-modal-overlay" id="custom-food-modal" hidden onclick="closeCustomFoodModal()">
+  <div class="custom-food-modal" onclick="event.stopPropagation()">
+    <h3>הוסף מאכל</h3>
+    <input class="custom-food-field" id="custom-food-name" type="text" placeholder="שם מאכל">
+    <select class="custom-food-field" id="custom-food-serving" onchange="toggleCustomFoodGrams()">
+      <option value="100">לפי 100 גרם</option>
+      <option value="small">יחידה קטנה</option>
+      <option value="medium">יחידה בינונית</option>
+      <option value="large">יחידה גדולה</option>
+      <option value="custom">מותאם אישית</option>
+    </select>
+    <input class="custom-food-field" id="custom-food-grams" type="number" min="1" placeholder="גרמים" style="display:none">
+    <div class="custom-food-grid">
+      <input class="custom-food-field" id="custom-food-cal" type="number" min="0" step="0.1" placeholder="קלוריות">
+      <input class="custom-food-field" id="custom-food-carbs" type="number" min="0" step="0.1" placeholder="פחמימות">
+      <input class="custom-food-field" id="custom-food-protein" type="number" min="0" step="0.1" placeholder="חלבונים">
+      <input class="custom-food-field" id="custom-food-fat" type="number" min="0" step="0.1" placeholder="שומנים">
+    </div>
+    <div class="custom-food-actions">
+      <button class="custom-food-save" onclick="saveCustomFood()">הוספה</button>
+      <button class="custom-food-cancel" onclick="closeCustomFoodModal()">ביטול</button>
     </div>
   </div>
 </div>
@@ -560,7 +602,7 @@
 <script src="js/avatar.js"></script>
 <script src="data/foods.js"></script>
 <script src="js/parser.js?v=4"></script>
-<script src="js/app.js?v=10059"></script>
+<script src="js/app.js?v=10060"></script>
 <script src="js/usda.js"></script>
 <script>
 (function() {
