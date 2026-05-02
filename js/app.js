@@ -356,10 +356,139 @@ function updateProfileView() {
     if (el) el.textContent = val || '-';
   };
   set('profile-name', firstName);
-  set('profile-weight', d.weight ? `${d.weight} ק"ג` : '-');
-  set('profile-height', d.height ? `${d.height} ס"מ` : '-');
-  set('profile-activity', d.activity ? String(d.activity) : '-');
+  set('profile-language', d.language || 'עברית');
   set('profile-calories', GOALS.cal ? `${GOALS.cal} קל׳` : '-');
+  set('profile-water', `${getWaterTarget()} כוסות`);
+  renderWaterWidget();
+  renderStepsWidget();
+}
+
+function openProfileModal(title, bodyHtml) {
+  const modal = document.getElementById('profile-modal');
+  document.getElementById('profile-modal-title').textContent = title;
+  document.getElementById('profile-modal-body').innerHTML = bodyHtml;
+  modal.hidden = false;
+}
+function closeProfileModal(){ document.getElementById('profile-modal').hidden = true; }
+
+function openProfileNameModal() {
+  const first = ((_currentUser.fullName || '').trim().split(/\s+/)[0] || '');
+  openProfileModal('שם משתמש', `
+    <input class="custom-food-field" id="profile-new-name" value="${escHtml(first)}" placeholder="שם פרטי">
+    <div class="profile-modal-actions"><button class="custom-food-save" onclick="saveProfileName()">שמירה</button><button class="custom-food-cancel" onclick="closeProfileModal()">ביטול</button></div>`);
+}
+function saveProfileName() {
+  const name = document.getElementById('profile-new-name').value.trim();
+  if (!name) return;
+  _currentUser.fullName = name;
+  localStorage.setItem('loggedUser', JSON.stringify(_currentUser));
+  sessionStorage.setItem('loggedUser', JSON.stringify(_currentUser));
+  document.getElementById('user-name').textContent = 'שלום, ' + name.split(/\s+/)[0];
+  updateProfileView();
+  closeProfileModal();
+}
+function openPasswordModal() {
+  openProfileModal('שינוי סיסמא', `
+    <input class="custom-food-field" id="old-pass" type="password" placeholder="סיסמה ישנה">
+    <input class="custom-food-field" id="new-pass" type="password" placeholder="סיסמה חדשה">
+    <div class="profile-modal-actions"><button class="custom-food-save" onclick="savePasswordChange()">שמירה</button><button class="custom-food-cancel" onclick="closeProfileModal()">ביטול</button></div>`);
+}
+function savePasswordChange() {
+  const oldPass = document.getElementById('old-pass').value;
+  const newPass = document.getElementById('new-pass').value;
+  if (!newPass || (_currentUser.password && oldPass !== _currentUser.password)) {
+    showAutoMissingQty(null, null, null, 'הסיסמה הישנה לא נכונה או שחסרה סיסמה חדשה.');
+    return;
+  }
+  _currentUser.password = newPass;
+  localStorage.setItem('loggedUser', JSON.stringify(_currentUser));
+  closeProfileModal();
+}
+function openLanguageModal() {
+  const d = _safeDietData();
+  openProfileModal('שפות', `
+    <select class="custom-food-field custom-food-select" id="profile-lang">
+      ${['עברית','English','Русский'].map(x => `<option ${x === (d.language || 'עברית') ? 'selected' : ''}>${x}</option>`).join('')}
+    </select>
+    <div class="profile-modal-actions"><button class="custom-food-save" onclick="saveLanguage()">שמירה</button><button class="custom-food-cancel" onclick="closeProfileModal()">ביטול</button></div>`);
+}
+function saveLanguage() {
+  const d = _safeDietData();
+  d.language = document.getElementById('profile-lang').value;
+  localStorage.setItem(_DIET_KEY, JSON.stringify(d));
+  save();
+  updateProfileView();
+  closeProfileModal();
+}
+function openBmrModal() {
+  const d = _safeDietData();
+  openProfileModal('חישוב BMR מחדש', `
+    <input class="custom-food-field" id="bmr-height" type="number" placeholder="גובה" value="${d.height || ''}">
+    <input class="custom-food-field" id="bmr-weight" type="number" placeholder="משקל" value="${d.weight || ''}">
+    <input class="custom-food-field" id="bmr-cal" type="number" placeholder="יעד קלוריות" value="${GOALS.cal || ''}">
+    <input class="custom-food-field" id="bmr-protein" type="number" placeholder="חלבון" value="${GOALS.protein || ''}">
+    <input class="custom-food-field" id="bmr-carbs" type="number" placeholder="פחמימות" value="${GOALS.carbs || ''}">
+    <input class="custom-food-field" id="bmr-fat" type="number" placeholder="שומנים" value="${GOALS.fat || ''}">
+    <div class="profile-modal-actions"><button class="custom-food-save" onclick="saveBmrUpdate()">אישור</button><button class="custom-food-cancel" onclick="closeProfileModal()">ביטול</button></div>`);
+}
+function saveBmrUpdate() {
+  const d = _safeDietData();
+  d.height = parseFloat(document.getElementById('bmr-height').value) || d.height;
+  d.weight = parseFloat(document.getElementById('bmr-weight').value) || d.weight;
+  GOALS.cal = parseFloat(document.getElementById('bmr-cal').value) || GOALS.cal;
+  GOALS.protein = parseFloat(document.getElementById('bmr-protein').value) || GOALS.protein;
+  GOALS.carbs = parseFloat(document.getElementById('bmr-carbs').value) || GOALS.carbs;
+  GOALS.fat = parseFloat(document.getElementById('bmr-fat').value) || GOALS.fat;
+  d.dailyCal = GOALS.cal; d.protein = GOALS.protein; d.carbs = GOALS.carbs; d.fat = GOALS.fat;
+  localStorage.setItem(_DIET_KEY, JSON.stringify(d));
+  save();
+  render();
+  updateProfileView();
+  closeProfileModal();
+}
+function getWaterTarget(){ return parseInt(_safeDietData().waterTarget || localStorage.getItem('miri_water_target') || '8', 10); }
+function getWaterCount(){ return parseInt(localStorage.getItem('miri_water_' + TODAY) || '0', 10); }
+function renderWaterWidget() {
+  const target = Math.max(1, getWaterTarget());
+  const count = getWaterCount();
+  const wc = document.getElementById('water-count'), wt = document.getElementById('water-target'), wf = document.getElementById('water-fill');
+  if (wc) wc.textContent = count;
+  if (wt) wt.textContent = target;
+  if (wf) wf.style.width = Math.min(100, (count / target) * 100) + '%';
+}
+function openWaterTargetModal() {
+  openProfileModal('מטרת מים', `
+    <input class="custom-food-field" id="water-target-input" type="number" min="1" value="${getWaterTarget()}" placeholder="כמות כוסות">
+    <div class="profile-modal-actions"><button class="custom-food-save" onclick="saveWaterTarget()">שמירה</button><button class="custom-food-cancel" onclick="closeProfileModal()">ביטול</button></div>`);
+}
+function saveWaterTarget() {
+  const target = Math.max(1, parseInt(document.getElementById('water-target-input').value || '8', 10));
+  const d = _safeDietData();
+  d.waterTarget = target;
+  localStorage.setItem(_DIET_KEY, JSON.stringify(d));
+  localStorage.setItem('miri_water_target', String(target));
+  save();
+  updateProfileView();
+  closeProfileModal();
+}
+function openWaterModal(){ document.getElementById('water-modal').hidden = false; }
+function closeWaterModal(){ document.getElementById('water-modal').hidden = true; }
+function addWaterCup() {
+  localStorage.setItem('miri_water_' + TODAY, String(getWaterCount() + 1));
+  renderWaterWidget();
+  closeWaterModal();
+}
+function renderStepsWidget() {
+  const el = document.getElementById('steps-count');
+  if (el) el.textContent = localStorage.getItem('miri_steps_' + TODAY) || '0';
+}
+function openStepsModal(){ document.getElementById('steps-modal').hidden = false; }
+function closeStepsModal(){ document.getElementById('steps-modal').hidden = true; }
+function saveManualSteps() {
+  const v = Math.max(0, parseInt(document.getElementById('steps-manual-input').value || '0', 10));
+  localStorage.setItem('miri_steps_' + TODAY, String(v));
+  renderStepsWidget();
+  closeStepsModal();
 }
 
 function updateJournalDate() {
@@ -2435,6 +2564,18 @@ function generateDailyMenus() {
   const proteins = sortedByPref(DB.filter(f => macroRole(f) === 'protein' && f.cal > 0));
   const carbs    = sortedByPref(DB.filter(f => macroRole(f) === 'carbs'   && f.cal > 0));
   const fats     = sortedByPref(DB.filter(f => macroRole(f) === 'fat'     && f.cal > 0));
+  const mealProteinHints = {
+    breakfast: ['גבינה','קוטג','טונה','ביצה','חביתה','מקושקשת','יוגורט'],
+    lunch: ['עוף','חזה עוף','בשר','קציצה','קבב','הודו','דג'],
+    snack: ['יוגורט','גבינה','קוטג','טונה','ביצה'],
+    dinner: ['ביצה','חביתה','טונה','גבינה','קוטג','יוגורט'],
+    night: ['יוגורט','גבינה','קוטג','ביצה']
+  };
+  function mealFoods(list, type) {
+    const hints = mealProteinHints[type] || [];
+    const filtered = list.filter(f => hints.some(h => (f.n || []).some(n => n.includes(h))));
+    return filtered.length ? filtered : list;
+  }
 
   const menus = [];
   for (let m = 0; m < 3; m++) {
@@ -2447,7 +2588,8 @@ function generateDailyMenus() {
       const carbTarget = Math.round(GOALS.carbs   * share);
       const fatTarget  = Math.round(GOALS.fat     * share);
 
-      const pf = proteins[pi % proteins.length];
+      const mealProteins = mealFoods(proteins, type);
+      const pf = mealProteins[pi % mealProteins.length];
       const cf = carbs[ci % carbs.length];
       const ff = fats[fi % fats.length];
       pi++; ci++; fi++;
@@ -2535,7 +2677,7 @@ function closeMenuModal() {
 function downloadMenuPDF() {
   if (!_currentMenuData) return;
   const menu = _currentMenuData;
-  const html = `<!DOCTYPE html><html dir="rtl" lang="he"><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;direction:rtl;padding:24px;color:#333}h2{color:#6366f1;margin-bottom:16px;font-size:1.2rem}.meal{margin-bottom:12px;border:1px solid #ddd;border-radius:8px;padding:10px 14px}.meal-lbl{font-weight:700;color:#6366f1;margin-bottom:6px;font-size:.95rem}.meal-item{font-size:.88rem;color:#333;padding:3px 0;border-bottom:1px solid #f0f0f0}.meal-item:last-child{border:none}.meal-total{font-size:.78rem;color:#888;margin-top:6px;padding-top:4px;border-top:1px solid #f0f0f0}.footer{font-size:.78rem;color:#aaa;text-align:center;margin-top:16px}</style></head><body><h2>תפריט ${menu.index} — מירי הדיאטנית</h2>${menu.meals.map(meal=>{const t=meal.items.reduce((s,it)=>s+it.cal,0);return`<div class="meal"><div class="meal-lbl">${meal.label}</div>${meal.items.map(it=>`<div class="meal-item">• ${it.name} — ${it.grams}g (${it.cal} קל׳, חלבון ${it.protein}g, פחמ׳ ${it.carbs}g, שומן ${it.fat}g)</div>`).join('')}<div class="meal-total">סה"כ: ${t} קל׳</div></div>`}).join('')}<div class="footer">יעד יומי: ${GOALS.cal} קל׳ | מירי הדיאטנית</div></body></html>`;
+  const html = `<!DOCTYPE html><html dir="rtl" lang="he"><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;direction:rtl;padding:24px;color:#333}.pdf-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}.pdf-head img{width:54px;height:54px;border-radius:50%;object-fit:cover}h2{color:#4a9b7f;margin:0;font-size:1.35rem}.meal{margin-bottom:12px;border:1px solid #ddd;border-radius:10px;padding:10px 14px;box-shadow:0 12px 18px -16px rgba(0,0,0,.35)}.meal-lbl{font-weight:700;color:#4a9b7f;margin-bottom:6px;font-size:.95rem}.meal-item{font-size:.88rem;color:#333;padding:3px 0;border-bottom:1px solid #f0f0f0}.meal-item:last-child{border:none}.meal-total{font-size:.78rem;color:#777;margin-top:6px;padding-top:4px;border-top:1px solid #f0f0f0}.footer{font-size:.78rem;color:#aaa;text-align:center;margin-top:16px}</style></head><body><div class="pdf-head"><img src="images/miri-fab.webp"><h2>תפריט מס ${menu.index}</h2></div>${menu.meals.map(meal=>{const t=meal.items.reduce((s,it)=>s+it.cal,0);return`<div class="meal"><div class="meal-lbl">${meal.label}</div>${meal.items.map(it=>`<div class="meal-item">• ${it.name} — ${it.grams}g (${it.cal} קל׳, חלבון ${it.protein}g, פחמ׳ ${it.carbs}g, שומן ${it.fat}g)</div>`).join('')}<div class="meal-total">סה"כ: ${t} קל׳</div></div>`}).join('')}<div class="footer">יעד יומי: ${GOALS.cal} קל׳ | חלבון ${GOALS.protein}g | פחמ׳ ${GOALS.carbs}g | שומן ${GOALS.fat}g</div></body></html>`;
   const w = window.open('', '_blank', 'width=620,height=780');
   w.document.write(html);
   w.document.close();

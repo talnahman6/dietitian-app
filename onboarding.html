@@ -59,8 +59,8 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
   font-family:'Heebo',sans-serif;font-size:1rem;font-weight:700;transition:all .2s}
 .gender-btns:not(.goal-btn-grid) .gender-btn{flex-direction:column;justify-content:center;min-height:118px;background:#fff;border:2px solid var(--bdr);border-radius:18px;padding:20px 18px;color:var(--txt);font-size:1.1rem;font-weight:900;box-shadow:0 10px 18px rgba(28,31,35,.07),0 2px 4px rgba(28,31,35,.04)}
 .gender-btn:hover{border-color:var(--green);background:var(--green-light);color:var(--txt)}
-.gender-btn:active{transform:translateY(8px) scale(.94);background:#eeeeee;box-shadow:inset 0 12px 24px rgba(26,26,42,.22)}
-.gender-btn.selected{border-color:#d8d8d8;background:#eeeeee;color:var(--txt);transform:translateY(8px) scale(.94);box-shadow:inset 0 12px 26px rgba(26,26,42,.22),0 1px 2px rgba(26,26,42,.02)}
+.gender-btn:active{transform:translateY(10px) scale(.92);background:#eeeeee;box-shadow:inset 0 14px 28px rgba(26,26,42,.24)}
+.gender-btn.selected{border-color:#d2d2d2;background:#eeeeee;color:var(--txt);transform:translateY(10px) scale(.92);box-shadow:inset 0 14px 30px rgba(26,26,42,.24),0 1px 2px rgba(26,26,42,.02)}
 .gender-icon{font-size:2.2rem}
 .gender-btns:not(.goal-btn-grid) .gender-icon{width:auto;height:auto;margin:0;font-size:2.2rem;line-height:1;background:none;box-shadow:none}
 .gender-icon.male,.gender-icon.female{color:inherit;background:none}
@@ -69,13 +69,18 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
 .goal-btn-grid .gender-btn.selected{background:#edf1ef;border-color:var(--green);box-shadow:inset 0 10px 22px rgba(26,26,42,.16),0 1px 2px rgba(26,26,42,.02)}
 .goal-btn-grid .gender-icon{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--green);font-size:1.65rem;box-shadow:0 7px 18px rgba(26,26,42,.08)}
 .birth-copy{display:none}
-.birth-wheel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;direction:ltr;align-items:stretch;min-height:210px;margin-top:18px}
-.birth-col{height:210px;min-height:210px;max-height:210px;overflow-y:auto;scroll-snap-type:y mandatory;padding:84px 0;direction:rtl;scrollbar-width:none;overscroll-behavior:contain;align-self:start;position:relative}
-.birth-col::-webkit-scrollbar{display:none}
-.birth-option{height:42px;display:grid;place-items:center;font-size:1.34rem;font-weight:400;color:#8a8f98;scroll-snap-align:center;border-radius:12px;opacity:.22;transition:opacity .08s,color .08s,background .08s}
-.birth-option.near-2{opacity:.38}
-.birth-option.near-1{opacity:.62}
-.birth-option.selected{background:#d9f4d3;color:var(--green);opacity:1;font-weight:600}
+.birth-wheel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:18px}
+.birth-select-wrap{position:relative}
+.birth-select{
+  width:100%;height:54px;border:1.5px solid var(--bdr);border-radius:14px;background:var(--inp);
+  color:var(--txt2);font-family:inherit;font-size:1rem;font-weight:800;text-align:center;text-align-last:center;
+  appearance:none;padding:0 14px 0 34px;box-shadow:0 8px 18px rgba(28,31,35,.06);outline:none;
+}
+.birth-select-wrap::after{
+  content:"";position:absolute;left:14px;top:50%;width:9px;height:9px;border-left:2px solid #9aa1aa;border-bottom:2px solid #9aa1aa;
+  transform:translateY(-62%) rotate(-45deg);pointer-events:none;
+}
+.birth-select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(74,155,127,.12)}
 .time-unit-wrap{position:relative;width:150px;flex:0 0 150px}
 .time-unit-btn{width:150px;height:65px;background:var(--inp);border:2px solid var(--bdr);border-radius:14px;padding:0 16px 0 34px;color:var(--txt2);font-family:'Heebo',sans-serif;font-size:1.05rem;font-weight:800;cursor:pointer;box-shadow:var(--sh);position:relative;text-align:right}
 .time-unit-btn::after{content:'';position:absolute;left:15px;top:50%;width:8px;height:8px;border-left:2px solid #9aa0aa;border-bottom:2px solid #9aa0aa;transform:translateY(-65%) rotate(-45deg);opacity:.85}
@@ -218,9 +223,9 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
       <h2>מתי נולדת?</h2>
       <p class="birth-copy">תאריך הלידה שלך מאפשר לנו ליצור מטרות אישיות ומדויקות עבורך</p>
       <div class="birth-wheel">
-        <div class="birth-col" id="birth-year"></div>
-        <div class="birth-col" id="birth-day"></div>
-        <div class="birth-col" id="birth-month"></div>
+        <div class="birth-select-wrap"><select class="birth-select" id="birth-day"></select></div>
+        <div class="birth-select-wrap"><select class="birth-select" id="birth-month"></select></div>
+        <div class="birth-select-wrap"><select class="birth-select" id="birth-year"></select></div>
       </div>
     </div>
 
@@ -457,51 +462,20 @@ function selectWeeklyTarget(v) {
 }
 
 function buildBirthWheel() {
-  const months = ['ינואר','פבר׳','מרץ','אפר׳','מאי','יוני','יולי','אוג׳','ספט׳','אוק׳','נוב׳','דצמ׳'];
-  const mark = (el, idx) => {
-    el.querySelectorAll('.birth-option').forEach((x, i) => {
-      const distance = Math.abs(i - idx);
-      x.classList.toggle('selected', distance === 0);
-      x.classList.toggle('near-1', distance === 1);
-      x.classList.toggle('near-2', distance === 2);
-    });
-  };
-  const markFromScroll = el => {
-    const values = el._birthValues || [];
-    const idx = Math.max(0, Math.min(values.length - 1, Math.round(el.scrollTop / 42)));
-    mark(el, idx);
-    return idx;
-  };
+  const months = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
   const fill = (id, values, selected, key, labelFn = v => v) => {
     const el = document.getElementById(id);
-    if (!el || el.dataset.ready) return;
-    el._birthValues = values;
-    el.innerHTML = values.map(v => `<div class="birth-option ${v === selected ? 'selected' : ''}" data-v="${v}">${labelFn(v)}</div>`).join('');
-    el.dataset.ready = '1';
-    requestAnimationFrame(() => {
-      const idx = Math.max(0, values.indexOf(selected));
-      el.scrollTop = idx * 42;
-      mark(el, idx);
-    });
-    el.addEventListener('click', e => {
-      const opt = e.target.closest('.birth-option');
-      if (!opt) return;
-      selectedBirth[key] = parseInt(opt.dataset.v);
-      const idx = values.indexOf(selectedBirth[key]);
-      el.scrollTop = idx * 42;
-      mark(el, idx);
-    });
-    el.addEventListener('scroll', () => {
-      if (el._birthRaf) cancelAnimationFrame(el._birthRaf);
-      el._birthRaf = requestAnimationFrame(() => {
-        const idx = markFromScroll(el);
-        selectedBirth[key] = values[idx];
-      });
-    });
+    if (!el) return;
+    if (!el.dataset.ready) {
+      el.innerHTML = values.map(v => `<option value="${v}">${labelFn(v)}</option>`).join('');
+      el.dataset.ready = '1';
+      el.addEventListener('change', () => { selectedBirth[key] = parseInt(el.value); });
+    }
+    el.value = String(selected);
   };
-  fill('birth-year', Array.from({length: 83}, (_, i) => 1942 + i), selectedBirth.year, 'year');
-  fill('birth-day', Array.from({length: 31}, (_, i) => i + 1), selectedBirth.day, 'day');
+  fill('birth-day', Array.from({length: 30}, (_, i) => i + 1), selectedBirth.day, 'day');
   fill('birth-month', Array.from({length: 12}, (_, i) => i + 1), selectedBirth.month, 'month', v => months[v - 1]);
+  fill('birth-year', Array.from({length: 97}, (_, i) => 1930 + i), selectedBirth.year, 'year');
 }
 
 function toggleTimeUnitList() {
