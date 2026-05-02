@@ -26,7 +26,7 @@ function toggleCustomFoodGrams() {
   grams.style.display = serving.value === 'custom' ? '' : 'none';
 }
 
-function saveCustomFood() {
+async function saveCustomFood() {
   const name = document.getElementById('custom-food-name').value.trim();
   const serving = document.getElementById('custom-food-serving').value;
   const gramsByServing = { '100': 100, small: 80, medium: 120, large: 180 };
@@ -52,20 +52,15 @@ function saveCustomFood() {
     dw: Math.round(grams),
     custom: true
   };
-  const foods = getCustomFoods().filter(item => !(item.n && item.n.includes(name)));
-  foods.unshift(food);
-  localStorage.setItem(CUSTOM_FOODS_KEY, JSON.stringify(foods));
-  if (typeof DB !== 'undefined' && Array.isArray(DB)) {
-    const existing = DB.findIndex(item => item.n && item.n.includes(name));
-    if (existing >= 0) DB.splice(existing, 1);
-    DB.unshift(food);
-  }
+  const latest = await getSupabaseCustomFoods();
+  const foods = mergeCustomFoods([food].concat(latest.filter(item => !(item.n && item.n.includes(name)))));
+  const savedRemote = await saveSupabaseCustomFoods(foods);
   ['custom-food-name','custom-food-grams','custom-food-cal','custom-food-carbs','custom-food-protein','custom-food-fat'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
   closeCustomFoodModal();
-  showAutoMissingQty(null, null, null, 'המאכל נוסף למאגר ונמצא בחיפוש.');
+  showAutoMissingQty(null, null, null, savedRemote ? 'המאכל נוסף למאגר ונמצא בחיפוש אצל כולם.' : 'המאכל נוסף במכשיר הזה. שמירה ל-Supabase נכשלה.');
 }
 
 function setSearchMode(mode) {
@@ -111,6 +106,7 @@ const GOALS = {cal:2000,carbs:250,protein:60,fat:65};
 let _showRemaining = false;
 const _emptyState = document.getElementById('empty-state');
 const CUSTOM_FOODS_KEY = 'miri_custom_foods_v1';
+const GLOBAL_CUSTOM_FOODS_USER = '__global_custom_foods__';
 
 function round1(v) {
   return Math.round(v * 10) / 10;
@@ -124,12 +120,78 @@ function getCustomFoods() {
 function loadCustomFoods() {
   if (typeof DB === 'undefined' || !Array.isArray(DB)) return;
   getCustomFoods().forEach(food => {
-    const name = food && food.n && food.n[0];
-    if (name && !DB.some(item => item.n && item.n.includes(name))) DB.unshift(food);
+    addCustomFoodToDb(food);
   });
 }
 
+function addCustomFoodToDb(food) {
+  if (typeof DB === 'undefined' || !Array.isArray(DB)) return;
+  const name = food && food.n && food.n[0];
+  if (!name) return;
+  const existing = DB.findIndex(item => item.n && item.n.includes(name));
+  if (existing >= 0) DB.splice(existing, 1);
+  DB.unshift(food);
+}
+
+function mergeCustomFoods(foods) {
+  const current = getCustomFoods();
+  const byName = new Map();
+  current.concat(foods || []).forEach(food => {
+    const name = food && food.n && food.n[0];
+    if (name) byName.set(name, food);
+  });
+  const merged = Array.from(byName.values());
+  localStorage.setItem(CUSTOM_FOODS_KEY, JSON.stringify(merged));
+  merged.forEach(addCustomFoodToDb);
+  return merged;
+}
+
+async function loadSupabaseCustomFoods() {
+  const foods = await getSupabaseCustomFoods();
+  if (foods.length) mergeCustomFoods(foods);
+}
+
+async function getSupabaseCustomFoods() {
+  if (typeof _sbReady === 'undefined') return [];
+  const sb = await _sbReady;
+  if (!sb) return [];
+  try {
+    const { data, error } = await sb
+      .from('user_data')
+      .select('diet_log')
+      .eq('username', GLOBAL_CUSTOM_FOODS_USER)
+      .maybeSingle();
+    if (error || !data || !data.diet_log) return [];
+    return data.diet_log.custom_foods || [];
+  } catch (err) {
+    console.error('Supabase load custom foods:', err);
+    return [];
+  }
+}
+
+async function saveSupabaseCustomFoods(foods) {
+  if (typeof _sbReady === 'undefined') return false;
+  const sb = await _sbReady;
+  if (!sb) return false;
+  try {
+    const { error } = await sb.from('user_data').upsert({
+      username: GLOBAL_CUSTOM_FOODS_USER,
+      updated_at: new Date().toISOString(),
+      diet_log: { custom_foods: foods }
+    }, { onConflict: 'username' });
+    if (error) {
+      console.error('Supabase save custom foods:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Supabase save custom foods:', err);
+    return false;
+  }
+}
+
 loadCustomFoods();
+loadSupabaseCustomFoods();
 /* load calorie goal from onboarding; redirect if profile not set */
 async function _initGoals() {
   let d = JSON.parse(localStorage.getItem(_DIET_KEY) || '{}');
