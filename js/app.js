@@ -67,6 +67,7 @@ async function _initGoals() {
   GOALS.fat     = Math.round(cal * 0.30 / 9 * 10) / 10;
   if (typeof saveUserData === 'function') saveUserData(_currentUser.username);
   render();
+  showMenuPage(0);
 }
 _initGoals();
 
@@ -2183,12 +2184,12 @@ function showFoodFreeTextPrompt() {
    DAILY MENUS GENERATOR
    ─────────────────────────────────────────────────────── */
 function generateDailyMenus() {
-  const mealTimes = (() => { try { return JSON.parse(localStorage.getItem('mealTimes') || '["breakfast","lunch","dinner"]'); } catch { return ['breakfast','lunch','dinner']; } })();
+  const mealTimes = ['breakfast','lunch','snack','dinner','night'];
   const prefData  = (() => { try { return JSON.parse(localStorage.getItem('foodPreferences') || '{}'); } catch { return {}; } })();
   const prefs = (prefData.all || []).map(s => s.toLowerCase());
 
   const calShareBase = { breakfast:0.25, lunch:0.40, snack:0.10, dinner:0.30, night:0.05 };
-  const mealLabel = { breakfast:'ארוחת בוקר', lunch:'ארוחת צהריים', snack:'חטיף', dinner:'ארוחת ערב', night:'ארוחת לילה' };
+  const mealLabel = { breakfast:'ארוחת בוקר', lunch:'ארוחת צהריים', snack:'ארוחת ביניים', dinner:'ארוחת ערב', night:'ארוחת לילה' };
 
   const totalShare = mealTimes.reduce((s, t) => s + (calShareBase[t] || 0.2), 0);
   const calShare = {};

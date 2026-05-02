@@ -25,11 +25,18 @@
   --txt3: #a0aab4;
 
   --r: 18px;
-  --sh: 0 10px 24px rgba(26,26,42,.11), 0 2px 6px rgba(26,26,42,.06);
-  --sh2: 0 18px 44px rgba(26,26,42,.16), 0 4px 12px rgba(26,26,42,.08);
+  --sh: 0 18px 28px rgba(26,26,42,.13), 0 5px 10px rgba(26,26,42,.06);
+  --sh2: 0 24px 52px rgba(26,26,42,.18), 0 8px 16px rgba(26,26,42,.08);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
+button, a, input, select, textarea, .bn-tab, .profile-row {
+  -webkit-tap-highlight-color: transparent;
+  tap-highlight-color: transparent;
+}
+button:focus, button:active, a:focus, a:active, input:focus, select:focus, textarea:focus {
+  outline: none;
+}
 body {
   font-family: 'Heebo', sans-serif;
   background: var(--bg);
@@ -120,10 +127,10 @@ body {
 .profile-row::before {
   content: '';
   position: absolute;
-  inset: 0 auto 0 0;
+  inset: 0 0 0 auto;
   width: 0;
   background: rgba(74,155,127,.12);
-  transition: width .22s ease;
+  transition: width .38s ease;
 }
 .profile-row:active::before { width: 100%; }
 .profile-row > * { position: relative; z-index: 1; }
@@ -1454,6 +1461,7 @@ body {
   justify-content: center;
   z-index: 200;
   box-shadow: 0 -4px 20px rgba(0,0,0,.07);
+  overflow: hidden;
 }
 .bn-tab {
   flex: 1;
@@ -1474,22 +1482,25 @@ body {
   position: relative;
   overflow: hidden;
   z-index: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 .bn-tab::before {
   content: '';
   position: absolute;
   left: 50%;
-  bottom: -32px;
-  width: 0;
-  height: 72px;
-  border-radius: 72px 72px 0 0;
-  background: rgba(74,155,127,.14);
-  transform: translateX(-50%);
-  transition: width .26s ease;
+  bottom: -52px;
+  width: 100%;
+  height: 112px;
+  border-radius: 112px 112px 0 0;
+  background: rgba(74,155,127,.16);
+  transform: translateX(-50%) scaleX(0);
+  transform-origin: center bottom;
+  transition: transform .32s ease;
   z-index: 0;
 }
 .bn-tab.active { color: var(--green); }
-.bn-tab.active::before { width: 90%; }
+.bn-tab.active::before { transform: translateX(-50%) scaleX(1); }
 .bn-tab svg, .bn-tab .bn-icon { font-size: 1.55rem; line-height: 1; }
 .bn-tab span { position: relative; z-index: 1; }
 
