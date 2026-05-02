@@ -59,17 +59,18 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
   font-family:'Heebo',sans-serif;font-size:1rem;font-weight:700;transition:all .2s}
 .gender-btns:not(.goal-btn-grid) .gender-btn{flex-direction:column;justify-content:center;min-height:118px;background:#fff;border:2px solid var(--bdr);border-radius:18px;padding:20px 18px;color:var(--txt);font-size:1.1rem;font-weight:900;box-shadow:0 10px 18px rgba(28,31,35,.07),0 2px 4px rgba(28,31,35,.04)}
 .gender-btn:hover{border-color:var(--green);background:var(--green-light);color:var(--txt)}
-.gender-btn:active{transform:translateY(6px) scale(.955);background:#e7e7e7;box-shadow:inset 0 9px 22px rgba(26,26,42,.2)}
-.gender-btn.selected{border-color:#d5d5d5;background:#e7e7e7;color:var(--txt);transform:translateY(6px) scale(.955);box-shadow:inset 0 9px 24px rgba(26,26,42,.2),0 1px 2px rgba(26,26,42,.03)}
+.gender-btn:active{transform:translateY(8px) scale(.94);background:#eeeeee;box-shadow:inset 0 12px 24px rgba(26,26,42,.22)}
+.gender-btn.selected{border-color:#d8d8d8;background:#eeeeee;color:var(--txt);transform:translateY(8px) scale(.94);box-shadow:inset 0 12px 26px rgba(26,26,42,.22),0 1px 2px rgba(26,26,42,.02)}
 .gender-icon{font-size:2.2rem}
 .gender-btns:not(.goal-btn-grid) .gender-icon{width:auto;height:auto;margin:0;font-size:2.2rem;line-height:1;background:none;box-shadow:none}
 .gender-icon.male,.gender-icon.female{color:inherit;background:none}
 .goal-btn-grid{grid-template-columns:1fr 1fr}
 .goal-btn-grid .gender-btn{min-height:132px;border-radius:22px}
+.goal-btn-grid .gender-btn.selected{background:#edf1ef;border-color:var(--green);box-shadow:inset 0 10px 22px rgba(26,26,42,.16),0 1px 2px rgba(26,26,42,.02)}
 .goal-btn-grid .gender-icon{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--green);font-size:1.65rem;box-shadow:0 7px 18px rgba(26,26,42,.08)}
-.birth-copy{max-width:360px;margin:0 auto 86px;color:var(--txt2);font-size:.95rem;font-weight:500;line-height:1.55;text-align:center}
-.birth-wheel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;direction:ltr;align-items:stretch;min-height:210px}
-.birth-col{height:210px;min-height:210px;max-height:210px;overflow-y:auto;scroll-snap-type:y mandatory;padding:84px 0;direction:rtl;scrollbar-width:none;overscroll-behavior:contain;align-self:stretch}
+.birth-copy{display:none}
+.birth-wheel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;direction:ltr;align-items:stretch;min-height:210px;margin-top:18px}
+.birth-col{height:210px;min-height:210px;max-height:210px;overflow-y:auto;scroll-snap-type:y mandatory;padding:84px 0;direction:rtl;scrollbar-width:none;overscroll-behavior:contain;align-self:start;position:relative}
 .birth-col::-webkit-scrollbar{display:none}
 .birth-option{height:42px;display:grid;place-items:center;font-size:1.34rem;font-weight:400;color:#8a8f98;scroll-snap-align:center;border-radius:12px;opacity:.22;transition:opacity .08s,color .08s,background .08s}
 .birth-option.near-2{opacity:.38}
@@ -487,7 +488,7 @@ function buildBirthWheel() {
       if (!opt) return;
       selectedBirth[key] = parseInt(opt.dataset.v);
       const idx = values.indexOf(selectedBirth[key]);
-      el.scrollTo({ top: idx * 42, behavior: 'smooth' });
+      el.scrollTop = idx * 42;
       mark(el, idx);
     });
     el.addEventListener('scroll', () => {

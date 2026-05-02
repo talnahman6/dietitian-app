@@ -213,6 +213,7 @@ async function _initGoals() {
   GOALS.carbs   = Math.round(cal * 0.40 / 4 * 10) / 10;
   GOALS.fat     = Math.round(cal * 0.30 / 9 * 10) / 10;
   if (typeof saveUserData === 'function') saveUserData(_currentUser.username);
+  setMiriGenderUi();
   render();
   showMenuPage(0);
 }
@@ -372,9 +373,15 @@ function updateJournalDate() {
   });
   const monthEl = document.getElementById('journal-month');
   const dayEl = document.getElementById('journal-day');
-  if (monthEl) monthEl.textContent = now.toLocaleDateString('he-IL', { month: 'long' }).replace(/^ב/, '');
+  const monthName = now.toLocaleDateString('he-IL', { month: 'long' }).replace(/^ב/, '');
+  if (monthEl) monthEl.textContent = monthName;
   if (dayEl) dayEl.textContent = now.getDate();
+  const navMonth = document.getElementById('bn-calendar-month');
+  const navDay = document.getElementById('bn-calendar-day');
+  if (navMonth) navMonth.textContent = monthName;
+  if (navDay) navDay.textContent = now.getDate();
 }
+updateJournalDate();
 
 function moveSearchToView(viewName) {
   const search = document.querySelector('.input-area');
@@ -2165,11 +2172,63 @@ function _getMiriAnswer(text) {
 }
 
 let _miriLastSend = { text: '', time: 0 };
+let _miriIntroShown = false;
 
-function miriSend() {
+function getUserGender() {
+  const d = _safeDietData();
+  return d.gender === 'נקבה' ? 'נקבה' : 'זכר';
+}
+
+function setMiriGenderUi() {
+  const isFemale = getUserGender() === 'נקבה';
+  const sendBtn = document.querySelector('.miri-chat-send');
+  const input = document.querySelector('.miri-chat-input');
+  if (sendBtn) sendBtn.textContent = isFemale ? 'שלחי' : 'שלח';
+  if (input) input.placeholder = isFemale ? 'כתבי הודעה…' : 'כתוב הודעה…';
+}
+
+function openMiriChat() {
+  const wrap = document.getElementById('miri-fab-wrap');
+  const popup = document.getElementById('miri-popup');
+  if (!wrap || !popup) return;
+  popup.style.display = 'flex';
+  wrap.classList.add('chat-open');
+  setMiriGenderUi();
+  if (!_miriIntroShown && !document.getElementById('miri-chat-msgs').children.length) {
+    _miriIntroShown = true;
+    showMiriIntro();
+  }
+}
+
+function showMiriIntro() {
+  const msgs = document.getElementById('miri-chat-msgs');
+  const name = ((_currentUser.fullName || '').trim().split(/\s+/)[0] || '');
+  const isFemale = getUserGender() === 'נקבה';
+  const text = isFemale
+    ? `היי, ${name}, כאן מירי הדיאטנית. ברוכה הבאה לאפליקציה שלי, תוכלי להתייעץ איתי מתי שרק תרצי.\nתוכלי לשאול אותי שאלות כמו: מה המצב שלי נכון לעכשיו? מה אפשר לאכול? מה חסר לי? מה את ממליצה? וכו וכו.\nנסי אותי עכשיו`
+    : `היי, ${name}, כאן מירי הדיאטנית. ברוכים הבאים לאפליקציה שלי, תוכל להתייעץ איתי מתי שרק תרצה.\nתוכל לשאול אותי שאלות כמו: מה המצב שלי נכון לעכשיו? מה אפשר לאכול? מה חסר לי? מה את ממליצה? וכו וכו.\nנסה אותי עכשיו`;
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'miri-msg miri-msg-bot';
+  typingDiv.innerHTML = '<div class="miri-msg-bot-inner"><span class="miri-msg-name-row"><img class="miri-msg-avatar" src="images/miri-fab.webp"><span class="miri-msg-label">מירי:</span></span><span class="miri-dots"><span>.</span><span>.</span><span>.</span></span></div>';
+  msgs.appendChild(typingDiv);
+  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(() => {
+    typingDiv.innerHTML = `<div class="miri-msg-bot-inner"><span class="miri-msg-name-row"><img class="miri-msg-avatar" src="images/miri-fab.webp"><span class="miri-msg-label">מירי:</span></span><span class="miri-msg-text"></span><div class="miri-quick-actions">
+      <button class="miri-quick-btn" onclick="miriSend('מה המצב שלי נכון לעכשיו?')">מה המצב שלי?</button>
+      <button class="miri-quick-btn" onclick="miriSend('מה אפשר לאכול?')">מה אפשר לאכול?</button>
+      <button class="miri-quick-btn" onclick="miriSend('מה חסר לי?')">מה חסר לי?</button>
+      <button class="miri-quick-btn" onclick="miriSend('מה את ממליצה?')">מה את ממליצה?</button>
+    </div></div>`;
+    typingDiv.querySelector('.miri-msg-text').textContent = text;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 3000);
+}
+
+function miriSend(forcedText) {
   const input = document.querySelector('.miri-chat-input');
   const msgs = document.getElementById('miri-chat-msgs');
-  const text = input.value.trim();
+  if (typeof forcedText !== 'string') forcedText = '';
+  const text = (forcedText || input.value).trim();
   if (!text) return;
   const now = Date.now();
   if (_miriLastSend.text === text && now - _miriLastSend.time < 900) return;
@@ -2177,7 +2236,7 @@ function miriSend() {
 
   const userDiv = document.createElement('div');
   userDiv.className = 'miri-msg miri-msg-user';
-  userDiv.innerHTML = '<span class="miri-msg-label">אתה:</span><span class="miri-msg-text"></span>';
+  userDiv.innerHTML = `<span class="miri-msg-label">${getUserGender() === 'נקבה' ? 'את:' : 'אתה:'}</span><span class="miri-msg-text"></span>`;
   userDiv.querySelector('.miri-msg-text').textContent = text;
   msgs.appendChild(userDiv);
 
@@ -2191,7 +2250,7 @@ function miriSend() {
   msgs.appendChild(typingDiv);
 
   msgs.scrollTop = msgs.scrollHeight;
-  input.value = '';
+  if (!forcedText) input.value = '';
 
   const isRejection = /לא בא לי|לא רוצה|לא אוהב|אין לי|תחליף|בלי/.test(text);
   const isRecommendRequest = /המלצ|מה לאכול|מה כדאי|תמליצ|מה אפשר|תציעי|תציע|מה עוד/.test(text);
@@ -2248,6 +2307,7 @@ document.querySelector('.miri-chat-send').addEventListener('click', miriSend);
 document.querySelector('.miri-chat-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') miriSend();
 });
+setMiriGenderUi();
 
 function bindPressEffect(selector, cls) {
   document.querySelectorAll(selector).forEach(el => {

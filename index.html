@@ -337,13 +337,15 @@
   <div class="custom-food-modal" onclick="event.stopPropagation()">
     <h3>הוסף מאכל</h3>
     <input class="custom-food-field" id="custom-food-name" type="text" placeholder="שם מאכל">
-    <select class="custom-food-field" id="custom-food-serving" onchange="toggleCustomFoodGrams()">
-      <option value="100">לפי 100 גרם</option>
-      <option value="small">יחידה קטנה</option>
-      <option value="medium">יחידה בינונית</option>
-      <option value="large">יחידה גדולה</option>
-      <option value="custom">מותאם אישית</option>
-    </select>
+    <div class="custom-food-select-wrap">
+      <select class="custom-food-field custom-food-select" id="custom-food-serving" onchange="toggleCustomFoodGrams()">
+        <option value="100">100 גרם</option>
+        <option value="small">יחידה קטנה</option>
+        <option value="medium">יחידה בינונית</option>
+        <option value="large">יחידה גדולה</option>
+        <option value="custom">מותאם אישית</option>
+      </select>
+    </div>
     <input class="custom-food-field" id="custom-food-grams" type="number" min="1" placeholder="גרמים" style="display:none">
     <div class="custom-food-grid">
       <input class="custom-food-field" id="custom-food-cal" type="number" min="0" step="0.1" placeholder="קלוריות">
@@ -371,7 +373,7 @@
     <span>תפריטים</span>
   </button>
   <button class="bn-tab" data-view="journal" onclick="showView('journal')">
-    <span class="bn-icon">📅</span>
+    <span class="bn-calendar-icon"><em id="bn-calendar-month">מאי</em><strong id="bn-calendar-day">1</strong></span>
     <span>היומן שלי</span>
   </button>
   <button class="bn-tab" data-view="profile" onclick="showView('profile')">
@@ -384,7 +386,7 @@
 <div class="miri-fab-wrap" id="miri-fab-wrap">
   <div class="miri-chat" id="miri-popup" style="display:none">
     <div class="miri-chat-hdr">
-      <span class="miri-popup-title">מירי ממליצה</span>
+      <span class="miri-popup-title"><img src="images/miri-fab.webp" alt="">מירי ממליצה</span>
       <button class="miri-popup-close" onclick="document.getElementById('miri-popup').style.display='none';document.getElementById('miri-fab-wrap').classList.remove('chat-open')">✕</button>
     </div>
     <div class="miri-chat-msgs" id="miri-chat-msgs"></div>
@@ -394,7 +396,7 @@
       <button class="miri-chat-send btn-go">שלח</button>
     </div>
   </div>
-  <button class="miri-fab" onclick="var w=document.getElementById('miri-fab-wrap'),p=document.getElementById('miri-popup');p.style.display='flex';w.classList.add('chat-open')" aria-label="מירי ממליצה">
+  <button class="miri-fab" onclick="openMiriChat()" aria-label="מירי ממליצה">
     <svg class="miri-fab-arc" viewBox="0 0 118 56" aria-hidden="true">
       <defs><path id="miriArcPath" d="M 11 53 A 48 48 0 0 1 107 53"></path></defs>
       <text textLength="94" lengthAdjust="spacing"><textPath href="#miriArcPath" startOffset="50%" text-anchor="middle">מירי ממליצה</textPath></text>
@@ -602,7 +604,7 @@
 <script src="js/avatar.js"></script>
 <script src="data/foods.js"></script>
 <script src="js/parser.js?v=4"></script>
-<script src="js/app.js?v=10061"></script>
+<script src="js/app.js?v=10062"></script>
 <script src="js/usda.js"></script>
 <script>
 (function() {
