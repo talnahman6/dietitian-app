@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מירי - הדיאטנית האישית שלך</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=36">
+<link rel="stylesheet" href="css/style.css?v=39">
 <style>
 .miri-fab-wrap{right:20px;left:auto;bottom:116px;z-index:9999;align-items:flex-start}
 @media (max-width:900px){
   .miri-fab-wrap{inset:0;bottom:0;right:0;left:0;align-items:stretch;justify-content:flex-end;pointer-events:none}
   .miri-fab-wrap .miri-fab{pointer-events:auto;position:fixed;right:18px;bottom:112px}
-  .miri-chat{width:calc(100vw - 16px);height:calc(100dvh - 24px);margin:8px;max-height:none;border-radius:18px;pointer-events:auto}
+  .miri-chat{width:calc(100vw - 16px);height:calc(100dvh - 44px);margin:8px;max-height:none;border-radius:18px;pointer-events:auto;z-index:2}
   .miri-chat-msgs{min-height:0;overflow-y:auto}
   .miri-chat-input-row{flex-shrink:0;padding-bottom:max(12px,env(safe-area-inset-bottom))}
 }
@@ -65,7 +65,6 @@
 <div class="input-area">
   <label>מה אכלת היום? 😊</label>
   <div class="manual-search-hdr">
-    <span class="manual-search-title">לבחירתך</span>
     <div class="search-toggle">
       <button class="stgl-btn stgl-active" id="toggle-manual" onclick="setSearchMode('manual')">חיפוש ידני</button>
       <button class="stgl-btn" id="toggle-auto" onclick="setSearchMode('auto')">חיפוש אוטומטי</button>
@@ -132,16 +131,6 @@
   </div>
 </div>
 
-<!-- DAILY MENUS -->
-<div class="menus-section">
-  <span class="menus-label">תפריטים יומיים</span>
-  <div class="menus-btns">
-    <button class="menu-btn" onclick="openMenuModal(0)">תפריט 1</button>
-    <button class="menu-btn" onclick="openMenuModal(1)">תפריט 2</button>
-    <button class="menu-btn" onclick="openMenuModal(2)">תפריט 3</button>
-  </div>
-</div>
-
 <!-- PROGRESS -->
 <div class="progress-box">
   <div class="progress-hdr">
@@ -170,11 +159,10 @@
 
 <section class="app-view" id="view-journal">
 <div class="page-panel diary-page">
-  <div class="page-title-row">
-    <h2>היומן שלי</h2>
-    <span>📅</span>
+  <div class="journal-date-row">
+    <div class="calendar-badge"><span id="journal-month">מאי</span><strong id="journal-day">1</strong></div>
+    <div class="journal-date" id="journal-date"></div>
   </div>
-  <div class="journal-date" id="journal-date"></div>
 </div>
 
 <!-- FOOD LOG -->
@@ -191,6 +179,21 @@
       <p style="font-size:.78rem;margin-top:4px;color:var(--txt3)">הקלד/הקלט מה אכלת למטה</p>
     </div>
   </div>
+</div>
+</section>
+
+<section class="app-view" id="view-menus">
+<div class="page-panel menus-page">
+  <div class="page-title-row">
+    <h2>התפריטים שלי</h2>
+    <span>📋</span>
+  </div>
+  <div class="menus-btns menus-page-tabs">
+    <button class="menu-btn active" id="menu-tab-0" onclick="showMenuPage(0)">תפריט 1</button>
+    <button class="menu-btn" id="menu-tab-1" onclick="showMenuPage(1)">תפריט 2</button>
+    <button class="menu-btn" id="menu-tab-2" onclick="showMenuPage(2)">תפריט 3</button>
+  </div>
+  <div class="menu-page-body" id="menu-page-body"></div>
 </div>
 </section>
 
@@ -302,6 +305,17 @@
   </div>
 </div>
 
+<!-- CONFIRM MODAL -->
+<div class="confirm-modal-overlay" id="confirm-clear-overlay" hidden onclick="closeClearConfirm()">
+  <div class="confirm-modal" onclick="event.stopPropagation()">
+    <p class="confirm-modal-title">האם אתה בטוח שברצונך למחוק את כל המאכלים?</p>
+    <div class="confirm-modal-actions">
+      <button class="confirm-modal-ok" onclick="confirmClearAll()">אישור</button>
+      <button class="confirm-modal-cancel" onclick="closeClearConfirm()">ביטול</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- end #app -->
 
 <!-- BOTTOM NAV -->
@@ -309,6 +323,10 @@
   <button class="bn-tab active" data-view="home" onclick="showView('home')">
     <span class="bn-icon">🏠</span>
     <span>ראשי</span>
+  </button>
+  <button class="bn-tab" data-view="menus" onclick="showView('menus')">
+    <span class="bn-icon">📋</span>
+    <span>תפריטים</span>
   </button>
   <button class="bn-tab" data-view="journal" onclick="showView('journal')">
     <span class="bn-icon">📅</span>
@@ -325,7 +343,7 @@
   <div class="miri-chat" id="miri-popup" style="display:none">
     <div class="miri-chat-hdr">
       <span class="miri-popup-title">מירי ממליצה</span>
-      <button class="miri-popup-close" onclick="document.getElementById('miri-popup').style.display='none'">✕</button>
+      <button class="miri-popup-close" onclick="document.getElementById('miri-popup').style.display='none';document.getElementById('miri-fab-wrap').classList.remove('chat-open')">✕</button>
     </div>
     <div class="miri-chat-msgs" id="miri-chat-msgs"></div>
     <div class="miri-chat-input-row">
@@ -334,7 +352,7 @@
       <button class="miri-chat-send btn-go">שלח</button>
     </div>
   </div>
-  <button class="miri-fab" onclick="var p=document.getElementById('miri-popup');p.style.display=p.style.display==='flex'?'none':'flex'" aria-label="מירי ממליצה">
+  <button class="miri-fab" onclick="var w=document.getElementById('miri-fab-wrap'),p=document.getElementById('miri-popup');p.style.display='flex';w.classList.add('chat-open')" aria-label="מירי ממליצה">
     <svg class="miri-fab-arc" viewBox="0 0 118 56" aria-hidden="true">
       <defs><path id="miriArcPath" d="M 11 53 A 48 48 0 0 1 107 53"></path></defs>
       <text textLength="94" lengthAdjust="spacing"><textPath href="#miriArcPath" startOffset="50%" text-anchor="middle">מירי ממליצה</textPath></text>

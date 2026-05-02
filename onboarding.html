@@ -57,6 +57,14 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
 .gender-btn:hover{border-color:var(--green);background:var(--green-light);color:var(--txt)}
 .gender-btn.selected{border-color:var(--green);background:var(--green-light);color:var(--green);box-shadow:0 0 0 3px rgba(74,155,127,.15)}
 .gender-icon{font-size:2.2rem}
+.goal-btn-grid{grid-template-columns:1fr 1fr}
+.goal-btn-grid .gender-btn{min-height:132px;border-radius:22px}
+#step-3 .num-input-wrap{flex-wrap:wrap}
+#step-3 .birth-date-wrap{order:3;flex:0 0 100%;margin-top:24px;text-align:center}
+#step-3 .birth-date-wrap h2{margin-bottom:8px}
+#step-3 .birth-date-wrap p{max-width:360px;margin:0 auto 18px;color:var(--txt2);font-size:.95rem;font-weight:700;line-height:1.55}
+.birth-date-input{width:100%;max-width:320px;background:var(--inp);border:2px solid var(--bdr);border-radius:18px;padding:16px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:1.15rem;font-weight:800;text-align:center;outline:none;box-shadow:var(--sh)}
+.birth-date-input:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(74,155,127,.14),var(--sh)}
 
 /* Number input */
 .num-input-wrap{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:8px}
@@ -174,6 +182,11 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
       <h2>מה הגובה שלך?</h2>
       <div class="num-input-wrap">
         <input type="number" class="ob-num-input" id="height-input" min="100" max="250" placeholder="170">
+        <div class="birth-date-wrap">
+          <h2>מתי נולדת?</h2>
+          <p>תאריך הלידה שלך מאפשר לנו ליצור מטרות אישיות ומדויקות עבורך</p>
+          <input type="date" class="birth-date-input" id="birth-date-input">
+        </div>
         <span class="num-unit">ס״מ</span>
       </div>
     </div>
@@ -247,7 +260,7 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
     <!-- Step 6: Goal -->
     <div class="ob-step" id="step-6" style="display:none">
       <h2>מה המטרה שלך?</h2>
-      <div class="gender-btns" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="gender-btns goal-btn-grid">
         <button type="button" class="gender-btn" id="btn-goal-loss" onclick="selectGoal('ירידה במשקל')">
           <span class="gender-icon">⬇️</span>
           <span>ירידה במשקל</span>
@@ -259,6 +272,10 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
         <button type="button" class="gender-btn" id="btn-goal-lean" onclick="selectGoal('להתחטב')">
           <span class="gender-icon">🔥</span>
           <span>להתחטב</span>
+        </button>
+        <button type="button" class="gender-btn" id="btn-goal-maintain" onclick="selectGoal('maintain')">
+          <span class="gender-icon">⚖️</span>
+          <span>לשמור על המשקל</span>
         </button>
       </div>
     </div>
@@ -366,7 +383,7 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
 const _user = getLoggedUser();
 if (!_user) window.location.href = 'login.html';
 
-const answers = { gender: null, age: null, height: null, weight: null, activity: null, goal: null, weekly_target: null, targetKg: null, targetTimeAmount: null, targetTimeUnit: null, totalGoalKg: null, goalMonths: null, weeklyGoal: null };
+const answers = { gender: null, age: null, height: null, birthDate: null, weight: null, activity: null, goal: null, weekly_target: null, targetKg: null, targetTimeAmount: null, targetTimeUnit: null, totalGoalKg: null, goalMonths: null, weeklyGoal: null };
 let currentStep = 1;
 let onLossConfirm = false;
 const TOTAL = 9;
@@ -378,11 +395,20 @@ function selectGender(g) {
 }
 
 function selectGoal(g) {
+  if (g === 'maintain') {
+    answers.goal = 'maintain';
+    ['btn-goal-loss','btn-goal-gain','btn-goal-lean'].forEach(id => document.getElementById(id).classList.remove('selected'));
+    document.getElementById('btn-goal-maintain').classList.add('selected');
+    return;
+  }
   answers.goal = (g === 'להתחטב') ? 'ירידה במשקל' : g;
   document.getElementById('btn-goal-loss').classList.toggle('selected', g === 'ירידה במשקל');
   document.getElementById('btn-goal-gain').classList.toggle('selected', g === 'עלייה במסה');
   document.getElementById('btn-goal-lean').classList.toggle('selected', g === 'להתחטב');
+  document.getElementById('btn-goal-maintain')?.classList.remove('selected');
 }
+
+document.getElementById('btn-goal-maintain')?.classList.remove('selected');
 
 function selectWeeklyTarget(v) {
   answers.weekly_target = v;
@@ -433,6 +459,9 @@ function validate() {
     const v = parseInt(document.getElementById('height-input').value);
     if (!v || v < 100 || v > 250) { err.textContent = 'יש להזין גובה תקין (100–250 ס״מ)'; return false; }
     answers.height = v;
+    const birthDate = document.getElementById('birth-date-input').value;
+    if (!birthDate) { err.textContent = 'יש לבחור תאריך לידה'; return false; }
+    answers.birthDate = birthDate;
   } else if (currentStep === 4) {
     const v = parseFloat(document.getElementById('weight-input').value);
     if (!v || v < 20 || v > 300) { err.textContent = 'יש להזין משקל תקין (20–300 ק״ג)'; return false; }
@@ -478,6 +507,7 @@ function goNext() {
   console.log('[onboarding] selected goal:', answers.goal);
   if (onLossConfirm) { onLossConfirm = false; showResults(); return; }
   if (!validate()) return;
+  if (currentStep === 6 && answers.goal === 'maintain') { showResults(); return; }
   if (currentStep === 8 && answers.goal === 'ירידה במשקל') { showLossConfirm(); return; }
   if (currentStep < TOTAL) {
     const nextStep = currentStep + 1;
@@ -529,7 +559,10 @@ function showResults() {
   const tdee = Math.round(bmr * answers.activity);
 
   let dailyDelta, dailyCal;
-  if (answers.goal === 'ירידה במשקל') {
+  if (answers.goal === 'maintain') {
+    dailyDelta = 0;
+    dailyCal = tdee;
+  } else if (answers.goal === 'ירידה במשקל') {
     const weeks = answers.goalMonths * 4;
     answers.weeklyGoal = parseFloat((answers.totalGoalKg / weeks).toFixed(2));
     answers.weekly_target = answers.weeklyGoal;

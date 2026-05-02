@@ -215,13 +215,17 @@ function updateProfileView() {
 
 function updateJournalDate() {
   const el = document.getElementById('journal-date');
-  if (!el) return;
-  el.textContent = new Date().toLocaleDateString('he-IL', {
+  const now = new Date();
+  if (el) el.textContent = now.toLocaleDateString('he-IL', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
     year: 'numeric'
   });
+  const monthEl = document.getElementById('journal-month');
+  const dayEl = document.getElementById('journal-day');
+  if (monthEl) monthEl.textContent = now.toLocaleDateString('he-IL', { month: 'long' }).replace(/^ב/, '');
+  if (dayEl) dayEl.textContent = now.getDate();
 }
 
 function moveSearchToView(viewName) {
@@ -239,6 +243,7 @@ function showView(viewName) {
   });
   moveSearchToView(viewName);
   if (viewName === 'journal') updateJournalDate();
+  if (viewName === 'menus') showMenuPage(0);
   if (viewName === 'profile') updateProfileView();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -946,6 +951,8 @@ function deleteItem(i) {
 }
 
 function clearAll() {
+  const modal = document.getElementById('confirm-clear-overlay');
+  if (modal) { modal.hidden = false; return; }
   if (!confirm('למחוק את כל הרשומות של היום?')) return;
   log = [];
   save();
@@ -956,6 +963,19 @@ function clearAll() {
 /* ─────────────────────────────────────────────────────────
    CAMERA
    ─────────────────────────────────────────────────────── */
+function closeClearConfirm() {
+  const modal = document.getElementById('confirm-clear-overlay');
+  if (modal) modal.hidden = true;
+}
+
+function confirmClearAll() {
+  closeClearConfirm();
+  log = [];
+  save();
+  document.getElementById('ai-msg').classList.remove('show');
+  render();
+}
+
 function openCamera() {
   let fileIn = document.getElementById('_cam-input');
   if (!fileIn) {
@@ -1013,8 +1033,6 @@ function initVoice() {
     const btn = document.getElementById('mic-btn');
     btn.classList.remove('rec');
     btn.textContent = '🎤';
-    const val = document.getElementById('food-input').value.trim();
-    if (val) addFood();
   };
 
   recognition.onerror = (e) => {
@@ -1053,7 +1071,6 @@ function toggleVoice() {
     isRecording = false;
     manualBtn.classList.remove('rec');
     manualBtn.textContent = '🎤';
-    if (manualInput.value.trim()) addFood();
   };
   recognition.onerror = (e) => {
     isRecording = false;
@@ -1089,7 +1106,6 @@ function toggleAutoVoice() {
     isRecording = false;
     autoBtn.classList.remove('rec');
     autoBtn.textContent = '🎤';
-    if (autoInput.value.trim()) addAutoFood();
   };
   recognition.onerror = (e) => {
     isRecording = false;
@@ -1138,8 +1154,6 @@ function toggleMiriVoice() {
     _miriRecording = false;
     chatBtn.classList.remove('rec');
     chatBtn.textContent = '🎤';
-    const val = chatInput.value.trim();
-    if (val) setTimeout(() => miriSend(), 100);
   };
   try {
     _miriRec.start();
@@ -2002,11 +2016,16 @@ function _getMiriAnswer(text) {
   return null;
 }
 
+let _miriLastSend = { text: '', time: 0 };
+
 function miriSend() {
   const input = document.querySelector('.miri-chat-input');
   const msgs = document.getElementById('miri-chat-msgs');
   const text = input.value.trim();
   if (!text) return;
+  const now = Date.now();
+  if (_miriLastSend.text === text && now - _miriLastSend.time < 900) return;
+  _miriLastSend = { text, time: now };
 
   const userDiv = document.createElement('div');
   userDiv.className = 'miri-msg miri-msg-user';
@@ -2245,6 +2264,29 @@ function generateDailyMenus() {
 }
 
 let _currentMenuData = null;
+
+function showMenuPage(idx) {
+  const menus = generateDailyMenus();
+  const menu = menus[idx] || menus[0];
+  if (!menu) return;
+  _currentMenuData = menu;
+  document.querySelectorAll('.menus-page-tabs .menu-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i === idx);
+  });
+  const body = document.getElementById('menu-page-body');
+  if (!body) return;
+  body.innerHTML = menu.meals.map(meal => {
+    const mealCal   = meal.items.reduce((s, it) => s + it.cal,     0);
+    const mealProt  = meal.items.reduce((s, it) => s + it.protein,  0);
+    const mealCarbs = meal.items.reduce((s, it) => s + it.carbs,    0);
+    const mealFat   = meal.items.reduce((s, it) => s + it.fat,      0);
+    return `<div class="menu-meal">
+      <div class="menu-meal-label">${escHtml(meal.label)}</div>
+      ${meal.items.map(it => `<div class="menu-meal-item">• ${escHtml(it.name)} - ${it.grams}g (${it.cal} קל׳, חלבון ${it.protein}g, פחמ׳ ${it.carbs}g, שומן ${it.fat}g)</div>`).join('')}
+      <div class="menu-meal-total">סה״כ: ${mealCal} קל׳ | חלבון ${mealProt}g | פחמ׳ ${mealCarbs}g | שומן ${mealFat}g</div>
+    </div>`;
+  }).join('') + (menu.total ? `<div class="menu-meal menu-day-total"><div class="menu-meal-label">סה״כ יומי</div><div class="menu-meal-total">${menu.total.cal} קל׳ | חלבון ${menu.total.protein}g | פחמ׳ ${menu.total.carbs}g | שומן ${menu.total.fat}g</div></div>` : '');
+}
 
 function openMenuModal(idx) {
   const menus = generateDailyMenus();
