@@ -24,7 +24,8 @@
   --sh: 0 2px 16px rgba(0,0,0,.07);
   --sh2: 0 8px 32px rgba(0,0,0,.10);
 }
-*{margin:0;padding:0;box-sizing:border-box}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+button,input,select,a{outline:none;-webkit-tap-highlight-color:transparent}
 body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;direction:rtl;display:flex;align-items:center;justify-content:center;padding:20px}
 
 .ob-wrap{width:100%;max-width:500px}
@@ -56,25 +57,30 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
   padding:26px 16px;border-radius:18px;border:2px solid var(--bdr);
   background:var(--card2);color:var(--txt2);cursor:pointer;
   font-family:'Heebo',sans-serif;font-size:1rem;font-weight:700;transition:all .2s}
-.gender-btns:not(.goal-btn-grid) .gender-btn{flex-direction:row-reverse;justify-content:flex-start;min-height:86px;background:#fff;border:none;border-radius:18px;padding:20px 26px;color:var(--txt);font-size:1.55rem;font-weight:900;box-shadow:0 14px 34px rgba(26,26,42,.08)}
+.gender-btns:not(.goal-btn-grid) .gender-btn{flex-direction:row-reverse;justify-content:center;min-height:86px;background:#fff;border:none;border-radius:18px;padding:20px 26px;color:var(--txt);font-size:1.55rem;font-weight:900;box-shadow:0 12px 22px rgba(28,31,35,.10),0 2px 5px rgba(28,31,35,.04)}
 .gender-btn:hover{border-color:var(--green);background:var(--green-light);color:var(--txt)}
-.gender-btn.selected{border-color:var(--green);background:var(--green-light);color:var(--green);box-shadow:0 0 0 3px rgba(74,155,127,.15)}
+.gender-btn:active{transform:translateY(2px) scale(.985);box-shadow:inset 0 4px 12px rgba(26,26,42,.12)}
+.gender-btn.selected{border-color:var(--green);background:var(--green-light);color:var(--green);transform:translateY(2px) scale(.985);box-shadow:inset 0 4px 14px rgba(74,155,127,.18),0 2px 8px rgba(26,26,42,.06)}
 .gender-icon{font-size:2.2rem}
-.gender-btns:not(.goal-btn-grid) .gender-icon{margin-inline-start:10px;font-size:2.3rem;line-height:1}
-.gender-icon.male{color:#3d9bd7}.gender-icon.female{color:#dc2878}
+.gender-btns:not(.goal-btn-grid) .gender-icon{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;margin-inline-start:10px;font-size:1.45rem;line-height:1;font-weight:900;background:#f5f7f8;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)}
+.gender-icon.male{color:#2f8fc3;background:#eef8ff}.gender-icon.female{color:#c73582;background:#fff0f7}
 .goal-btn-grid{grid-template-columns:1fr 1fr}
 .goal-btn-grid .gender-btn{min-height:132px;border-radius:22px}
 .goal-btn-grid .gender-icon{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--green);font-size:1.65rem;box-shadow:0 7px 18px rgba(26,26,42,.08)}
-.birth-copy{max-width:360px;margin:0 auto 82px;color:var(--txt2);font-size:.95rem;font-weight:800;line-height:1.55;text-align:center}
+.birth-copy{max-width:360px;margin:0 auto 82px;color:var(--txt2);font-size:.95rem;font-weight:600;line-height:1.55;text-align:center}
 .birth-wheel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;direction:ltr;align-items:center}
-.birth-col{height:176px;overflow-y:auto;scroll-snap-type:y mandatory;padding:46px 0;direction:rtl}
-.birth-option{height:42px;display:grid;place-items:center;font-size:1.45rem;font-weight:800;color:#8a8f98;scroll-snap-align:center;border-radius:12px}
-.birth-option.selected{background:#d9f4d3;color:var(--green)}
-.time-unit-wrap{position:relative}
-.time-unit-btn{min-width:132px;background:var(--inp);border:2px solid var(--bdr);border-radius:14px;padding:16px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:1.05rem;font-weight:800;cursor:pointer;box-shadow:var(--sh)}
-.time-unit-list{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:1px solid var(--bdr);border-radius:14px;box-shadow:var(--sh2);overflow:hidden;z-index:10}
-.time-unit-item{padding:12px;font-weight:800;cursor:pointer}
-.time-unit-item:hover{background:var(--green-light)}
+.birth-col{height:210px;overflow-y:auto;scroll-snap-type:y mandatory;padding:84px 0;direction:rtl;scrollbar-width:none}
+.birth-col::-webkit-scrollbar{display:none}
+.birth-option{height:42px;display:grid;place-items:center;font-size:1.42rem;font-weight:600;color:#8a8f98;scroll-snap-align:center;border-radius:12px;opacity:.22;transition:opacity .16s,color .16s,background .16s,font-weight .16s}
+.birth-option.near-2{opacity:.38}
+.birth-option.near-1{opacity:.62}
+.birth-option.selected{background:#d9f4d3;color:var(--green);opacity:1;font-weight:800}
+.time-unit-wrap{position:relative;width:150px}
+.time-unit-btn{width:150px;height:59px;background:var(--inp);border:2px solid var(--bdr);border-radius:14px;padding:0 16px 0 34px;color:var(--txt2);font-family:'Heebo',sans-serif;font-size:1.05rem;font-weight:800;cursor:pointer;box-shadow:var(--sh);position:relative;text-align:right}
+.time-unit-btn::after{content:'';position:absolute;left:15px;top:50%;width:8px;height:8px;border-left:2px solid #9aa0aa;border-bottom:2px solid #9aa0aa;transform:translateY(-65%) rotate(-45deg);opacity:.85}
+.time-unit-list{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--card2);border:1px solid var(--bdr);border-radius:14px;box-shadow:var(--sh2);overflow:hidden;z-index:10}
+.time-unit-item{padding:12px;font-weight:800;color:var(--txt2);cursor:pointer;background:var(--card2)}
+.time-unit-item:hover{background:var(--inp)}
 
 /* Number input */
 .num-input-wrap{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:8px}
@@ -116,13 +122,13 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
 .btn-start:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(74,155,127,.42)}
 
 /* Navigation */
-.ob-nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px}
+.ob-nav{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;margin-top:24px}
 .ob-btn-back{background:var(--inp);border:1.5px solid var(--bdr);color:var(--txt2);
-  border-radius:12px;padding:11px 20px;font-family:'Heebo',sans-serif;
+  border-radius:12px;padding:12px 20px;min-height:48px;width:100%;font-family:'Heebo',sans-serif;
   font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s}
 .ob-btn-back:hover{border-color:var(--bdr2);color:var(--txt)}
 .ob-btn-next{background:var(--green);
-  border:none;color:#fff;border-radius:12px;padding:11px 26px;
+  border:none;color:#fff;border-radius:12px;padding:12px 20px;min-height:48px;width:100%;
   font-family:'Heebo',sans-serif;font-size:.92rem;font-weight:800;cursor:pointer;transition:all .2s;
   box-shadow:0 4px 14px rgba(74,155,127,.3)}
 .ob-btn-next:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(74,155,127,.42)}
@@ -169,11 +175,11 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
       <h2>מה המין שלך?</h2>
       <div class="gender-btns">
         <button type="button" class="gender-btn" id="btn-male" onclick="selectGender('זכר')">
-          <span class="gender-icon male">♂</span>
+          <span class="gender-icon male">ז</span>
           <span>זכר</span>
         </button>
         <button type="button" class="gender-btn" id="btn-female" onclick="selectGender('נקבה')">
-          <span class="gender-icon female">♀</span>
+          <span class="gender-icon female">נ</span>
           <span>נקבה</span>
         </button>
       </div>
@@ -279,19 +285,19 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
       <h2>מה המטרה שלך?</h2>
       <div class="gender-btns goal-btn-grid">
         <button type="button" class="gender-btn" id="btn-goal-loss" onclick="selectGoal('ירידה במשקל')">
-          <span class="gender-icon">↓</span>
+          <span class="gender-icon">⬇️</span>
           <span>ירידה במשקל</span>
         </button>
         <button type="button" class="gender-btn" id="btn-goal-gain" onclick="selectGoal('עלייה במסה')">
-          <span class="gender-icon">↑</span>
+          <span class="gender-icon">💪</span>
           <span>עלייה במסה</span>
         </button>
         <button type="button" class="gender-btn" id="btn-goal-lean" onclick="selectGoal('להתחטב')">
-          <span class="gender-icon">◇</span>
+          <span class="gender-icon">🔥</span>
           <span>להתחטב</span>
         </button>
         <button type="button" class="gender-btn" id="btn-goal-maintain" onclick="selectGoal('maintain')">
-          <span class="gender-icon">=</span>
+          <span class="gender-icon">⚖️</span>
           <span>לשמור על המשקל</span>
         </button>
       </div>
@@ -410,7 +416,7 @@ const answers = { gender: null, age: null, height: null, birthDate: null, weight
 let currentStep = 1;
 let onLossConfirm = false;
 const TOTAL = 10;
-let selectedBirth = { year: 2000, month: 4, day: 30 };
+let selectedBirth = { year: 2000, month: 3, day: 30 };
 
 function selectGender(g) {
   answers.gender = g;
@@ -443,24 +449,38 @@ function selectWeeklyTarget(v) {
 
 function buildBirthWheel() {
   const months = ['ינואר','פבר׳','מרץ','אפר׳','מאי','יוני','יולי','אוג׳','ספט׳','אוק׳','נוב׳','דצמ׳'];
+  const mark = (el, idx) => {
+    el.querySelectorAll('.birth-option').forEach((x, i) => {
+      const distance = Math.abs(i - idx);
+      x.classList.toggle('selected', distance === 0);
+      x.classList.toggle('near-1', distance === 1);
+      x.classList.toggle('near-2', distance === 2);
+    });
+  };
   const fill = (id, values, selected, key, labelFn = v => v) => {
     const el = document.getElementById(id);
     if (!el || el.dataset.ready) return;
     el.innerHTML = values.map(v => `<div class="birth-option ${v === selected ? 'selected' : ''}" data-v="${v}">${labelFn(v)}</div>`).join('');
     el.dataset.ready = '1';
-    requestAnimationFrame(() => { el.scrollTop = Math.max(0, values.indexOf(selected) * 42); });
+    requestAnimationFrame(() => {
+      const idx = Math.max(0, values.indexOf(selected));
+      el.scrollTop = idx * 42;
+      mark(el, idx);
+    });
     el.addEventListener('click', e => {
       const opt = e.target.closest('.birth-option');
       if (!opt) return;
       selectedBirth[key] = parseInt(opt.dataset.v);
-      el.querySelectorAll('.birth-option').forEach(x => x.classList.toggle('selected', x === opt));
+      const idx = values.indexOf(selectedBirth[key]);
+      el.scrollTo({ top: idx * 42, behavior: 'smooth' });
+      mark(el, idx);
     });
     el.addEventListener('scroll', () => {
       clearTimeout(el._birthTimer);
       el._birthTimer = setTimeout(() => {
         const idx = Math.max(0, Math.min(values.length - 1, Math.round(el.scrollTop / 42)));
         selectedBirth[key] = values[idx];
-        el.querySelectorAll('.birth-option').forEach((x, i) => x.classList.toggle('selected', i === idx));
+        mark(el, idx);
       }, 80);
     });
   };

@@ -57,7 +57,7 @@ async function _initGoals() {
   if (d.weeklyGoal && d.goal) {
     const dailyDelta = Math.round((7500 * d.weeklyGoal) / 7);
     if (d.goal === 'loss') cal = d.tdee - dailyDelta;
-    else if (d.goal === 'gain') cal = d.tdee + dailyDelta;
+    else if (d.goal === 'gain' || d.goal === 'עלייה במסה') cal = d.tdee + dailyDelta;
   }
   d.dailyCal = cal;
   localStorage.setItem(_DIET_KEY, JSON.stringify(d));

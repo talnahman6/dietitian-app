@@ -25,16 +25,16 @@
   --txt3: #a0aab4;
 
   --r: 18px;
-  --sh: 0 18px 28px rgba(26,26,42,.13), 0 5px 10px rgba(26,26,42,.06);
-  --sh2: 0 24px 52px rgba(26,26,42,.18), 0 8px 16px rgba(26,26,42,.08);
+  --sh: 0 12px 22px rgba(28,31,35,.10), 0 2px 5px rgba(28,31,35,.04);
+  --sh2: 0 18px 34px rgba(28,31,35,.13), 0 4px 10px rgba(28,31,35,.05);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-button, a, input, select, textarea, .bn-tab, .profile-row {
+*, button, a, input, select, textarea, .bn-tab, .profile-row {
   -webkit-tap-highlight-color: transparent;
   tap-highlight-color: transparent;
 }
-button:focus, button:active, a:focus, a:active, input:focus, select:focus, textarea:focus {
+button:focus, button:active, a:focus, a:active, input:focus, select:focus, textarea:focus, .bn-tab:focus, .profile-row:focus {
   outline: none;
 }
 body {
