@@ -129,10 +129,10 @@ body {
   position: absolute;
   inset: 0 0 0 auto;
   width: 0;
-  background: rgba(74,155,127,.12);
-  transition: width .38s ease;
+  background: rgba(0,0,0,.10);
+  transition: width .58s ease;
 }
-.profile-row:active::before { width: 100%; }
+.profile-row.row-press::before { width: 100%; }
 .profile-row > * { position: relative; z-index: 1; }
 .profile-row:last-child { border-bottom: none; }
 .profile-row span { font-size: 1.45rem; text-align: center; }
@@ -1493,14 +1493,14 @@ body {
   width: 100%;
   height: 112px;
   border-radius: 112px 112px 0 0;
-  background: rgba(74,155,127,.16);
+  background: rgba(0,0,0,.11);
   transform: translateX(-50%) scaleX(0);
   transform-origin: center bottom;
-  transition: transform .32s ease;
+  transition: transform .42s ease;
   z-index: 0;
 }
 .bn-tab.active { color: var(--green); }
-.bn-tab.active::before { transform: translateX(-50%) scaleX(1); }
+.bn-tab.nav-press::before { transform: translateX(-50%) scaleX(1); }
 .bn-tab svg, .bn-tab .bn-icon { font-size: 1.55rem; line-height: 1; }
 .bn-tab span { position: relative; z-index: 1; }
 

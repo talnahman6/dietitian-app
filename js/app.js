@@ -2040,7 +2040,7 @@ function miriSend() {
 
   const typingDiv = document.createElement('div');
   typingDiv.className = 'miri-msg miri-msg-bot';
-  typingDiv.innerHTML = '<div class="miri-msg-bot-inner"><span class="miri-msg-name-row"><img class="miri-msg-avatar" src="images/מירי ממליצה חיוך 2.png"><span class="miri-msg-label">מירי:</span></span><span class="miri-dots"><span>.</span><span>.</span><span>.</span></span></div>';
+  typingDiv.innerHTML = '<div class="miri-msg-bot-inner"><span class="miri-msg-name-row"><img class="miri-msg-avatar" src="images/miri-fab.webp"><span class="miri-msg-label">מירי:</span></span><span class="miri-dots"><span>.</span><span>.</span><span>.</span></span></div>';
   msgs.appendChild(typingDiv);
 
   msgs.scrollTop = msgs.scrollHeight;
@@ -2090,7 +2090,7 @@ function miriSend() {
   }
 
   setTimeout(() => {
-    typingDiv.innerHTML = '<div class="miri-msg-bot-inner"><span class="miri-msg-name-row"><img class="miri-msg-avatar" src="images/מירי ממליצה חיוך 2.png"><span class="miri-msg-label">מירי:</span></span><span class="miri-msg-text"></span></div>';
+    typingDiv.innerHTML = '<div class="miri-msg-bot-inner"><span class="miri-msg-name-row"><img class="miri-msg-avatar" src="images/miri-fab.webp"><span class="miri-msg-label">מירי:</span></span><span class="miri-msg-text"></span></div>';
     typingDiv.querySelector('.miri-msg-text').textContent = replyText;
     msgs.scrollTop = msgs.scrollHeight;
   }, 3000);
@@ -2101,6 +2101,27 @@ document.querySelector('.miri-chat-send').addEventListener('click', miriSend);
 document.querySelector('.miri-chat-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') miriSend();
 });
+
+function bindPressEffect(selector, cls, minMs = 650) {
+  document.querySelectorAll(selector).forEach(el => {
+    let started = 0;
+    let timer = null;
+    const clear = () => {
+      const wait = Math.max(0, minMs - (Date.now() - started));
+      clearTimeout(timer);
+      timer = setTimeout(() => el.classList.remove(cls), wait);
+    };
+    el.addEventListener('pointerdown', () => {
+      started = Date.now();
+      clearTimeout(timer);
+      el.classList.add(cls);
+    });
+    ['pointerup','pointercancel','pointerleave'].forEach(evt => el.addEventListener(evt, clear));
+  });
+}
+
+bindPressEffect('.bn-tab', 'nav-press', 680);
+bindPressEffect('.profile-row', 'row-press', 760);
 
 /* ─────────────────────────────────────────────────────────
    ONBOARDING — GOAL SELECTION

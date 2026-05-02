@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>הגדרת פרופיל — מירי</title>
+<link rel="preload" as="image" href="images/miri-main.webp">
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -30,7 +31,8 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
 
 /* Logo */
 .auth-logo{text-align:center;margin-bottom:22px}
-.auth-logo .logo-icon{width:72px;height:72px;border-radius:50%;margin:0 auto 12px;background:linear-gradient(135deg,#4a9b7f,#3d8870);display:flex;align-items:center;justify-content:center;font-size:2.2rem;box-shadow:0 4px 20px rgba(74,155,127,.35)}
+.auth-logo .logo-icon{width:78px;height:78px;border-radius:50%;margin:0 auto 12px;background:#ffd22e;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(74,155,127,.24),0 0 0 5px rgba(74,155,127,.12)}
+.auth-logo .logo-icon img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;transform:scale(1.22)}
 .auth-logo h1{font-size:1.75rem;font-weight:900;color:var(--green);letter-spacing:-.5px}
 .auth-logo p{color:var(--txt2);font-size:.86rem;margin-top:5px;line-height:1.5}
 
@@ -38,33 +40,41 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
 .ob-card{background:var(--card);border-radius:22px;padding:28px 26px;box-shadow:var(--sh2)}
 
 /* Progress */
-.ob-progress{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:26px}
-.ob-dots{display:flex;gap:7px}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--bdr);transition:all .3s}
-.dot.active{background:var(--green);width:24px;border-radius:100px;box-shadow:0 0 8px rgba(74,155,127,.4)}
-.dot.done{background:var(--green);opacity:.45}
+.ob-progress{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:28px}
+.ob-dots{width:min(340px,78vw);height:8px;display:grid;grid-template-columns:repeat(10,1fr);gap:0;background:#dff3dc;border-radius:999px;overflow:hidden}
+.dot{width:100%;height:100%;border-radius:0;background:transparent;transition:background .35s,opacity .35s}
+.dot.active,.dot.done{background:var(--green)}
+.dot.active{box-shadow:0 0 10px rgba(74,155,127,.38)}
 .ob-step-label{font-size:.75rem;color:var(--txt3);font-weight:700;letter-spacing:.05em;text-transform:uppercase}
 
 /* Step content */
 .ob-step h2{font-size:1.2rem;font-weight:800;margin-bottom:22px;text-align:center;color:var(--txt)}
 
 /* Gender buttons */
-.gender-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gender-btns{display:grid;grid-template-columns:1fr;gap:16px}
 .gender-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
   padding:26px 16px;border-radius:18px;border:2px solid var(--bdr);
   background:var(--card2);color:var(--txt2);cursor:pointer;
   font-family:'Heebo',sans-serif;font-size:1rem;font-weight:700;transition:all .2s}
+.gender-btns:not(.goal-btn-grid) .gender-btn{flex-direction:row-reverse;justify-content:flex-start;min-height:86px;background:#fff;border:none;border-radius:18px;padding:20px 26px;color:var(--txt);font-size:1.55rem;font-weight:900;box-shadow:0 14px 34px rgba(26,26,42,.08)}
 .gender-btn:hover{border-color:var(--green);background:var(--green-light);color:var(--txt)}
 .gender-btn.selected{border-color:var(--green);background:var(--green-light);color:var(--green);box-shadow:0 0 0 3px rgba(74,155,127,.15)}
 .gender-icon{font-size:2.2rem}
+.gender-btns:not(.goal-btn-grid) .gender-icon{margin-inline-start:10px;font-size:2.3rem;line-height:1}
+.gender-icon.male{color:#3d9bd7}.gender-icon.female{color:#dc2878}
 .goal-btn-grid{grid-template-columns:1fr 1fr}
 .goal-btn-grid .gender-btn{min-height:132px;border-radius:22px}
-#step-3 .num-input-wrap{flex-wrap:wrap}
-#step-3 .birth-date-wrap{order:3;flex:0 0 100%;margin-top:24px;text-align:center}
-#step-3 .birth-date-wrap h2{margin-bottom:8px}
-#step-3 .birth-date-wrap p{max-width:360px;margin:0 auto 18px;color:var(--txt2);font-size:.95rem;font-weight:700;line-height:1.55}
-.birth-date-input{width:100%;max-width:320px;background:var(--inp);border:2px solid var(--bdr);border-radius:18px;padding:16px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:1.15rem;font-weight:800;text-align:center;outline:none;box-shadow:var(--sh)}
-.birth-date-input:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(74,155,127,.14),var(--sh)}
+.goal-btn-grid .gender-icon{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--green);font-size:1.65rem;box-shadow:0 7px 18px rgba(26,26,42,.08)}
+.birth-copy{max-width:360px;margin:0 auto 82px;color:var(--txt2);font-size:.95rem;font-weight:800;line-height:1.55;text-align:center}
+.birth-wheel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;direction:ltr;align-items:center}
+.birth-col{height:176px;overflow-y:auto;scroll-snap-type:y mandatory;padding:46px 0;direction:rtl}
+.birth-option{height:42px;display:grid;place-items:center;font-size:1.45rem;font-weight:800;color:#8a8f98;scroll-snap-align:center;border-radius:12px}
+.birth-option.selected{background:#d9f4d3;color:var(--green)}
+.time-unit-wrap{position:relative}
+.time-unit-btn{min-width:132px;background:var(--inp);border:2px solid var(--bdr);border-radius:14px;padding:16px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:1.05rem;font-weight:800;cursor:pointer;box-shadow:var(--sh)}
+.time-unit-list{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:1px solid var(--bdr);border-radius:14px;box-shadow:var(--sh2);overflow:hidden;z-index:10}
+.time-unit-item{padding:12px;font-weight:800;cursor:pointer}
+.time-unit-item:hover{background:var(--green-light)}
 
 /* Number input */
 .num-input-wrap{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:8px}
@@ -130,7 +140,7 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
 <div class="ob-wrap">
 
   <div class="auth-logo">
-    <div class="logo-icon">🥗</div>
+    <div class="logo-icon"><img src="images/miri-main.webp" alt="מירי"></div>
     <h1>מירי</h1>
     <p>בוא/י נכיר — כמה פרטים ואני מגדירה עבורך יעד אישי</p>
   </div>
@@ -149,8 +159,9 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
         <div class="dot" id="dot-7"></div>
         <div class="dot" id="dot-8"></div>
         <div class="dot" id="dot-9"></div>
+        <div class="dot" id="dot-10"></div>
       </div>
-      <div class="ob-step-label" id="step-label">שלב 1 מתוך 9</div>
+      <div class="ob-step-label" id="step-label">שלב 1 מתוך 10</div>
     </div>
 
     <!-- Step 1: Gender -->
@@ -158,11 +169,11 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
       <h2>מה המין שלך?</h2>
       <div class="gender-btns">
         <button type="button" class="gender-btn" id="btn-male" onclick="selectGender('זכר')">
-          <span class="gender-icon">👨</span>
+          <span class="gender-icon male">♂</span>
           <span>זכר</span>
         </button>
         <button type="button" class="gender-btn" id="btn-female" onclick="selectGender('נקבה')">
-          <span class="gender-icon">👩</span>
+          <span class="gender-icon female">♀</span>
           <span>נקבה</span>
         </button>
       </div>
@@ -172,7 +183,7 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
     <div class="ob-step" id="step-2" style="display:none">
       <h2>מה הגיל שלך?</h2>
       <div class="num-input-wrap">
-        <input type="number" class="ob-num-input" id="age-input" min="1" max="120" placeholder="25">
+        <input type="number" class="ob-num-input" id="age-input" min="1" max="120" placeholder="0">
         <span class="num-unit">שנים</span>
       </div>
     </div>
@@ -181,12 +192,7 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
     <div class="ob-step" id="step-3" style="display:none">
       <h2>מה הגובה שלך?</h2>
       <div class="num-input-wrap">
-        <input type="number" class="ob-num-input" id="height-input" min="100" max="250" placeholder="170">
-        <div class="birth-date-wrap">
-          <h2>מתי נולדת?</h2>
-          <p>תאריך הלידה שלך מאפשר לנו ליצור מטרות אישיות ומדויקות עבורך</p>
-          <input type="date" class="birth-date-input" id="birth-date-input">
-        </div>
+        <input type="number" class="ob-num-input" id="height-input" min="100" max="250" placeholder="0">
         <span class="num-unit">ס״מ</span>
       </div>
     </div>
@@ -195,13 +201,24 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
     <div class="ob-step" id="step-4" style="display:none">
       <h2>מה המשקל שלך?</h2>
       <div class="num-input-wrap">
-        <input type="number" class="ob-num-input" id="weight-input" min="20" max="300" placeholder="70">
+        <input type="number" class="ob-num-input" id="weight-input" min="20" max="300" placeholder="0">
         <span class="num-unit">ק״ג</span>
       </div>
     </div>
 
-    <!-- Step 5: Activity level -->
+    <!-- Step 5: Birth date -->
     <div class="ob-step" id="step-5" style="display:none">
+      <h2>מתי נולדת?</h2>
+      <p class="birth-copy">תאריך הלידה שלך מאפשר לנו ליצור מטרות אישיות ומדויקות עבורך</p>
+      <div class="birth-wheel">
+        <div class="birth-col" id="birth-year"></div>
+        <div class="birth-col" id="birth-day"></div>
+        <div class="birth-col" id="birth-month"></div>
+      </div>
+    </div>
+
+    <!-- Step 6: Activity level -->
+    <div class="ob-step" id="step-6" style="display:none">
       <h2>רמת הפעילות שלך?</h2>
       <div class="activity-cards">
         <label class="act-card">
@@ -257,74 +274,79 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
       </div>
     </div>
 
-    <!-- Step 6: Goal -->
-    <div class="ob-step" id="step-6" style="display:none">
+    <!-- Step 7: Goal -->
+    <div class="ob-step" id="step-7" style="display:none">
       <h2>מה המטרה שלך?</h2>
       <div class="gender-btns goal-btn-grid">
         <button type="button" class="gender-btn" id="btn-goal-loss" onclick="selectGoal('ירידה במשקל')">
-          <span class="gender-icon">⬇️</span>
+          <span class="gender-icon">↓</span>
           <span>ירידה במשקל</span>
         </button>
         <button type="button" class="gender-btn" id="btn-goal-gain" onclick="selectGoal('עלייה במסה')">
-          <span class="gender-icon">💪</span>
+          <span class="gender-icon">↑</span>
           <span>עלייה במסה</span>
         </button>
         <button type="button" class="gender-btn" id="btn-goal-lean" onclick="selectGoal('להתחטב')">
-          <span class="gender-icon">🔥</span>
+          <span class="gender-icon">◇</span>
           <span>להתחטב</span>
         </button>
         <button type="button" class="gender-btn" id="btn-goal-maintain" onclick="selectGoal('maintain')">
-          <span class="gender-icon">⚖️</span>
+          <span class="gender-icon">=</span>
           <span>לשמור על המשקל</span>
         </button>
       </div>
     </div>
 
-    <!-- Step 7: Weekly target (right after goal) -->
-    <div class="ob-step" id="step-7" style="display:none">
+    <!-- Step 8: Weekly target (right after goal) -->
+    <div class="ob-step" id="step-8" style="display:none">
       <div id="step-7-loss" style="display:none">
         <h2>מה היעד שלך? כמה את/ה רוצה לרדת?</h2>
         <div class="num-input-wrap">
-          <input type="number" class="ob-num-input" id="total-loss-input" min="1" max="200" step="0.5" placeholder="10">
+          <input type="number" class="ob-num-input" id="total-loss-input" min="1" max="200" step="0.5" placeholder="0">
           <span class="num-unit">ק״ג</span>
         </div>
       </div>
       <div id="step-7-weekly-gain" style="display:none">
-        <h2>קצב עלייה שבועי?</h2>
+        <h2>כמה את/ה רוצה לעלות?</h2>
         <div class="num-input-wrap">
-          <input type="number" class="ob-num-input" id="weekly-gain-input" min="0.25" max="2" step="0.25" placeholder="0.5">
-          <span class="num-unit">ק״ג/שבוע</span>
+          <input type="number" class="ob-num-input" id="weekly-gain-input" min="1" max="100" step="0.5" placeholder="0">
+          <span class="num-unit">ק״ג</span>
         </div>
       </div>
     </div>
 
-    <!-- Step 8: Target weight change -->
-    <div class="ob-step" id="step-8" style="display:none">
+    <!-- Step 9: Target weight change -->
+    <div class="ob-step" id="step-9" style="display:none">
       <div id="step-8-loss-timeframe" style="display:none">
         <h2>תוך כמה זמן את/ה רוצה להגיע ליעד?</h2>
         <div class="num-input-wrap">
-          <input type="number" class="ob-num-input" id="loss-months-input" min="1" max="30" placeholder="6" style="width:120px">
+          <input type="number" class="ob-num-input" id="loss-months-input" min="1" max="30" placeholder="0" style="width:150px">
           <span class="num-unit">חודשים</span>
         </div>
       </div>
       <div id="step-8-target-gain" style="display:none">
         <h2>כמה את/ה רוצה לעלות?</h2>
         <div class="num-input-wrap">
-          <input type="number" class="ob-num-input" id="target-gain-input" min="1" max="100" step="0.5" placeholder="5">
+          <input type="number" class="ob-num-input" id="target-gain-input" min="1" max="100" step="0.5" placeholder="0">
           <span class="num-unit">ק״ג</span>
         </div>
       </div>
     </div>
 
-    <!-- Step 9: Target timeframe -->
-    <div class="ob-step" id="step-9" style="display:none">
+    <!-- Step 10: Target timeframe -->
+    <div class="ob-step" id="step-10" style="display:none">
       <h2>תוך כמה זמן את/ה רוצה להגיע ליעד?</h2>
       <div class="num-input-wrap">
-        <input type="number" class="ob-num-input" id="timeframe-amount-input" min="1" max="30" placeholder="6" style="width:120px">
-        <select id="timeframe-unit-select" style="background:var(--inp);border:1px solid var(--bdr);border-radius:12px;padding:14px 16px;color:var(--txt);font-family:'Heebo',sans-serif;font-size:1.1rem;font-weight:700;outline:none;cursor:pointer">
-          <option value="חודשים">חודשים</option>
-          <option value="ימים">ימים</option>
-        </select>
+        <input type="number" class="ob-num-input" id="timeframe-amount-input" min="1" max="30" placeholder="0" style="width:150px">
+        <div class="time-unit-wrap">
+          <button type="button" class="time-unit-btn" id="timeframe-unit-btn" onclick="toggleTimeUnitList()">חודשים</button>
+          <div class="time-unit-list" id="timeframe-unit-list" style="display:none">
+            <div class="time-unit-item" onclick="selectTimeUnit('חודשים')">חודשים</div>
+            <div class="time-unit-item" onclick="selectTimeUnit('שבועות')">שבועות</div>
+            <div class="time-unit-item" onclick="selectTimeUnit('ימים')">ימים</div>
+          </div>
+          <input type="hidden" id="timeframe-unit-select" value="חודשים">
+        </div>
       </div>
     </div>
 
@@ -333,8 +355,9 @@ body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--txt);min-he
     <!-- Loss goal confirmation screen -->
     <div class="ob-step" id="step-loss-confirm" style="display:none">
       <div class="results-header">
-        <img src="img/miri-smile.png" alt="" onerror="this.style.display='none'" style="width:80px;height:80px;border-radius:50%;margin:0 auto 12px;display:block;object-fit:cover;border:3px solid var(--green);box-shadow:0 0 24px rgba(16,185,129,.35)">
+        <img src="images/miri-main.webp" alt="" style="width:80px;height:80px;border-radius:50%;margin:0 auto 12px;display:block;object-fit:cover;object-position:50% 30%;border:3px solid var(--green);box-shadow:0 0 24px rgba(16,185,129,.35)">
         <h2>יפה!</h2>
+        <p style="font-size:1rem;color:var(--txt);font-weight:800;margin-top:6px">אין לי ספק שנוכל לעמוד ביעד!</p>
         <p id="confirm-weekly-text" style="font-size:1rem;color:var(--txt);margin-top:10px"></p>
       </div>
     </div>
@@ -386,7 +409,8 @@ if (!_user) window.location.href = 'login.html';
 const answers = { gender: null, age: null, height: null, birthDate: null, weight: null, activity: null, goal: null, weekly_target: null, targetKg: null, targetTimeAmount: null, targetTimeUnit: null, totalGoalKg: null, goalMonths: null, weeklyGoal: null };
 let currentStep = 1;
 let onLossConfirm = false;
-const TOTAL = 9;
+const TOTAL = 10;
+let selectedBirth = { year: 2000, month: 4, day: 30 };
 
 function selectGender(g) {
   answers.gender = g;
@@ -417,6 +441,45 @@ function selectWeeklyTarget(v) {
   });
 }
 
+function buildBirthWheel() {
+  const months = ['ינואר','פבר׳','מרץ','אפר׳','מאי','יוני','יולי','אוג׳','ספט׳','אוק׳','נוב׳','דצמ׳'];
+  const fill = (id, values, selected, key, labelFn = v => v) => {
+    const el = document.getElementById(id);
+    if (!el || el.dataset.ready) return;
+    el.innerHTML = values.map(v => `<div class="birth-option ${v === selected ? 'selected' : ''}" data-v="${v}">${labelFn(v)}</div>`).join('');
+    el.dataset.ready = '1';
+    requestAnimationFrame(() => { el.scrollTop = Math.max(0, values.indexOf(selected) * 42); });
+    el.addEventListener('click', e => {
+      const opt = e.target.closest('.birth-option');
+      if (!opt) return;
+      selectedBirth[key] = parseInt(opt.dataset.v);
+      el.querySelectorAll('.birth-option').forEach(x => x.classList.toggle('selected', x === opt));
+    });
+    el.addEventListener('scroll', () => {
+      clearTimeout(el._birthTimer);
+      el._birthTimer = setTimeout(() => {
+        const idx = Math.max(0, Math.min(values.length - 1, Math.round(el.scrollTop / 42)));
+        selectedBirth[key] = values[idx];
+        el.querySelectorAll('.birth-option').forEach((x, i) => x.classList.toggle('selected', i === idx));
+      }, 80);
+    });
+  };
+  fill('birth-year', Array.from({length: 83}, (_, i) => 1942 + i), selectedBirth.year, 'year');
+  fill('birth-day', Array.from({length: 31}, (_, i) => i + 1), selectedBirth.day, 'day');
+  fill('birth-month', Array.from({length: 12}, (_, i) => i + 1), selectedBirth.month, 'month', v => months[v - 1]);
+}
+
+function toggleTimeUnitList() {
+  const list = document.getElementById('timeframe-unit-list');
+  if (list) list.style.display = list.style.display === 'none' ? 'block' : 'none';
+}
+
+function selectTimeUnit(unit) {
+  document.getElementById('timeframe-unit-select').value = unit;
+  document.getElementById('timeframe-unit-btn').textContent = unit;
+  document.getElementById('timeframe-unit-list').style.display = 'none';
+}
+
 function updateUI() {
   for (let i = 1; i <= TOTAL; i++) {
     document.getElementById('step-' + i).style.display = i === currentStep ? '' : 'none';
@@ -428,22 +491,23 @@ function updateUI() {
   document.getElementById('btn-back').style.visibility = currentStep > 1 ? 'visible' : 'hidden';
   document.getElementById('btn-next').textContent = currentStep === TOTAL ? 'חשב ✓' : 'המשך';
   document.getElementById('ob-error').textContent = '';
-  if (currentStep === 7) {
+  if (currentStep === 5) buildBirthWheel();
+  if (currentStep === 8) {
     document.getElementById('step-7-loss').style.display = answers.goal === 'ירידה במשקל' ? '' : 'none';
     document.getElementById('step-7-weekly-gain').style.display = answers.goal === 'עלייה במסה' ? '' : 'none';
     document.getElementById('total-loss-input').value = '';
     document.getElementById('weekly-gain-input').value = '';
   }
-  if (currentStep === 8) {
+  if (currentStep === 9) {
     document.getElementById('step-8-loss-timeframe').style.display = answers.goal === 'ירידה במשקל' ? '' : 'none';
-    document.getElementById('step-8-target-gain').style.display = answers.goal === 'עלייה במסה' ? '' : 'none';
+    document.getElementById('step-8-target-gain').style.display = 'none';
     if (answers.goal === 'ירידה במשקל') document.getElementById('loss-months-input').value = '';
   }
-  if (currentStep === 9) {
+  if (currentStep === 10) {
     answers.targetTimeAmount = null;
     answers.targetTimeUnit = null;
     document.getElementById('timeframe-amount-input').value = '';
-    document.getElementById('timeframe-unit-select').value = 'חודשים';
+    selectTimeUnit('חודשים');
   }
 }
 
@@ -459,30 +523,29 @@ function validate() {
     const v = parseInt(document.getElementById('height-input').value);
     if (!v || v < 100 || v > 250) { err.textContent = 'יש להזין גובה תקין (100–250 ס״מ)'; return false; }
     answers.height = v;
-    const birthDate = document.getElementById('birth-date-input').value;
-    if (!birthDate) { err.textContent = 'יש לבחור תאריך לידה'; return false; }
-    answers.birthDate = birthDate;
   } else if (currentStep === 4) {
     const v = parseFloat(document.getElementById('weight-input').value);
     if (!v || v < 20 || v > 300) { err.textContent = 'יש להזין משקל תקין (20–300 ק״ג)'; return false; }
     answers.weight = v;
   } else if (currentStep === 5) {
+    answers.birthDate = `${selectedBirth.year}-${String(selectedBirth.month).padStart(2,'0')}-${String(selectedBirth.day).padStart(2,'0')}`;
+  } else if (currentStep === 6) {
     const sel = document.querySelector('input[name="activity"]:checked');
     if (!sel) { err.textContent = 'יש לבחור רמת פעילות'; return false; }
     answers.activity = parseFloat(sel.value);
-  } else if (currentStep === 6) {
-    if (!answers.goal) { err.textContent = 'יש לבחור מטרה'; return false; }
   } else if (currentStep === 7) {
+    if (!answers.goal) { err.textContent = 'יש לבחור מטרה'; return false; }
+  } else if (currentStep === 8) {
     if (answers.goal === 'ירידה במשקל') {
       const v = parseFloat(document.getElementById('total-loss-input').value);
       if (!v || v <= 0) { err.textContent = 'יש להזין כמות תקינה בק״ג'; return false; }
       answers.totalGoalKg = v;
     } else {
       const v = parseFloat(document.getElementById('weekly-gain-input').value);
-      if (!v || v <= 0) { err.textContent = 'יש להזין קצב שבועי תקין'; return false; }
-      answers.weekly_target = v;
+      if (!v || v <= 0) { err.textContent = 'יש להזין כמות תקינה בק״ג'; return false; }
+      answers.targetKg = v;
     }
-  } else if (currentStep === 8) {
+  } else if (currentStep === 9) {
     if (answers.goal === 'ירידה במשקל') {
       const v = parseInt(document.getElementById('loss-months-input').value);
       if (!v || v < 1 || v > 30) { err.textContent = 'יש להזין מספר בין 1 ל-30'; return false; }
@@ -492,7 +555,7 @@ function validate() {
       if (!v || v <= 0) { err.textContent = 'יש להזין כמות תקינה בק״ג'; return false; }
       answers.targetKg = v;
     }
-  } else if (currentStep === 9) {
+  } else if (currentStep === 10) {
     const v = parseInt(document.getElementById('timeframe-amount-input').value);
     if (!v || v < 1 || v > 30) { err.textContent = 'יש להזין מספר בין 1 ל-30'; return false; }
     answers.targetTimeAmount = v;
@@ -507,8 +570,9 @@ function goNext() {
   console.log('[onboarding] selected goal:', answers.goal);
   if (onLossConfirm) { onLossConfirm = false; showResults(); return; }
   if (!validate()) return;
-  if (currentStep === 6 && answers.goal === 'maintain') { showResults(); return; }
-  if (currentStep === 8 && answers.goal === 'ירידה במשקל') { showLossConfirm(); return; }
+  if (currentStep === 7 && answers.goal === 'maintain') { showResults(); return; }
+  if (currentStep === 8 && answers.goal === 'עלייה במסה') { currentStep = 10; updateUI(); return; }
+  if (currentStep === 9 && answers.goal === 'ירידה במשקל') { showLossConfirm(); return; }
   if (currentStep < TOTAL) {
     const nextStep = currentStep + 1;
     console.log('[onboarding] next step:', nextStep);
@@ -521,7 +585,8 @@ function goNext() {
 }
 
 function goBack() {
-  if (onLossConfirm) { onLossConfirm = false; document.getElementById('step-loss-confirm').style.display = 'none'; currentStep = 8; updateUI(); return; }
+  if (onLossConfirm) { onLossConfirm = false; document.getElementById('step-loss-confirm').style.display = 'none'; currentStep = 9; updateUI(); return; }
+  if (currentStep === 10 && answers.goal === 'עלייה במסה') { currentStep = 8; updateUI(); return; }
   if (currentStep > 1) { currentStep--; updateUI(); }
 }
 
@@ -571,6 +636,10 @@ function showResults() {
     dailyCal = Math.round(tdee - dailyDeficit);
     dailyDelta = Math.round(dailyDeficit);
   } else {
+    const unit = answers.targetTimeUnit || 'חודשים';
+    const amount = answers.targetTimeAmount || 1;
+    const weeks = unit === 'ימים' ? amount / 7 : unit === 'שבועות' ? amount : amount * 4;
+    answers.weekly_target = parseFloat((answers.targetKg / weeks).toFixed(2));
     dailyDelta = Math.round((answers.weekly_target * 7500) / 7);
     dailyCal = tdee + dailyDelta;
   }
