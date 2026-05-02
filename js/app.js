@@ -2102,26 +2102,16 @@ document.querySelector('.miri-chat-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') miriSend();
 });
 
-function bindPressEffect(selector, cls, minMs = 650) {
+function bindPressEffect(selector, cls) {
   document.querySelectorAll(selector).forEach(el => {
-    let started = 0;
-    let timer = null;
-    const clear = () => {
-      const wait = Math.max(0, minMs - (Date.now() - started));
-      clearTimeout(timer);
-      timer = setTimeout(() => el.classList.remove(cls), wait);
-    };
-    el.addEventListener('pointerdown', () => {
-      started = Date.now();
-      clearTimeout(timer);
-      el.classList.add(cls);
-    });
+    const clear = () => el.classList.remove(cls);
+    el.addEventListener('pointerdown', () => el.classList.add(cls));
     ['pointerup','pointercancel','pointerleave'].forEach(evt => el.addEventListener(evt, clear));
   });
 }
 
-bindPressEffect('.bn-tab', 'nav-press', 680);
-bindPressEffect('.profile-row', 'row-press', 760);
+bindPressEffect('.bn-tab', 'nav-press');
+bindPressEffect('.profile-row', 'row-press');
 
 /* ─────────────────────────────────────────────────────────
    ONBOARDING — GOAL SELECTION
