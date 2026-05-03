@@ -107,6 +107,11 @@ let _showRemaining = false;
 const _emptyState = document.getElementById('empty-state');
 const CUSTOM_FOODS_KEY = 'miri_custom_foods_v1';
 const GLOBAL_CUSTOM_FOODS_USER = '__global_custom_foods__';
+const VALID_LANGUAGES = ['עברית', 'English', 'Русский'];
+
+function normalizeLanguage(lang) {
+  return VALID_LANGUAGES.includes(lang) ? lang : 'עברית';
+}
 
 function round1(v) {
   return Math.round(v * 10) / 10;
@@ -200,6 +205,7 @@ async function _initGoals() {
     d = JSON.parse(localStorage.getItem(_DIET_KEY) || '{}');
   }
   if (!d.tdee) { window.location.href = 'onboarding.html'; return; }
+  d.language = normalizeLanguage(d.language);
   let cal = d.tdee;
   if (d.weeklyGoal && d.goal) {
     const dailyDelta = Math.round((7500 * d.weeklyGoal) / 7);
@@ -344,7 +350,11 @@ function moveMealSelectToMode(mode) {
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
 function _safeDietData() {
-  try { return JSON.parse(localStorage.getItem(_DIET_KEY) || '{}'); }
+  try {
+    const d = JSON.parse(localStorage.getItem(_DIET_KEY) || '{}');
+    d.language = normalizeLanguage(d.language);
+    return d;
+  }
   catch { return {}; }
 }
 
@@ -414,7 +424,7 @@ function openLanguageModal() {
 }
 function saveLanguage() {
   const d = _safeDietData();
-  d.language = document.getElementById('profile-lang').value;
+  d.language = normalizeLanguage(document.getElementById('profile-lang').value);
   localStorage.setItem(_DIET_KEY, JSON.stringify(d));
   save();
   updateProfileView();
