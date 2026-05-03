@@ -216,7 +216,6 @@
 <div class="page-panel menus-page">
   <div class="page-title-row">
     <h2>התפריטים שלי</h2>
-    <button class="menu-pdf-btn" onclick="downloadMenuPDF()">הורד לPDF</button>
     <span>📋</span>
   </div>
   <div class="menus-btns menus-page-tabs">
@@ -224,6 +223,7 @@
     <button class="menu-btn" id="menu-tab-1" onclick="showMenuPage(1)">תפריט 2</button>
     <button class="menu-btn" id="menu-tab-2" onclick="showMenuPage(2)">תפריט 3</button>
   </div>
+  <button class="menu-pdf-btn" onclick="downloadMenuPDF()">הורד לPDF</button>
   <div class="menu-page-body" id="menu-page-body"></div>
 </div>
 </section>
@@ -350,16 +350,14 @@
   <div class="custom-food-modal" onclick="event.stopPropagation()">
     <h3>הוסף מאכל</h3>
     <input class="custom-food-field" id="custom-food-name" type="text" placeholder="שם מאכל">
-    <div class="custom-select-wrap custom-food-serving-ui">
-      <button type="button" class="custom-select-btn" id="custom-food-serving-btn" onclick="toggleCustomFoodServingList()">100 גרם</button>
-      <div class="custom-select-list" id="custom-food-serving-list" style="display:none">
-        <div class="custom-select-item" onclick="selectCustomFoodServing('100','100 גרם')">100 גרם</div>
-        <div class="custom-select-item" onclick="selectCustomFoodServing('small','יחידה קטנה')">יחידה קטנה</div>
-        <div class="custom-select-item" onclick="selectCustomFoodServing('medium','יחידה בינונית')">יחידה בינונית</div>
-        <div class="custom-select-item" onclick="selectCustomFoodServing('large','יחידה גדולה')">יחידה גדולה</div>
-        <div class="custom-select-item" onclick="selectCustomFoodServing('custom','מותאם אישית')">מותאם אישית</div>
-      </div>
-      <input type="hidden" id="custom-food-serving" value="100">
+    <div class="custom-food-select-wrap">
+      <select class="custom-food-field custom-food-select" id="custom-food-serving" onchange="toggleCustomFoodGrams()">
+        <option value="100">100 גרם</option>
+        <option value="small">יחידה קטנה</option>
+        <option value="medium">יחידה בינונית</option>
+        <option value="large">יחידה גדולה</option>
+        <option value="custom">מותאם אישית</option>
+      </select>
     </div>
     <input class="custom-food-field" id="custom-food-grams" type="number" min="1" placeholder="גרמים" style="display:none">
     <div class="custom-food-grid">
@@ -625,12 +623,9 @@
 <div class="water-modal-overlay" id="water-modal" hidden onclick="closeWaterModal()">
   <div class="water-modal" onclick="event.stopPropagation()">
     <button class="profile-modal-close" onclick="closeWaterModal()">✕</button>
-    <h3>עדכון כוסות מים</h3>
-    <p class="water-modal-question">להוסיף כוס מים?</p>
-    <div class="profile-modal-actions">
-      <button class="custom-food-save" onclick="addWaterCup()">הוספה</button>
-      <button class="custom-food-cancel" onclick="removeWaterCup()">הסרה</button>
-    </div>
+    <h3>עדכון מים</h3>
+    <p>להוסיף כוס מים?</p>
+    <button class="custom-food-save" onclick="addWaterCup()">הוספה</button>
   </div>
 </div>
 
@@ -649,7 +644,7 @@
 <script src="js/avatar.js"></script>
 <script src="data/foods.js"></script>
 <script src="js/parser.js?v=4"></script>
-<script src="js/app.js?v=10064"></script>
+<script src="js/app.js?v=10063"></script>
 <script src="js/usda.js"></script>
 <script>
 (function() {

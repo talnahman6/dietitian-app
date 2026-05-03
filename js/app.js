@@ -1,10 +1,10 @@
-﻿function toggleHelpPopup() {
+function toggleHelpPopup() {
   const p = document.getElementById('help-modal-overlay');
   p.hidden = !p.hidden;
 }
 
 function showCustomFoodHelp() {
-  showAutoMissingQty(null, null, null, '׳”׳•׳¡׳£ ׳׳׳›׳ ׳©׳׳ ׳׳¦׳׳× ׳‘׳¨׳©׳™׳׳”.');
+  showAutoMissingQty(null, null, null, 'הוסף מאכל שלא מצאת ברשימה.');
 }
 
 function openCustomFoodModal() {
@@ -26,21 +26,6 @@ function toggleCustomFoodGrams() {
   grams.style.display = serving.value === 'custom' ? '' : 'none';
 }
 
-function toggleCustomFoodServingList() {
-  const list = document.getElementById('custom-food-serving-list');
-  if (list) list.style.display = list.style.display === 'none' ? 'block' : 'none';
-}
-
-function selectCustomFoodServing(value, label) {
-  const input = document.getElementById('custom-food-serving');
-  const btn = document.getElementById('custom-food-serving-btn');
-  const list = document.getElementById('custom-food-serving-list');
-  if (input) input.value = value;
-  if (btn) btn.textContent = label;
-  if (list) list.style.display = 'none';
-  toggleCustomFoodGrams();
-}
-
 async function saveCustomFood() {
   const name = document.getElementById('custom-food-name').value.trim();
   const serving = document.getElementById('custom-food-serving').value;
@@ -53,13 +38,13 @@ async function saveCustomFood() {
   const protein = parseFloat(document.getElementById('custom-food-protein').value);
   const fat = parseFloat(document.getElementById('custom-food-fat').value);
   if (!name || !grams || grams <= 0 || [cal, carbs, protein, fat].some(v => Number.isNaN(v) || v < 0)) {
-    showAutoMissingQty(null, null, null, '׳™׳© ׳׳׳׳ ׳©׳ ׳׳׳›׳ ׳•׳›׳ ׳”׳¢׳¨׳›׳™׳ ׳”׳×׳–׳•׳ ׳×׳™׳™׳.');
+    showAutoMissingQty(null, null, null, 'יש למלא שם מאכל וכל הערכים התזונתיים.');
     return;
   }
   const factor = 100 / grams;
   const food = {
     n: [name],
-    cat: '׳׳׳›׳׳™׳ ׳©׳”׳•׳¡׳₪׳•',
+    cat: 'מאכלים שהוספו',
     cal: round1(cal * factor),
     c: round1(carbs * factor),
     p: round1(protein * factor),
@@ -75,7 +60,7 @@ async function saveCustomFood() {
     if (el) el.value = '';
   });
   closeCustomFoodModal();
-  showAutoMissingQty(null, null, null, savedRemote ? '׳”׳׳׳›׳ ׳ ׳•׳¡׳£ ׳׳׳׳’׳¨ ׳•׳ ׳׳¦׳ ׳‘׳—׳™׳₪׳•׳© ׳׳¦׳ ׳›׳•׳׳.' : '׳”׳׳׳›׳ ׳ ׳•׳¡׳£ ׳‘׳׳›׳©׳™׳¨ ׳”׳–׳”. ׳©׳׳™׳¨׳” ׳-Supabase ׳ ׳›׳©׳׳”.');
+  showAutoMissingQty(null, null, null, savedRemote ? 'המאכל נוסף למאגר ונמצא בחיפוש אצל כולם.' : 'המאכל נוסף במכשיר הזה. שמירה ל-Supabase נכשלה.');
 }
 
 function setSearchMode(mode) {
@@ -87,17 +72,17 @@ function setSearchMode(mode) {
   moveMealSelectToMode(mode);
 }
 
-/* ג”€ג”€ג”€ AUTH GATE ג”€ג”€ג”€ */
+/* ─── AUTH GATE ─── */
 requireAuth();
 const _currentUser = getLoggedUser();
-document.getElementById('user-name').textContent = '׳©׳׳•׳, ' + ((_currentUser.fullName || '').trim().split(/\s+/)[0] || '');
+document.getElementById('user-name').textContent = 'שלום, ' + ((_currentUser.fullName || '').trim().split(/\s+/)[0] || '');
 
 /* inject avatar into AI message mini icon only */
 document.getElementById('mini-av').innerHTML = AVATAR_SVG;
 
-/* ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€
+/* ─────────────────────────────────────────────────────────
    STATE + STORAGE
-   ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ */
+   ─────────────────────────────────────────────────────── */
 const TODAY = new Date().toDateString();
 const _DIET_KEY = dietKey(_currentUser.username);
 
@@ -219,7 +204,7 @@ async function _initGoals() {
   if (d.weeklyGoal && d.goal) {
     const dailyDelta = Math.round((7500 * d.weeklyGoal) / 7);
     if (d.goal === 'loss') cal = d.tdee - dailyDelta;
-    else if (d.goal === 'gain' || d.goal === '׳¢׳׳™׳™׳” ׳‘׳׳¡׳”') cal = d.tdee + dailyDelta;
+    else if (d.goal === 'gain' || d.goal === 'עלייה במסה') cal = d.tdee + dailyDelta;
   }
   d.dailyCal = cal;
   localStorage.setItem(_DIET_KEY, JSON.stringify(d));
@@ -241,9 +226,9 @@ function totals() {
   }), {cal:0,carbs:0,protein:0,fat:0});
 }
 
-/* ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€
+/* ─────────────────────────────────────────────────────────
    RENDER
-   ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ */
+   ─────────────────────────────────────────────────────── */
 function render() {
   const t = totals();
 
@@ -259,12 +244,12 @@ function render() {
       protein: Math.max(0, Math.round(GOALS.protein - t.protein)),
       fat:     Math.max(0, Math.round(GOALS.fat     - t.fat)),
     };
-    document.getElementById('pt-cal').textContent = r.cal+" ׳§׳'";
+    document.getElementById('pt-cal').textContent = r.cal+" קל'";
     document.getElementById('pt-crb').textContent = r.carbs+'g';
     document.getElementById('pt-prt').textContent = r.protein+'g';
     document.getElementById('pt-fat').textContent = r.fat+'g';
   } else {
-    document.getElementById('pt-cal').textContent = Math.round(t.cal)+' / '+GOALS.cal+" ׳§׳'";
+    document.getElementById('pt-cal').textContent = Math.round(t.cal)+' / '+GOALS.cal+" קל'";
     document.getElementById('pt-crb').textContent = Math.round(t.carbs)+' / '+GOALS.carbs+'g';
     document.getElementById('pt-prt').textContent = Math.round(t.protein)+' / '+GOALS.protein+'g';
     document.getElementById('pt-fat').textContent = Math.round(t.fat)+' / '+GOALS.fat+'g';
@@ -293,27 +278,27 @@ function render() {
     div.innerHTML = `
       <div class="fi-info">
         <div class="fi-name">${escHtml(e.food.n[0])}${e.quantityDisplay ? ' - ' + escHtml(e.quantityDisplay) : ''}</div>
-        <div class="fi-qty">${Math.round(e.grams)}g ֲ· ${escHtml(e.food.cat)}</div>
+        <div class="fi-qty">${Math.round(e.grams)}g · ${escHtml(e.food.cat)}</div>
       </div>
       <div class="fi-nutrients">
-        <div class="nb c"><span class="nb-v">${e.cal}</span><span class="nb-l">׳§׳׳•׳¨׳™׳•׳×</span></div>
-        <div class="nb h"><span class="nb-v">${e.carbs}g</span><span class="nb-l">׳₪׳—׳׳™׳׳•׳×</span></div>
-        <div class="nb p"><span class="nb-v">${e.protein}g</span><span class="nb-l">׳—׳׳‘׳•׳ ׳™׳</span></div>
-        <div class="nb f"><span class="nb-v">${e.fat}g</span><span class="nb-l">׳©׳•׳׳ ׳™׳</span></div>
+        <div class="nb c"><span class="nb-v">${e.cal}</span><span class="nb-l">קלוריות</span></div>
+        <div class="nb h"><span class="nb-v">${e.carbs}g</span><span class="nb-l">פחמימות</span></div>
+        <div class="nb p"><span class="nb-v">${e.protein}g</span><span class="nb-l">חלבונים</span></div>
+        <div class="nb f"><span class="nb-v">${e.fat}g</span><span class="nb-l">שומנים</span></div>
       </div>
-      <button class="btn-del" onclick="deleteItem(${i})" title="׳׳—׳§">ג•</button>`;
+      <button class="btn-del" onclick="deleteItem(${i})" title="מחק">✕</button>`;
     el.appendChild(div);
   });
 }
 
 function renderMealGroups(el) {
   const meals = [
-    ['breakfast', '׳׳¨׳•׳—׳× ׳‘׳•׳§׳¨'],
-    ['lunch', '׳׳¨׳•׳—׳× ׳¦׳”׳¨׳™׳™׳'],
-    ['snack', '׳׳¨׳•׳—׳× ׳‘׳™׳ ׳™׳™׳'],
-    ['dinner', '׳׳¨׳•׳—׳× ׳¢׳¨׳‘'],
-    ['night', '׳׳¨׳•׳—׳× ׳׳™׳׳”'],
-    ['none', '׳׳׳ ׳©׳™׳•׳']
+    ['breakfast', 'ארוחת בוקר'],
+    ['lunch', 'ארוחת צהריים'],
+    ['snack', 'ארוחת ביניים'],
+    ['dinner', 'ארוחת ערב'],
+    ['night', 'ארוחת לילה'],
+    ['none', 'ללא שיוך']
   ];
   meals.forEach(([meal, title]) => {
     const items = log.map((entry, index) => ({ entry, index })).filter(item => (item.entry.mealType || 'none') === meal);
@@ -328,8 +313,8 @@ function renderMealGroups(el) {
         <div class="fi-info">
           <div class="fi-name">${escHtml(e.food.n[0])}${e.quantityDisplay ? ' - ' + escHtml(e.quantityDisplay) : ''}</div>
         </div>
-        <div class="fi-qty">${Math.round(e.grams)} ׳’׳¨׳</div>
-        <button class="btn-del" onclick="deleteItem(${i})" title="׳׳—׳§">ג•</button>`;
+        <div class="fi-qty">${Math.round(e.grams)} גרם</div>
+        <button class="btn-del" onclick="deleteItem(${i})" title="מחק">✕</button>`;
       group.appendChild(div);
     });
     el.appendChild(group);
@@ -346,7 +331,7 @@ function requireMealType() {
   const aiMsg = document.getElementById('ai-msg');
   const aiText = document.getElementById('ai-text');
   const warnBox = document.getElementById('warn-box');
-  showAutoMissingQty(aiMsg, aiText, warnBox, '׳™׳© ׳׳‘׳—׳•׳¨ ׳¡׳•׳’ ׳׳¨׳•׳—׳” ׳׳₪׳ ׳™ ׳”׳•׳¡׳₪׳× ׳”׳׳׳›׳');
+  showAutoMissingQty(aiMsg, aiText, warnBox, 'יש לבחור סוג ארוחה לפני הוספת המאכל');
   return '';
 }
 
@@ -371,12 +356,11 @@ function updateProfileView() {
     if (el) el.textContent = val || '-';
   };
   set('profile-name', firstName);
-  set('profile-language', d.language || '׳¢׳‘׳¨׳™׳×');
-  set('profile-calories', GOALS.cal ? `${GOALS.cal} ׳§׳׳³` : '-');
-  set('profile-water', `${getWaterTarget()} ׳›׳•׳¡׳•׳×`);
+  set('profile-language', d.language || 'עברית');
+  set('profile-calories', GOALS.cal ? `${GOALS.cal} קל׳` : '-');
+  set('profile-water', `${getWaterTarget()} כוסות`);
   renderWaterWidget();
   renderStepsWidget();
-  applyLanguage(d.language || '׳¢׳‘׳¨׳™׳×');
 }
 
 function openProfileModal(title, bodyHtml) {
@@ -389,9 +373,9 @@ function closeProfileModal(){ document.getElementById('profile-modal').hidden = 
 
 function openProfileNameModal() {
   const first = ((_currentUser.fullName || '').trim().split(/\s+/)[0] || '');
-  openProfileModal('׳©׳ ׳׳©׳×׳׳©', `
-    <input class="custom-food-field" id="profile-new-name" value="${escHtml(first)}" placeholder="׳©׳ ׳₪׳¨׳˜׳™">
-    <div class="profile-modal-actions"><button class="custom-food-save" onclick="saveProfileName()">׳©׳׳™׳¨׳”</button><button class="custom-food-cancel" onclick="closeProfileModal()">׳‘׳™׳˜׳•׳</button></div>`);
+  openProfileModal('שם משתמש', `
+    <input class="custom-food-field" id="profile-new-name" value="${escHtml(first)}" placeholder="שם פרטי">
+    <div class="profile-modal-actions"><button class="custom-food-save" onclick="saveProfileName()">שמירה</button><button class="custom-food-cancel" onclick="closeProfileModal()">ביטול</button></div>`);
 }
 function saveProfileName() {
   const name = document.getElementById('profile-new-name').value.trim();
@@ -399,22 +383,21 @@ function saveProfileName() {
   _currentUser.fullName = name;
   localStorage.setItem('loggedUser', JSON.stringify(_currentUser));
   sessionStorage.setItem('loggedUser', JSON.stringify(_currentUser));
-  document.getElementById('user-name').textContent = '׳©׳׳•׳, ' + name.split(/\s+/)[0];
+  document.getElementById('user-name').textContent = 'שלום, ' + name.split(/\s+/)[0];
   updateProfileView();
   closeProfileModal();
 }
 function openPasswordModal() {
-  openProfileModal('׳©׳™׳ ׳•׳™ ׳¡׳™׳¡׳׳', `
-    <input class="custom-food-field" id="old-pass" type="password" placeholder="׳¡׳™׳¡׳׳” ׳™׳©׳ ׳”">
-    <input class="custom-food-field" id="new-pass" type="password" placeholder="׳¡׳™׳¡׳׳” ׳—׳“׳©׳”">
-    <button class="forgot-password-btn" onclick="window.location.href='login.html?forgot=1'">׳©׳›׳—׳×׳™ ׳¡׳™׳¡׳׳</button>
-    <div class="profile-modal-actions"><button class="custom-food-save" onclick="savePasswordChange()">׳©׳׳™׳¨׳”</button><button class="custom-food-cancel" onclick="closeProfileModal()">׳‘׳™׳˜׳•׳</button></div>`);
+  openProfileModal('שינוי סיסמא', `
+    <input class="custom-food-field" id="old-pass" type="password" placeholder="סיסמה ישנה">
+    <input class="custom-food-field" id="new-pass" type="password" placeholder="סיסמה חדשה">
+    <div class="profile-modal-actions"><button class="custom-food-save" onclick="savePasswordChange()">שמירה</button><button class="custom-food-cancel" onclick="closeProfileModal()">ביטול</button></div>`);
 }
 function savePasswordChange() {
   const oldPass = document.getElementById('old-pass').value;
   const newPass = document.getElementById('new-pass').value;
   if (!newPass || (_currentUser.password && oldPass !== _currentUser.password)) {
-    showAutoMissingQty(null, null, null, '׳”׳¡׳™׳¡׳׳” ׳”׳™׳©׳ ׳” ׳׳ ׳ ׳›׳•׳ ׳” ׳׳• ׳©׳—׳¡׳¨׳” ׳¡׳™׳¡׳׳” ׳—׳“׳©׳”.');
+    showAutoMissingQty(null, null, null, 'הסיסמה הישנה לא נכונה או שחסרה סיסמה חדשה.');
     return;
   }
   _currentUser.password = newPass;
@@ -423,102 +406,44 @@ function savePasswordChange() {
 }
 function openLanguageModal() {
   const d = _safeDietData();
-  openProfileModal('׳©׳₪׳•׳×', `
-    <div class="custom-select-wrap">
-      <button type="button" class="custom-select-btn" id="profile-lang-btn" onclick="toggleProfileLangList()">${d.language || '׳¢׳‘׳¨׳™׳×'}</button>
-      <div class="custom-select-list" id="profile-lang-list" style="display:none">
-        ${['׳¢׳‘׳¨׳™׳×','English','׀ ׁƒׁׁ׀÷׀¸׀¹'].map(x => `<div class="custom-select-item" onclick="selectProfileLang('${x}')">${x}</div>`).join('')}
-      </div>
-      <input type="hidden" id="profile-lang" value="${d.language || '׳¢׳‘׳¨׳™׳×'}">
-    </div>
-    <div class="profile-modal-actions"><button class="custom-food-save" onclick="saveLanguage()">׳©׳׳™׳¨׳”</button><button class="custom-food-cancel" onclick="closeProfileModal()">׳‘׳™׳˜׳•׳</button></div>`);
-}
-function toggleProfileLangList() {
-  const list = document.getElementById('profile-lang-list');
-  if (list) list.style.display = list.style.display === 'none' ? 'block' : 'none';
-}
-function selectProfileLang(lang) {
-  document.getElementById('profile-lang').value = lang;
-  document.getElementById('profile-lang-btn').textContent = lang;
-  document.getElementById('profile-lang-list').style.display = 'none';
+  openProfileModal('שפות', `
+    <select class="custom-food-field custom-food-select" id="profile-lang">
+      ${['עברית','English','Русский'].map(x => `<option ${x === (d.language || 'עברית') ? 'selected' : ''}>${x}</option>`).join('')}
+    </select>
+    <div class="profile-modal-actions"><button class="custom-food-save" onclick="saveLanguage()">שמירה</button><button class="custom-food-cancel" onclick="closeProfileModal()">ביטול</button></div>`);
 }
 function saveLanguage() {
   const d = _safeDietData();
   d.language = document.getElementById('profile-lang').value;
   localStorage.setItem(_DIET_KEY, JSON.stringify(d));
   save();
-  applyLanguage(d.language);
   updateProfileView();
   closeProfileModal();
 }
-function applyLanguage(lang) {
-  const isHeb = !lang || lang === '׳¢׳‘׳¨׳™׳×';
-  document.documentElement.lang = lang === 'English' ? 'en' : lang === '׀ ׁƒׁׁ׀÷׀¸׀¹' ? 'ru' : 'he';
-  document.documentElement.dir = isHeb ? 'rtl' : 'ltr';
-  const dict = {
-    English: { home:'Home', menus:'Menus', journal:'My diary', profile:'Profile', add:'Add', water:'Water', steps:'Steps' },
-    '׀ ׁƒׁׁ׀÷׀¸׀¹': { home:'׀“׀»׀°׀²׀½׀°ׁ', menus:'׀׀µ׀½ׁ', journal:'׀”׀½׀µ׀²׀½׀¸׀÷', profile:'׀ׁ€׀¾ׁ„׀¸׀»ׁ', add:'׀”׀¾׀±׀°׀²׀¸ׁ‚ׁ', water:'׀’׀¾׀´׀°', steps:'׀¨׀°׀³׀¸' },
-    '׳¢׳‘׳¨׳™׳×': { home:'׳¨׳׳©׳™', menus:'׳×׳₪׳¨׳™׳˜׳™׳', journal:'׳”׳™׳•׳׳ ׳©׳׳™', profile:'׳׳–׳•׳¨ ׳׳™׳©׳™', add:'׳”׳•׳¡׳₪׳”', water:'׳׳™׳', steps:'׳¦׳¢׳“׳™׳' }
-  }[lang || '׳¢׳‘׳¨׳™׳×'];
-  const tabs = document.querySelectorAll('.bn-tab span:last-child');
-  if (tabs[0]) tabs[0].textContent = dict.home;
-  if (tabs[1]) tabs[1].textContent = dict.menus;
-  if (tabs[2]) tabs[2].textContent = dict.journal;
-  if (tabs[3]) tabs[3].textContent = dict.profile;
-  document.querySelectorAll('.btn-go').forEach(btn => { if (btn.textContent.trim() === '׳”׳•׳¡׳₪׳”') btn.textContent = dict.add; });
-  const water = document.querySelector('.water-card strong'); if (water) water.textContent = dict.water;
-  const steps = document.querySelector('.steps-card strong'); if (steps) steps.textContent = dict.steps;
-}
 function openBmrModal() {
   const d = _safeDietData();
-  openProfileModal('׳—׳™׳©׳•׳‘ BMR ׳׳—׳“׳©', `
-    <div class="field-row"><label>׳’׳™׳</label><input class="custom-food-field" id="bmr-age" type="number" placeholder="׳’׳™׳" value="${d.age || ''}"></div>
-    <div class="field-row"><label>׳’׳•׳‘׳”</label><input class="custom-food-field" id="bmr-height" type="number" placeholder="׳’׳•׳‘׳”" value="${d.height || ''}"></div>
-    <div class="field-row"><label>׳׳©׳§׳</label><input class="custom-food-field" id="bmr-weight" type="number" placeholder="׳׳©׳§׳" value="${d.weight || ''}"></div>
-    <div class="field-row"><label>׳™׳¢׳“</label><div class="custom-select-wrap"><button type="button" class="custom-select-btn" id="bmr-goal-btn" onclick="toggleBmrGoalList()">${d.goal === 'gain' ? '׳¢׳׳™׳™׳” ׳‘׳׳¡׳”' : d.goal === 'maintain' ? '׳׳©׳׳•׳¨ ׳¢׳ ׳”׳׳©׳§׳' : '׳™׳¨׳™׳“׳” ׳‘׳׳©׳§׳'}</button><div class="custom-select-list" id="bmr-goal-list" style="display:none"><div class="custom-select-item" onclick="selectBmrGoal('loss','׳™׳¨׳™׳“׳” ׳‘׳׳©׳§׳')">׳™׳¨׳™׳“׳” ׳‘׳׳©׳§׳</div><div class="custom-select-item" onclick="selectBmrGoal('lean','׳׳”׳×׳—׳˜׳‘')">׳׳”׳×׳—׳˜׳‘</div><div class="custom-select-item" onclick="selectBmrGoal('gain','׳¢׳׳™׳™׳” ׳‘׳׳¡׳”')">׳¢׳׳™׳™׳” ׳‘׳׳¡׳”</div><div class="custom-select-item" onclick="selectBmrGoal('maintain','׳׳©׳׳•׳¨ ׳¢׳ ׳”׳׳©׳§׳')">׳׳©׳׳•׳¨ ׳¢׳ ׳”׳׳©׳§׳</div></div><input type="hidden" id="bmr-goal" value="${d.goal || 'loss'}"></div></div>
-    <div class="field-row"><label id="bmr-target-label">׳™׳¢׳“ ׳™׳¨׳™׳“׳”</label><input class="custom-food-field" id="bmr-target" type="number" step="0.1" placeholder="׳§׳´׳’" value="${Math.abs(d.totalGoalKg || d.targetKg || 0) || ''}"></div>
-    <div class="field-row"><label>׳×׳•׳ ׳›׳׳” ׳–׳׳?</label><input class="custom-food-field" id="bmr-time" type="number" placeholder="0" value="${d.targetTimeAmount || d.goalMonths || ''}"></div>
-    <div class="field-row"><label>׳™׳—׳™׳“׳”</label><div class="custom-select-wrap"><button type="button" class="custom-select-btn" id="bmr-time-unit-btn" onclick="toggleBmrTimeList()">${d.targetTimeUnit || '׳—׳•׳“׳©׳™׳'}</button><div class="custom-select-list" id="bmr-time-unit-list" style="display:none"><div class="custom-select-item" onclick="selectBmrTimeUnit('׳™׳׳™׳')">׳™׳׳™׳</div><div class="custom-select-item" onclick="selectBmrTimeUnit('׳©׳‘׳•׳¢׳•׳×')">׳©׳‘׳•׳¢׳•׳×</div><div class="custom-select-item" onclick="selectBmrTimeUnit('׳—׳•׳“׳©׳™׳')">׳—׳•׳“׳©׳™׳</div></div><input type="hidden" id="bmr-time-unit" value="${d.targetTimeUnit || '׳—׳•׳“׳©׳™׳'}"></div></div>
-    <div class="profile-modal-actions"><button class="custom-food-save" onclick="saveBmrUpdate()">׳—׳©׳‘</button><button class="custom-food-cancel" onclick="closeProfileModal()">׳‘׳™׳˜׳•׳</button></div>`);
-  selectBmrGoal(document.getElementById('bmr-goal').value, document.getElementById('bmr-goal-btn').textContent, true);
+  openProfileModal('חישוב BMR מחדש', `
+    <input class="custom-food-field" id="bmr-height" type="number" placeholder="גובה" value="${d.height || ''}">
+    <input class="custom-food-field" id="bmr-weight" type="number" placeholder="משקל" value="${d.weight || ''}">
+    <input class="custom-food-field" id="bmr-cal" type="number" placeholder="יעד קלוריות" value="${GOALS.cal || ''}">
+    <input class="custom-food-field" id="bmr-protein" type="number" placeholder="חלבון" value="${GOALS.protein || ''}">
+    <input class="custom-food-field" id="bmr-carbs" type="number" placeholder="פחמימות" value="${GOALS.carbs || ''}">
+    <input class="custom-food-field" id="bmr-fat" type="number" placeholder="שומנים" value="${GOALS.fat || ''}">
+    <div class="profile-modal-actions"><button class="custom-food-save" onclick="saveBmrUpdate()">אישור</button><button class="custom-food-cancel" onclick="closeProfileModal()">ביטול</button></div>`);
 }
-function toggleBmrGoalList(){ const el=document.getElementById('bmr-goal-list'); if(el) el.style.display=el.style.display==='none'?'block':'none'; }
-function selectBmrGoal(value, label, keepOpen) {
-  document.getElementById('bmr-goal').value = value;
-  document.getElementById('bmr-goal-btn').textContent = label;
-  const targetLabel = document.getElementById('bmr-target-label');
-  if (targetLabel) targetLabel.textContent = value === 'gain' ? '׳™׳¢׳“ ׳¢׳׳™׳”' : '׳™׳¢׳“ ׳™׳¨׳™׳“׳”';
-  const target = document.getElementById('bmr-target');
-  if (target) target.parentElement.style.display = value === 'maintain' ? 'none' : 'grid';
-  const list = document.getElementById('bmr-goal-list');
-  if (list && !keepOpen) list.style.display = 'none';
-}
-function toggleBmrTimeList(){ const el=document.getElementById('bmr-time-unit-list'); if(el) el.style.display=el.style.display==='none'?'block':'none'; }
-function selectBmrTimeUnit(unit){ document.getElementById('bmr-time-unit').value=unit; document.getElementById('bmr-time-unit-btn').textContent=unit; document.getElementById('bmr-time-unit-list').style.display='none'; }
 function saveBmrUpdate() {
   const d = _safeDietData();
-  d.age = parseFloat(document.getElementById('bmr-age').value) || d.age;
   d.height = parseFloat(document.getElementById('bmr-height').value) || d.height;
   d.weight = parseFloat(document.getElementById('bmr-weight').value) || d.weight;
-  d.goal = document.getElementById('bmr-goal').value;
-  d.targetKg = parseFloat(document.getElementById('bmr-target').value) || 0;
-  d.targetTimeAmount = parseFloat(document.getElementById('bmr-time').value) || 1;
-  d.targetTimeUnit = document.getElementById('bmr-time-unit').value;
-  const days = d.targetTimeUnit === '׳™׳׳™׳' ? d.targetTimeAmount : d.targetTimeUnit === '׳©׳‘׳•׳¢׳•׳×' ? d.targetTimeAmount * 7 : d.targetTimeAmount * 30;
-  const bmr = Math.round(((d.gender === '׳ ׳§׳‘׳”' ? 10 * d.weight + 6.25 * d.height - 5 * d.age - 161 : 10 * d.weight + 6.25 * d.height - 5 * d.age + 5) || 0));
-  const tdee = Math.round(bmr * (parseFloat(d.activity) || 1.375));
-  const dailyDelta = d.goal === 'maintain' ? 0 : Math.round((7500 * d.targetKg) / Math.max(1, days));
-  GOALS.cal = d.goal === 'gain' ? tdee + dailyDelta : d.goal === 'maintain' ? tdee : tdee - dailyDelta;
-  GOALS.protein = round1(GOALS.cal * 0.30 / 4);
-  GOALS.carbs = round1(GOALS.cal * 0.40 / 4);
-  GOALS.fat = round1(GOALS.cal * 0.30 / 9);
-  d.bmr = bmr; d.tdee = tdee;
+  GOALS.cal = parseFloat(document.getElementById('bmr-cal').value) || GOALS.cal;
+  GOALS.protein = parseFloat(document.getElementById('bmr-protein').value) || GOALS.protein;
+  GOALS.carbs = parseFloat(document.getElementById('bmr-carbs').value) || GOALS.carbs;
+  GOALS.fat = parseFloat(document.getElementById('bmr-fat').value) || GOALS.fat;
   d.dailyCal = GOALS.cal; d.protein = GOALS.protein; d.carbs = GOALS.carbs; d.fat = GOALS.fat;
   localStorage.setItem(_DIET_KEY, JSON.stringify(d));
   save();
   render();
   updateProfileView();
-  showAutoMissingQty(null, null, null, `BMR: ${bmr} | ׳×׳—׳–׳•׳§׳”: ${tdee} | ׳™׳¢׳“ ׳™׳•׳׳™: ${GOALS.cal} ׳§׳׳³`);
   closeProfileModal();
 }
 function getWaterTarget(){ return parseInt(_safeDietData().waterTarget || localStorage.getItem('miri_water_target') || '8', 10); }
@@ -532,9 +457,9 @@ function renderWaterWidget() {
   if (wf) wf.style.width = Math.min(100, (count / target) * 100) + '%';
 }
 function openWaterTargetModal() {
-  openProfileModal('׳׳˜׳¨׳× ׳׳™׳', `
-    <input class="custom-food-field" id="water-target-input" type="number" min="1" value="${getWaterTarget()}" placeholder="׳›׳׳•׳× ׳›׳•׳¡׳•׳×">
-    <div class="profile-modal-actions"><button class="custom-food-save" onclick="saveWaterTarget()">׳©׳׳™׳¨׳”</button><button class="custom-food-cancel" onclick="closeProfileModal()">׳‘׳™׳˜׳•׳</button></div>`);
+  openProfileModal('מטרת מים', `
+    <input class="custom-food-field" id="water-target-input" type="number" min="1" value="${getWaterTarget()}" placeholder="כמות כוסות">
+    <div class="profile-modal-actions"><button class="custom-food-save" onclick="saveWaterTarget()">שמירה</button><button class="custom-food-cancel" onclick="closeProfileModal()">ביטול</button></div>`);
 }
 function saveWaterTarget() {
   const target = Math.max(1, parseInt(document.getElementById('water-target-input').value || '8', 10));
@@ -550,11 +475,6 @@ function openWaterModal(){ document.getElementById('water-modal').hidden = false
 function closeWaterModal(){ document.getElementById('water-modal').hidden = true; }
 function addWaterCup() {
   localStorage.setItem('miri_water_' + TODAY, String(getWaterCount() + 1));
-  renderWaterWidget();
-  closeWaterModal();
-}
-function removeWaterCup() {
-  localStorage.setItem('miri_water_' + TODAY, String(Math.max(0, getWaterCount() - 1)));
   renderWaterWidget();
   closeWaterModal();
 }
@@ -582,7 +502,7 @@ function updateJournalDate() {
   });
   const monthEl = document.getElementById('journal-month');
   const dayEl = document.getElementById('journal-day');
-  const monthName = now.toLocaleDateString('he-IL', { month: 'long' }).replace(/^׳‘/, '');
+  const monthName = now.toLocaleDateString('he-IL', { month: 'long' }).replace(/^ב/, '');
   if (monthEl) monthEl.textContent = monthName;
   if (dayEl) dayEl.textContent = now.getDate();
   const navMonth = document.getElementById('bn-calendar-month');
@@ -612,9 +532,9 @@ function showView(viewName) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€
+/* ─────────────────────────────────────────────────────────
    AUTO-COMPLETE
-   ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ */
+   ─────────────────────────────────────────────────────── */
 const _acInput = document.getElementById('food-input');
 const _acList = document.getElementById('ac-list');
 let _acSelected = false;
@@ -631,7 +551,7 @@ function closeAutocomplete() {
 
 function acSearch(val) {
   if (_acSelected && selectedManualFood) { closeAutocomplete(); return; }
-  const norm = s => s.toLowerCase().replace(/['"׳´׳³]/g,'').replace(/\s+/g,' ').trim();
+  const norm = s => s.toLowerCase().replace(/['"״׳]/g,'').replace(/\s+/g,' ').trim();
   const t = norm(val);
   if (t.length < 2) { _acList.style.display = 'none'; return; }
   const scored = [];
@@ -697,9 +617,9 @@ _acInput.addEventListener('blur', () => {
 });
 _acInput.addEventListener('focus', () => { if (_acSuppress) return; if (_acSelected || selectedManualFood) return; if (_acInput.value.trim().length >= 2) acSearch(_acInput.value); });
 
-/* ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€
+/* ─────────────────────────────────────────────────────────
    ADD / DELETE / CLEAR
-   ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ */
+   ─────────────────────────────────────────────────────── */
 
 /* Prepend "1 <unit>" when qty-sel has a volume unit and text has no unit yet */
 function handleQtyUnitChange(sel) {
@@ -716,7 +636,7 @@ function handleQtyUnitChange(sel) {
 }
 
 function isPlateUnit(unit) {
-  return unit === 'plate' || unit === '׳¦׳׳—׳×';
+  return unit === 'plate' || unit === 'צלחת';
 }
 
 function getFullPlateGrams(food) {
@@ -724,12 +644,12 @@ function getFullPlateGrams(food) {
   const cat = food.cat || '';
 
   if (food.plateGrams) return food.plateGrams;
-  if (/(׳—׳–׳” ׳¢׳•׳£|׳¢׳•׳£|׳”׳•׳“׳•|׳‘׳©׳¨|׳“׳’|׳¡׳׳׳•׳|׳˜׳•׳ ׳”|׳˜׳•׳₪׳•|׳‘׳™׳¦׳”|׳§׳¦׳™׳¦׳”|׳©׳ ׳™׳¦׳)/.test(foodText) || /׳‘׳©׳¨|׳“׳’׳™׳|׳—׳׳‘׳•׳/.test(cat)) return 180;
-  if (/(׳׳•׳¨׳–|׳₪׳¡׳˜׳”|׳₪׳×׳™׳×׳™׳|׳§׳•׳¡׳§׳•׳¡|׳‘׳•׳¨׳’׳•׳|׳§׳™׳ ׳•׳׳”)/.test(foodText)) return 270;
-  if (/(׳¢׳“׳©׳™׳|׳©׳¢׳•׳¢׳™׳×|׳—׳•׳׳•׳¡|׳׳₪׳•׳ ׳”|׳’׳¨׳™׳¡׳™׳)/.test(foodText)) return 250;
-  if (/(׳‘׳˜׳˜׳”|׳×׳₪׳•׳—\s*׳׳“׳׳”|׳×׳₪׳•["׳´]?׳|׳×׳₪׳•׳—׳™\s*׳׳“׳׳”|׳₪׳™׳¨׳”)/.test(foodText)) return 300;
-  if (/(׳¡׳׳˜|׳™׳¨׳§׳•׳×|׳—׳¡׳”|׳¢׳’׳‘|׳׳׳₪׳₪׳•׳|׳›׳¨׳•׳‘|׳‘׳¨׳•׳§׳•׳׳™|׳›׳¨׳•׳‘׳™׳×|׳§׳™׳©׳•׳|׳—׳¦׳™׳|׳’׳–׳¨)/.test(foodText) || /׳™׳¨׳§׳•׳×/.test(cat)) return 300;
-  if (/(׳׳–׳ ׳™׳”|׳׳•׳§׳₪׳¥|׳×׳‘׳©׳™׳|׳§׳“׳¨׳”|׳₪׳©׳˜׳™׳“׳”)/.test(foodText)) return 350;
+  if (/(חזה עוף|עוף|הודו|בשר|דג|סלמון|טונה|טופו|ביצה|קציצה|שניצל)/.test(foodText) || /בשר|דגים|חלבון/.test(cat)) return 180;
+  if (/(אורז|פסטה|פתיתים|קוסקוס|בורגול|קינואה)/.test(foodText)) return 270;
+  if (/(עדשים|שעועית|חומוס|אפונה|גריסים)/.test(foodText)) return 250;
+  if (/(בטטה|תפוח\s*אדמה|תפו["״]?א|תפוחי\s*אדמה|פירה)/.test(foodText)) return 300;
+  if (/(סלט|ירקות|חסה|עגב|מלפפון|כרוב|ברוקולי|כרובית|קישוא|חציל|גזר)/.test(foodText) || /ירקות/.test(cat)) return 300;
+  if (/(לזניה|מוקפץ|תבשיל|קדרה|פשטידה)/.test(foodText)) return 350;
   return 300;
 }
 
@@ -758,7 +678,7 @@ function buildCustomSelect(id, onChange) {
       const active = item.dataset.value === value;
       item.classList.toggle('active', active);
       const check = item.querySelector('.custom-select-check');
-      if (check) check.textContent = active ? 'ג“' : '';
+      if (check) check.textContent = active ? '✓' : '';
     });
     if (onChange) onChange(select);
   }
@@ -795,8 +715,8 @@ function applyQtyUnit(raw) {
   const qtySel = document.getElementById('qty-sel');
   if (!qtySel) return raw;
   const unit = qtySel.value;
-  const hasUnit = /׳›׳₪׳™׳×|׳›׳₪׳™׳•׳×|׳›׳£|׳›׳₪׳•׳×|׳›׳•׳¡׳•׳×|׳›׳•׳¡|׳"׳|׳׳™׳׳™׳׳™׳˜׳¨|׳’׳¨׳/.test(raw);
-  if (!hasUnit && ['׳›׳₪׳™׳×', '׳›׳£', '׳›׳•׳¡'].includes(unit)) {
+  const hasUnit = /כפית|כפיות|כף|כפות|כוסות|כוס|מ"ל|מיליליטר|גרם/.test(raw);
+  if (!hasUnit && ['כפית', 'כף', 'כוס'].includes(unit)) {
     return '1 ' + unit + ' ' + raw;
   }
   return raw;
@@ -806,11 +726,11 @@ function displayUnit(qty, unit) {
   const n = parseFloat(qty);
   if (n === 1) return unit;
   const plural = {
-    '׳›׳£': '׳›׳₪׳•׳×',
-    '׳›׳₪׳™׳×': '׳›׳₪׳™׳•׳×',
-    '׳›׳•׳¡': '׳›׳•׳¡׳•׳×',
-    '׳™׳—׳™׳“׳”': '׳™׳—׳™׳“׳•׳×',
-    '׳₪׳¨׳•׳¡׳”': '׳₪׳¨׳•׳¡׳•׳×',
+    'כף': 'כפות',
+    'כפית': 'כפיות',
+    'כוס': 'כוסות',
+    'יחידה': 'יחידות',
+    'פרוסה': 'פרוסות',
   };
   return plural[unit] || unit;
 }
@@ -851,7 +771,7 @@ function hasAutoExplicitQuantity(text) {
 }
 
 function showAutoMissingQty(aiMsg, aiText, warnBox, customMsg) {
-  const msg = customMsg || '׳‘׳—׳™׳₪׳•׳© ׳׳•׳˜׳•׳׳˜׳™ ׳™׳© ׳׳¨׳©׳•׳ ׳›׳׳•׳× + ׳™׳—׳™׳“׳× ׳׳©׳§׳. ׳׳׳©׳: ׳׳›׳׳×׳™ 100 ׳’׳¨׳ ׳—׳–׳” ׳¢׳•׳£, ׳׳›׳׳×׳™ ׳¨׳‘׳¢ ׳¦׳׳—׳× ׳׳•׳¨׳–';
+  const msg = customMsg || 'בחיפוש אוטומטי יש לרשום כמות + יחידת משקל. למשל: אכלתי 100 גרם חזה עוף, אכלתי רבע צלחת אורז';
   if (warnBox) warnBox.innerHTML = '';
   if (aiMsg) aiMsg.classList.remove('show');
   if (aiText) aiText.textContent = '';
@@ -862,7 +782,7 @@ function showAutoMissingQty(aiMsg, aiText, warnBox, customMsg) {
     toast.className = 'auto-qty-toast';
     document.body.appendChild(toast);
   }
-  toast.innerHTML = `<div class="auto-qty-toast-box"><div>${escHtml(msg)}</div><button type="button" class="auto-qty-toast-ok">׳׳™׳©׳•׳¨</button></div>`;
+  toast.innerHTML = `<div class="auto-qty-toast-box"><div>${escHtml(msg)}</div><button type="button" class="auto-qty-toast-ok">אישור</button></div>`;
   toast.querySelector('.auto-qty-toast-ok').addEventListener('click', () => toast.classList.remove('show'));
   toast.classList.add('show');
 }
@@ -903,15 +823,15 @@ function parseAutoFood(part) {
   const gramMatch = t.match(AUTO_GRAMS_RE);
   if (gramMatch) {
     grams = parseFloat(gramMatch[1].replace(',', '.'));
-    quantityDisplay = `${grams} ׳’׳¨׳`;
+    quantityDisplay = `${grams} גרם`;
   } else if (AUTO_PLATE_RE.test(t)) {
     const fraction = AUTO_QUARTER_RE.test(t) ? 0.25 : AUTO_THIRD_RE.test(t) ? 1 / 3 : AUTO_HALF_RE.test(t) ? 0.5 : 1;
     grams = getFullPlateGrams(food) * fraction;
-    const fractionText = fraction === 0.25 ? '׳¨׳‘׳¢' : fraction === 1 / 3 ? '׳©׳׳™׳©' : fraction === 0.5 ? '׳—׳¦׳™' : '׳©׳׳';
-    quantityDisplay = `${fractionText} ׳¦׳׳—׳×`;
+    const fractionText = fraction === 0.25 ? 'רבע' : fraction === 1 / 3 ? 'שליש' : fraction === 0.5 ? 'חצי' : 'שלם';
+    quantityDisplay = `${fractionText} צלחת`;
   } else {
     grams = food.dw || 100;
-    quantityDisplay = `${grams} ׳’׳¨׳`;
+    quantityDisplay = `${grams} גרם`;
   }
   const f = grams / 100;
   return {
@@ -936,7 +856,7 @@ async function addMeal(raw, sourceInput) {
   const rawParts = cleaned.split(/,\s*|,/);
   const parts = [];
   for (const part of rawParts) {
-    /* split "X ׳•-Y" Hebrew conjunction into separate items */
+    /* split "X ו-Y" Hebrew conjunction into separate items */
     const subParts = part.split(AUTO_SPLIT_AND_RE);
     for (const sp of subParts) {
       for (const item of splitAutoQuantityItems(sp.trim())) {
@@ -954,7 +874,7 @@ async function addMeal(raw, sourceInput) {
   }
 
   aiMsg.classList.add('show');
-  aiText.textContent = 'ג³ ׳׳•׳¡׳™׳£ ׳׳× ׳›׳ ׳”׳׳ ׳•׳×...';
+  aiText.textContent = '⏳ מוסיף את כל המנות...';
 
   let added = 0;
   let addedCal = 0;
@@ -969,7 +889,7 @@ async function addMeal(raw, sourceInput) {
   if (added > 0) playRegisterSound();
   if (failed.length > 0) {
     aiMsg.classList.add('show');
-    aiText.textContent = `׳׳ ׳–׳™׳”׳™׳×׳™: ${failed.join(', ')}`;
+    aiText.textContent = `לא זיהיתי: ${failed.join(', ')}`;
   } else {
     aiMsg.classList.remove('show');
     aiText.textContent = '';
@@ -978,8 +898,8 @@ async function addMeal(raw, sourceInput) {
 
   const total = totals();
   const warns = [];
-  if (total.cal > GOALS.cal) warns.push(`ג ן¸ ׳¢׳‘׳¨׳× ׳׳× ׳™׳¢׳“ ׳”׳§׳׳•׳¨׳™׳•׳× ׳”׳™׳•׳׳™ (${Math.round(total.cal)}/${GOALS.cal} ׳§׳׳³)`);
-  if (total.carbs > GOALS.carbs) warns.push(`ג ן¸ ׳¢׳‘׳¨׳× ׳׳× ׳™׳¢׳“ ׳”׳₪׳—׳׳™׳׳•׳× ׳”׳™׳•׳׳™`);
+  if (total.cal > GOALS.cal) warns.push(`⚠️ עברת את יעד הקלוריות היומי (${Math.round(total.cal)}/${GOALS.cal} קל׳)`);
+  if (total.carbs > GOALS.carbs) warns.push(`⚠️ עברת את יעד הפחמימות היומי`);
   warnBox.innerHTML = warns.map(w => `<div class="warn-box">${w}</div>`).join('');
 
   inp.value = '';
@@ -987,18 +907,18 @@ async function addMeal(raw, sourceInput) {
   return true;
 }
 
-/* ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€
+/* ─────────────────────────────────────────────────────────
    LOCAL QUANTITY DETECTION + POPUP
-   ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ */
+   ─────────────────────────────────────────────────────── */
 function hasExplicitQty(text) {
   const t = text.trim().toLowerCase();
-  if (/\d+(?:[.,]\d+)?\s*(?:׳’׳¨׳|׳’'|׳"?׳|׳׳™׳׳™׳׳™׳˜׳¨|׳׳|׳׳™׳˜׳¨|׳§"?׳’|׳§׳™׳׳•׳’׳¨׳)/.test(t)) return true;
-  if (/\d+(?:[.,]\d+)?\s*(?:׳›׳₪׳™׳•׳×?|׳›׳₪׳•׳×?|׳›׳•׳¡׳•׳×?|׳›׳•׳¡)/.test(t)) return true;
-  if (/(?:^|\s)(?:׳›׳₪׳™׳•׳×?|׳›׳₪׳•׳×?|׳›׳•׳¡׳•׳×?|׳›׳•׳¡)(?:\s|$)/.test(t)) return true;
-  if (/(?:^|\s)׳›׳£(?:\s|$)/.test(t)) return true;
-  if (/(?:^|\s)(?:׳—׳¦׳™|׳¨׳‘׳¢|׳©׳׳™׳©)(?:\s|$)/.test(t)) return true;
-  if (/׳©׳׳•׳©(?:\s+|-)?׳¨׳‘׳¢|׳©׳ ׳™(?:\s+|-)?׳©׳׳™׳©׳™|׳›׳•׳¡\s+׳•׳—׳¦׳™|׳©׳×׳™\s+׳›׳•׳¡׳•׳×/.test(t)) return true;
-  if (/(?:^|\s)(?:׳׳—׳“|׳׳—׳×|׳©׳ ׳™׳™׳|׳©׳×׳™׳™׳|׳©׳ ׳™|׳©׳×׳™|׳©׳׳•׳©׳”|׳©׳׳•׳©|׳׳¨׳‘׳¢׳”|׳׳¨׳‘׳¢|׳—׳׳™׳©׳”|׳—׳׳©|׳©׳™׳©׳”|׳©׳©)(?:\s|$)/.test(t)) return true;
+  if (/\d+(?:[.,]\d+)?\s*(?:גרם|ג'|מ"?ל|מיליליטר|מל|ליטר|ק"?ג|קילוגרם)/.test(t)) return true;
+  if (/\d+(?:[.,]\d+)?\s*(?:כפיות?|כפות?|כוסות?|כוס)/.test(t)) return true;
+  if (/(?:^|\s)(?:כפיות?|כפות?|כוסות?|כוס)(?:\s|$)/.test(t)) return true;
+  if (/(?:^|\s)כף(?:\s|$)/.test(t)) return true;
+  if (/(?:^|\s)(?:חצי|רבע|שליש)(?:\s|$)/.test(t)) return true;
+  if (/שלוש(?:\s+|-)?רבע|שני(?:\s+|-)?שלישי|כוס\s+וחצי|שתי\s+כוסות/.test(t)) return true;
+  if (/(?:^|\s)(?:אחד|אחת|שניים|שתיים|שני|שתי|שלושה|שלוש|ארבעה|ארבע|חמישה|חמש|שישה|שש)(?:\s|$)/.test(t)) return true;
   if (/^\d+(?:[.,]\d+)?(?:\s|$)/.test(t)) return true;
   return false;
 }
@@ -1008,25 +928,25 @@ let _qtyFood = null, _qtyFoodText = null;
 function _qtyUnitOptions(food) {
   const name = (food.n[0] || '').toLowerCase();
   const cat  = (food.cat || '').toLowerCase();
-  if (/׳׳©׳§׳”|׳©׳×׳™׳™׳”/.test(cat) || /׳׳™׳¥|׳—׳׳‘|׳׳™׳|׳§׳₪׳”|׳×׳”/.test(name))
-    return ['׳"׳', '׳›׳•׳¡', '׳›׳£', '׳›׳₪׳™׳×', '׳’׳¨׳'];
-  if (/׳׳—׳|׳˜׳•׳¡׳˜|׳‘׳’׳˜|׳—׳׳”|׳׳׳₪׳”|׳₪׳™׳×׳”|׳₪׳¨׳•׳¡׳”/.test(name))
-    return ['׳₪׳¨׳•׳¡׳•׳×', '׳’׳¨׳', '׳™׳—׳™׳“׳•׳×'];
-  if (/׳©׳׳|׳—׳׳׳×|׳˜׳—׳™׳ ׳”|׳׳׳¨׳—|׳׳׳—|׳§׳׳—|׳¡׳•׳›׳¨|׳“׳‘׳©|׳¨׳™׳‘׳”/.test(name))
-    return ['׳›׳£', '׳›׳₪׳™׳×', '׳›׳•׳¡', '׳’׳¨׳'];
-  return ['׳’׳¨׳', '׳™׳—׳™׳“׳•׳×', '׳›׳•׳¡', '׳›׳£', '׳›׳₪׳™׳×'];
+  if (/משקה|שתייה/.test(cat) || /מיץ|חלב|מים|קפה|תה/.test(name))
+    return ['מ"ל', 'כוס', 'כף', 'כפית', 'גרם'];
+  if (/לחם|טוסט|בגט|חלה|לאפה|פיתה|פרוסה/.test(name))
+    return ['פרוסות', 'גרם', 'יחידות'];
+  if (/שמן|חמאת|טחינה|ממרח|מלח|קמח|סוכר|דבש|ריבה/.test(name))
+    return ['כף', 'כפית', 'כוס', 'גרם'];
+  return ['גרם', 'יחידות', 'כוס', 'כף', 'כפית'];
 }
 
 function _qtyQuestion(food) {
   const name    = food.n[0];
   const nameLow = name.toLowerCase();
   const catLow  = (food.cat || '').toLowerCase();
-  if (/׳׳—׳|׳˜׳•׳¡׳˜|׳‘׳’׳˜|׳—׳׳”|׳׳׳₪׳”/.test(nameLow)) return `׳›׳׳” ׳₪׳¨׳•׳¡׳•׳× ${name}?`;
-  if (/׳₪׳™׳×׳”/.test(nameLow))                   return `׳›׳׳” ׳₪׳™׳×׳•׳×?`;
-  if (/׳‘׳™׳¦/.test(nameLow))                    return `׳›׳׳” ׳‘׳™׳¦׳™׳?`;
-  if (/׳׳©׳§׳”|׳©׳×׳™׳™׳”/.test(catLow) || /׳׳™׳¥|׳—׳׳‘|׳׳™׳|׳§׳₪׳”|׳×׳”/.test(nameLow)) return `׳›׳׳” ׳"׳ ${name}?`;
-  if (/׳™׳¨׳§׳•׳×|׳₪׳™׳¨׳•׳×/.test(catLow))             return `׳›׳׳” ${name}?`;
-  return `׳›׳׳” ׳’׳¨׳ ${name}?`;
+  if (/לחם|טוסט|בגט|חלה|לאפה/.test(nameLow)) return `כמה פרוסות ${name}?`;
+  if (/פיתה/.test(nameLow))                   return `כמה פיתות?`;
+  if (/ביצ/.test(nameLow))                    return `כמה ביצים?`;
+  if (/משקה|שתייה/.test(catLow) || /מיץ|חלב|מים|קפה|תה/.test(nameLow)) return `כמה מ"ל ${name}?`;
+  if (/ירקות|פירות/.test(catLow))             return `כמה ${name}?`;
+  return `כמה גרם ${name}?`;
 }
 
 function _ensureQtyPopup() {
@@ -1052,12 +972,12 @@ function _ensureQtyPopup() {
   div.innerHTML = `
     <div class="qty-popup-q" id="qty-popup-q"></div>
     <div class="qty-popup-row">
-      <input type="number" id="qty-popup-num" min="0.5" step="0.5" placeholder="׳›׳׳•׳×">
+      <input type="number" id="qty-popup-num" min="0.5" step="0.5" placeholder="כמות">
       <select id="qty-popup-unit"></select>
     </div>
     <div class="qty-popup-btns">
-      <button class="qty-btn-add" onclick="qtyPopupSubmit()">׳”׳•׳¡׳£ ג“</button>
-      <button class="qty-btn-cancel" onclick="qtyPopupClose()">׳‘׳™׳˜׳•׳</button>
+      <button class="qty-btn-add" onclick="qtyPopupSubmit()">הוסף ✓</button>
+      <button class="qty-btn-cancel" onclick="qtyPopupClose()">ביטול</button>
     </div>`;
   _acList.insertAdjacentElement('afterend', div);
 }
@@ -1088,13 +1008,13 @@ function qtyPopupSubmit() {
   const unit   = document.getElementById('qty-popup-unit').value;
   if (!numVal || numVal <= 0) { document.getElementById('qty-popup-num').focus(); return; }
   if (!_qtyFood || !_qtyFoodText) return;
-  const rawText = (unit === '׳™׳—׳™׳“׳•׳×' || unit === '׳₪׳¨׳•׳¡׳•׳×')
+  const rawText = (unit === 'יחידות' || unit === 'פרוסות')
     ? `${numVal} ${_qtyFoodText}`
     : `${numVal} ${unit} ${_qtyFoodText}`;
   const result = parseFood(rawText);
   if (!result) {
     document.getElementById('ai-msg').classList.add('show');
-    document.getElementById('ai-text').textContent = '׳׳ ׳”׳¦׳׳—׳×׳™ ׳׳—׳©׳‘ ׳׳× ׳”׳¢׳¨׳›׳™׳. ׳ ׳¡׳” ׳©׳•׳‘.';
+    document.getElementById('ai-text').textContent = 'לא הצלחתי לחשב את הערכים. נסה שוב.';
     return;
   }
   qtyPopupClose();
@@ -1148,8 +1068,8 @@ function _commitFoodEntry(result) {
   const warnBox = document.getElementById('warn-box');
   const total   = totals();
   const warns   = [];
-  if (total.cal   > GOALS.cal)   warns.push(`ג ן¸ ׳¢׳‘׳¨׳× ׳׳× ׳™׳¢׳“ ׳”׳§׳׳•׳¨׳™׳•׳× ׳”׳™׳•׳׳™ (${Math.round(total.cal)}/${GOALS.cal} ׳§׳׳³)`);
-  if (total.carbs > GOALS.carbs) warns.push(`ג ן¸ ׳¢׳‘׳¨׳× ׳׳× ׳™׳¢׳“ ׳”׳₪׳—׳׳™׳׳•׳× ׳”׳™׳•׳׳™`);
+  if (total.cal   > GOALS.cal)   warns.push(`⚠️ עברת את יעד הקלוריות היומי (${Math.round(total.cal)}/${GOALS.cal} קל׳)`);
+  if (total.carbs > GOALS.carbs) warns.push(`⚠️ עברת את יעד הפחמימות היומי`);
   warnBox.innerHTML = warns.map(w => `<div class="warn-box">${w}</div>`).join('');
   render();
   document.getElementById('food-list').scrollTop = document.getElementById('food-list').scrollHeight;
@@ -1165,7 +1085,7 @@ async function addFood() {
   const aiText = document.getElementById('ai-text');
   const warnBox = document.getElementById('warn-box');
 
-  /* ג”€ג”€ Manual search (autocomplete-selected item OR manual mode) ג”€ג”€ */
+  /* ── Manual search (autocomplete-selected item OR manual mode) ── */
   const _manualSec = document.getElementById('manual-section');
   const _isManual = _manualSec && _manualSec.style.display !== 'none';
   if (selectedManualFood || _acSelectedFood || _isManual) {
@@ -1175,20 +1095,20 @@ async function addFood() {
     console.log('[manual-add] DB length:', typeof DB !== 'undefined' ? DB.length : 'DB not defined');
     if (typeof DB === 'undefined' || !Array.isArray(DB) || DB.length === 0) {
       aiMsg.classList.add('show');
-      aiText.textContent = '׳׳׳’׳¨ ׳”׳׳׳›׳׳™׳ ׳׳ ׳ ׳˜׳¢׳';
+      aiText.textContent = 'מאגר המאכלים לא נטען';
       return;
     }
     const unit = document.getElementById('qty-sel').value;
     const qtyNum = parseFloat(document.getElementById('qty-num').value);
     if (!isPlateUnit(unit) && (!qtyNum || qtyNum <= 0)) {
-      showAutoMissingQty(aiMsg, aiText, warnBox, '׳™׳© ׳׳”׳–׳™׳ ׳›׳׳•׳× ׳׳₪׳ ׳™ ׳”׳•׳¡׳₪׳× ׳”׳׳׳›׳. ׳׳׳©׳: 100 ׳’׳¨׳ ׳׳•׳¨׳– ׳׳• ׳—׳¦׳™ ׳¦׳׳—׳× ׳׳•׳¨׳–');
+      showAutoMissingQty(aiMsg, aiText, warnBox, 'יש להזין כמות לפני הוספת המאכל. למשל: 100 גרם אורז או חצי צלחת אורז');
       return;
     }
     const food = selectedManualFood || _acSelectedFood || manualFindFood(raw);
     console.log('[manual-add] findFood result:', food);
     if (!food) {
       aiMsg.classList.add('show');
-      aiText.textContent = '׳”׳׳׳›׳ ׳׳ ׳ ׳׳¦׳ ׳‘׳׳׳’׳¨';
+      aiText.textContent = 'המאכל לא נמצא במאגר';
       _acSelected = false;
       _acSelectedFood = null;
       selectedManualFood = null;
@@ -1196,16 +1116,16 @@ async function addFood() {
     }
     if (food.cal === undefined || food.p === undefined || food.c === undefined || food.f === undefined) {
       aiMsg.classList.add('show');
-      aiText.textContent = '׳”׳׳׳›׳ ׳׳ ׳ ׳׳¦׳ ׳‘׳׳׳’׳¨';
+      aiText.textContent = 'המאכל לא נמצא במאגר';
       return;
     }
     let grams;
-    if (unit === '׳’׳¨׳') grams = qtyNum;
-    else if (unit === '׳"׳' || unit === '׳׳™׳׳™׳׳™׳˜׳¨') grams = qtyNum;
-    else if (unit === '׳™׳—׳™׳“׳•׳×' || unit === '׳™׳—׳™׳“׳”' || unit === '׳₪׳¨׳•׳¡׳•׳×' || unit === '׳₪׳¨׳•׳¡׳”') grams = qtyNum * (food.dw || 100);
-    else if (unit === '׳›׳•׳¡' || unit === '׳›׳•׳¡׳•׳×') grams = qtyNum * 240;
-    else if (unit === '׳›׳£' || unit === '׳›׳₪׳•׳×') grams = qtyNum * 15;
-    else if (unit === '׳›׳₪׳™׳×' || unit === '׳›׳₪׳™׳•׳×') grams = qtyNum * 5;
+    if (unit === 'גרם') grams = qtyNum;
+    else if (unit === 'מ"ל' || unit === 'מיליליטר') grams = qtyNum;
+    else if (unit === 'יחידות' || unit === 'יחידה' || unit === 'פרוסות' || unit === 'פרוסה') grams = qtyNum * (food.dw || 100);
+    else if (unit === 'כוס' || unit === 'כוסות') grams = qtyNum * 240;
+    else if (unit === 'כף' || unit === 'כפות') grams = qtyNum * 15;
+    else if (unit === 'כפית' || unit === 'כפיות') grams = qtyNum * 5;
     else if (isPlateUnit(unit)) {
       const fullPlateGrams = getFullPlateGrams(food);
       const fraction = document.getElementById('plate-fraction') ? document.getElementById('plate-fraction').value : '1';
@@ -1222,7 +1142,7 @@ async function addFood() {
       protein: Math.round(food.p   * multiplier * 10) / 10,
       fat:     Math.round(food.f   * multiplier * 10) / 10,
       raw,
-      quantityDisplay: isPlateUnit(unit) ? document.getElementById('plate-fraction').selectedOptions[0].text + " ׳¦׳׳—׳×" : formatQuantityDisplay(qtyNum, unit),
+      quantityDisplay: isPlateUnit(unit) ? document.getElementById('plate-fraction').selectedOptions[0].text + " צלחת" : formatQuantityDisplay(qtyNum, unit),
     };
     console.log('[manual-add] created entry:', entry);
     _acSelected = false;
@@ -1239,22 +1159,22 @@ async function addFood() {
   const rawOrig = raw;
   raw = applyQtyUnit(raw);
 
-  /* ג”€ג”€ Multi-food meal ג”€ג”€ */
-  const isMeal = /,|\n|\s+׳•(?=[׳-׳×])/.test(raw) || /^(׳׳›׳׳×׳™|׳׳›׳׳×|׳׳›׳|׳׳›׳׳”|׳©׳×׳™׳×׳™|׳©׳×׳™׳×)\s/.test(raw);
+  /* ── Multi-food meal ── */
+  const isMeal = /,|\n|\s+ו(?=[א-ת])/.test(raw) || /^(אכלתי|אכלת|אכל|אכלה|שתיתי|שתית)\s/.test(raw);
   if (isMeal) {
     const handled = await addMeal(raw.replace(/\n/g, ','), inp);
     if (handled) return;
   }
 
-  /* ג”€ג”€ Single food: local search only ג”€ג”€ */
-  const foodText = raw.replace(/^(׳׳›׳׳×׳™|׳׳›׳׳×|׳׳›׳|׳׳›׳׳”|׳©׳×׳™׳×׳™|׳©׳×׳™׳×)\s+/, '').trim();
-  const origFoodText = rawOrig.replace(/^(׳׳›׳׳×׳™|׳׳›׳׳×|׳׳›׳|׳׳›׳׳”|׳©׳×׳™׳×׳™|׳©׳×׳™׳×)\s+/, '').trim();
+  /* ── Single food: local search only ── */
+  const foodText = raw.replace(/^(אכלתי|אכלת|אכל|אכלה|שתיתי|שתית)\s+/, '').trim();
+  const origFoodText = rawOrig.replace(/^(אכלתי|אכלת|אכל|אכלה|שתיתי|שתית)\s+/, '').trim();
 
   const food = findFood(foodText);
   if (!food) {
     warnBox.innerHTML = '';
     aiMsg.classList.add('show');
-    aiText.textContent = `׳׳ ׳׳¦׳׳×׳™ "${origFoodText}" ׳‘׳׳׳’׳¨. ׳ ׳¡׳” ׳©׳ ׳׳—׳¨.`;
+    aiText.textContent = `לא מצאתי "${origFoodText}" במאגר. נסה שם אחר.`;
     return;
   }
 
@@ -1263,7 +1183,7 @@ async function addFood() {
     if (result) { inp.value = ''; _commitFoodEntry(result); return; }
   }
 
-  /* No explicit quantity ג€” open popup */
+  /* No explicit quantity — open popup */
   inp.value = '';
   warnBox.innerHTML = '';
   aiMsg.classList.remove('show');
@@ -1295,7 +1215,7 @@ async function addAutoFood() {
 
   warnBox.innerHTML = '';
   aiMsg.classList.add('show');
-  aiText.textContent = '׳׳—׳₪׳© ׳‘׳׳׳’׳¨ ׳”׳¨׳—׳‘...';
+  aiText.textContent = 'מחפש במאגר הרחב...';
   if (typeof fetchFoodsDict === 'function' && typeof showServingPicker === 'function') {
     const term = cleanAutoText(raw).trim();
     const fd = await fetchFoodsDict(term);
@@ -1305,7 +1225,7 @@ async function addAutoFood() {
       return;
     }
   }
-  aiText.textContent = `׳׳ ׳”׳¦׳׳—׳×׳™ ׳׳—׳©׳‘ ׳׳× "${raw}". ׳ ׳¡׳” ׳©׳ ׳׳—׳¨ ׳׳• ׳”׳•׳¡׳£ ׳›׳׳•׳×.`;
+  aiText.textContent = `לא הצלחתי לחשב את "${raw}". נסה שם אחר או הוסף כמות.`;
 }
 
 function deleteItem(i) {
@@ -1317,16 +1237,16 @@ function deleteItem(i) {
 function clearAll() {
   const modal = document.getElementById('confirm-clear-overlay');
   if (modal) { modal.hidden = false; return; }
-  if (!confirm('׳׳׳—׳•׳§ ׳׳× ׳›׳ ׳”׳¨׳©׳•׳׳•׳× ׳©׳ ׳”׳™׳•׳?')) return;
+  if (!confirm('למחוק את כל הרשומות של היום?')) return;
   log = [];
   save();
   document.getElementById('ai-msg').classList.remove('show');
   render();
 }
 
-/* ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€
+/* ─────────────────────────────────────────────────────────
    CAMERA
-   ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ */
+   ─────────────────────────────────────────────────────── */
 function closeClearConfirm() {
   const modal = document.getElementById('confirm-clear-overlay');
   if (modal) modal.hidden = true;
@@ -1355,16 +1275,16 @@ function openCamera() {
       const aiMsg = document.getElementById('ai-msg');
       const aiText = document.getElementById('ai-text');
       aiMsg.classList.add('show');
-      aiText.textContent = 'נ“· ׳”׳×׳׳•׳ ׳” ׳ ׳˜׳¢׳ ׳”! ׳›׳×׳‘/׳™ ׳׳× ׳©׳ ׳”׳׳ ׳” ׳‘׳©׳“׳” ׳”׳˜׳§׳¡׳˜ ׳›׳“׳™ ׳׳¨׳©׳•׳ ׳׳•׳×׳”.';
+      aiText.textContent = '📷 התמונה נטענה! כתב/י את שם המנה בשדה הטקסט כדי לרשום אותה.';
       fileIn.value = '';
     });
   }
   fileIn.click();
 }
 
-/* ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€
+/* ─────────────────────────────────────────────────────────
    VOICE RECORDING
-   ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ */
+   ─────────────────────────────────────────────────────── */
 let recognition = null;
 let isRecording = false;
 
@@ -1381,7 +1301,7 @@ function initVoice() {
     isRecording = true;
     const btn = document.getElementById('mic-btn');
     btn.classList.add('rec');
-    btn.textContent = '׳׳§׳׳™׳˜';
+    btn.textContent = 'מקליט';
   };
 
   recognition.onresult = (e) => {
@@ -1396,16 +1316,16 @@ function initVoice() {
     isRecording = false;
     const btn = document.getElementById('mic-btn');
     btn.classList.remove('rec');
-    btn.textContent = 'נ₪';
+    btn.textContent = '🎤';
   };
 
   recognition.onerror = (e) => {
     isRecording = false;
     const btn = document.getElementById('mic-btn');
     btn.classList.remove('rec');
-    btn.textContent = 'נ₪';
+    btn.textContent = '🎤';
     if (e.error === 'not-allowed') {
-      alert('׳™׳© ׳׳׳©׳¨ ׳’׳™׳©׳” ׳׳׳™׳§׳¨׳•׳₪׳•׳ ׳‘׳“׳₪׳“׳₪׳');
+      alert('יש לאשר גישה למיקרופון בדפדפן');
     }
   };
   return true;
@@ -1414,7 +1334,7 @@ function initVoice() {
 function toggleVoice() {
   if (!recognition) {
     if (!initVoice()) {
-      alert('׳”׳“׳₪׳“׳₪׳ ׳©׳׳ ׳׳ ׳×׳•׳׳ ׳‘׳”׳§׳׳˜׳” ׳§׳•׳׳™׳×. ׳ ׳¡׳” Chrome.');
+      alert('הדפדפן שלך לא תומך בהקלטה קולית. נסה Chrome.');
       return;
     }
   }
@@ -1424,7 +1344,7 @@ function toggleVoice() {
   recognition.onstart = () => {
     isRecording = true;
     manualBtn.classList.add('rec');
-    manualBtn.textContent = '׳׳§׳׳™׳˜';
+    manualBtn.textContent = 'מקליט';
   };
   recognition.onresult = (e) => {
     let txt = '';
@@ -1434,13 +1354,13 @@ function toggleVoice() {
   recognition.onend = () => {
     isRecording = false;
     manualBtn.classList.remove('rec');
-    manualBtn.textContent = 'נ₪';
+    manualBtn.textContent = '🎤';
   };
   recognition.onerror = (e) => {
     isRecording = false;
     manualBtn.classList.remove('rec');
-    manualBtn.textContent = 'נ₪';
-    if (e.error === 'not-allowed') alert('׳™׳© ׳׳׳©׳¨ ׳’׳™׳©׳” ׳׳׳™׳§׳¨׳•׳₪׳•׳ ׳‘׳“׳₪׳“׳₪׳');
+    manualBtn.textContent = '🎤';
+    if (e.error === 'not-allowed') alert('יש לאשר גישה למיקרופון בדפדפן');
   };
   manualInput.value = '';
   recognition.start();
@@ -1449,7 +1369,7 @@ function toggleVoice() {
 function toggleAutoVoice() {
   if (!recognition) {
     if (!initVoice()) {
-      alert('׳”׳“׳₪׳“׳₪׳ ׳©׳׳ ׳׳ ׳×׳•׳׳ ׳‘׳”׳§׳׳˜׳” ׳§׳•׳׳™׳×. ׳ ׳¡׳” Chrome.');
+      alert('הדפדפן שלך לא תומך בהקלטה קולית. נסה Chrome.');
       return;
     }
   }
@@ -1459,7 +1379,7 @@ function toggleAutoVoice() {
   recognition.onstart = () => {
     isRecording = true;
     autoBtn.classList.add('rec');
-    autoBtn.textContent = '׳׳§׳׳™׳˜';
+    autoBtn.textContent = 'מקליט';
   };
   recognition.onresult = (e) => {
     let txt = '';
@@ -1469,13 +1389,13 @@ function toggleAutoVoice() {
   recognition.onend = () => {
     isRecording = false;
     autoBtn.classList.remove('rec');
-    autoBtn.textContent = 'נ₪';
+    autoBtn.textContent = '🎤';
   };
   recognition.onerror = (e) => {
     isRecording = false;
     autoBtn.classList.remove('rec');
-    autoBtn.textContent = 'נ₪';
-    if (e.error === 'not-allowed') alert('׳™׳© ׳׳׳©׳¨ ׳’׳™׳©׳” ׳׳׳™׳§׳¨׳•׳₪׳•׳ ׳‘׳“׳₪׳“׳₪׳');
+    autoBtn.textContent = '🎤';
+    if (e.error === 'not-allowed') alert('יש לאשר גישה למיקרופון בדפדפן');
   };
   autoInput.value = '';
   recognition.start();
@@ -1486,7 +1406,7 @@ let _miriRecording = false;
 
 function toggleMiriVoice() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('׳”׳“׳₪׳“׳₪׳ ׳©׳׳ ׳׳ ׳×׳•׳׳ ׳‘׳”׳§׳׳˜׳” ׳§׳•׳׳™׳×. ׳ ׳¡׳” Chrome.'); return; }
+  if (!SR) { alert('הדפדפן שלך לא תומך בהקלטה קולית. נסה Chrome.'); return; }
 
   const chatInput = document.querySelector('.miri-chat-input');
   const chatBtn = document.querySelector('.miri-chat-voice');
@@ -1501,7 +1421,7 @@ function toggleMiriVoice() {
   _miriRec.onstart = () => {
     _miriRecording = true;
     chatBtn.classList.add('rec');
-    chatBtn.textContent = '׳׳§׳׳™׳˜';
+    chatBtn.textContent = 'מקליט';
   };
   _miriRec.onresult = (e) => {
     let txt = '';
@@ -1511,26 +1431,26 @@ function toggleMiriVoice() {
   _miriRec.onerror = (e) => {
     _miriRecording = false;
     chatBtn.classList.remove('rec');
-    chatBtn.textContent = e.error === 'no-speech' ? 'נ₪ ׳׳ ׳©׳׳¢׳×׳™' : 'נ₪';
-    setTimeout(() => { chatBtn.textContent = 'נ₪'; }, 2000);
+    chatBtn.textContent = e.error === 'no-speech' ? '🎤 לא שמעתי' : '🎤';
+    setTimeout(() => { chatBtn.textContent = '🎤'; }, 2000);
   };
   _miriRec.onend = () => {
     _miriRecording = false;
     chatBtn.classList.remove('rec');
-    chatBtn.textContent = 'נ₪';
+    chatBtn.textContent = '🎤';
   };
   try {
     _miriRec.start();
   } catch(e) {
     _miriRecording = false;
-    chatBtn.textContent = 'נ₪';
+    chatBtn.textContent = '🎤';
     setTimeout(() => toggleMiriVoice(), 400);
   }
 }
 
-/* ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€
+/* ─────────────────────────────────────────────────────────
    FOOD PICKER
-   ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ */
+   ─────────────────────────────────────────────────────── */
 let fpFood = null;
 
 function fpOpen() {
@@ -1562,7 +1482,7 @@ function fpClose() {
   document.getElementById('food-picker').style.display = 'none';
   fpFood = null;
   document.getElementById('fp-sel').value = '';
-  document.getElementById('fp-foodname').textContent = '׳‘׳—׳¨ ׳׳׳›׳';
+  document.getElementById('fp-foodname').textContent = 'בחר מאכל';
   document.getElementById('fp-catbadge').textContent = '';
   fpClear();
 }
@@ -1593,15 +1513,15 @@ function fpUpdate() {
   document.getElementById('fpn-carbs').textContent = (Math.round(fpFood.c * f * 10) / 10) + 'g';
   document.getElementById('fpn-prot').textContent = (Math.round(fpFood.p * f * 10) / 10) + 'g';
   document.getElementById('fpn-fat2').textContent = (Math.round(fpFood.f * f * 10) / 10) + 'g';
-  document.getElementById('fp-grams-note').textContent = g > 0 ? `׳׳—׳•׳©׳‘ ׳¢׳‘׳•׳¨ ${g} ׳’׳¨׳` : '';
+  document.getElementById('fp-grams-note').textContent = g > 0 ? `מחושב עבור ${g} גרם` : '';
 }
 
 function fpAdd() {
-  if (!fpFood) { alert('׳™׳© ׳׳‘׳—׳•׳¨ ׳׳׳›׳ ׳×׳—׳™׳׳”'); return; }
+  if (!fpFood) { alert('יש לבחור מאכל תחילה'); return; }
   const mealType = requireMealType();
   if (!mealType) return;
   const g = parseFloat(document.getElementById('fp-qty').value) || 0;
-  if (g <= 0) { alert('׳™׳© ׳׳”׳–׳™׳ ׳›׳׳•׳× ׳—׳™׳•׳‘׳™׳×'); return; }
+  if (g <= 0) { alert('יש להזין כמות חיובית'); return; }
   const f = g / 100;
   const entry = {
     food: fpFood, grams: g,
@@ -1622,17 +1542,17 @@ function fpAdd() {
   document.getElementById('warn-box').innerHTML = '';
   const t = totals();
   let warns = [];
-  if (t.cal > GOALS.cal) warns.push(`ג ן¸ ׳¢׳‘׳¨׳× ׳׳× ׳™׳¢׳“ ׳”׳§׳׳•׳¨׳™׳•׳× ׳”׳™׳•׳׳™ (${Math.round(t.cal)}/${GOALS.cal} ׳§׳׳³)`);
-  if (t.carbs > GOALS.carbs) warns.push(`ג ן¸ ׳¢׳‘׳¨׳× ׳׳× ׳™׳¢׳“ ׳”׳₪׳—׳׳™׳׳•׳× ׳”׳™׳•׳׳™`);
+  if (t.cal > GOALS.cal) warns.push(`⚠️ עברת את יעד הקלוריות היומי (${Math.round(t.cal)}/${GOALS.cal} קל׳)`);
+  if (t.carbs > GOALS.carbs) warns.push(`⚠️ עברת את יעד הפחמימות היומי`);
   document.getElementById('warn-box').innerHTML = warns.map(w => `<div class="warn-box">${w}</div>`).join('');
   render();
   fpClose();
   document.getElementById('food-list').scrollTop = document.getElementById('food-list').scrollHeight;
 }
 
-/* ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€
+/* ─────────────────────────────────────────────────────────
    FOODSDICTIONARY SERVING PICKER
-   ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ */
+   ─────────────────────────────────────────────────────── */
 let _fdPickerData = null;
 
 function _ensureFdPicker() {
@@ -1661,20 +1581,20 @@ function _ensureFdPicker() {
   div.innerHTML = `
     <div class="fd-picker-head">
       <span class="fd-picker-name" id="fd-fname">-</span>
-      <span class="fd-picker-src">ג— FoodsDictionary</span>
+      <span class="fd-picker-src">● FoodsDictionary</span>
     </div>
-    <label>׳‘׳—׳¨ ׳׳ ׳”:</label>
+    <label>בחר מנה:</label>
     <select id="fd-serving-sel" onchange="fdServingChange()"></select>
-    <input type="number" id="fd-custom-g" placeholder="׳”׳–׳ ׳’׳¨׳׳™׳" min="1" style="display:none" oninput="fdServingChange()">
+    <input type="number" id="fd-custom-g" placeholder="הזן גרמים" min="1" style="display:none" oninput="fdServingChange()">
     <div class="fd-picker-nums">
-      <div class="nb c"><span class="nb-v" id="fd-ncal">0</span><span class="nb-l">׳§׳׳•׳¨׳™׳•׳×</span></div>
-      <div class="nb h"><span class="nb-v" id="fd-ncarb">0g</span><span class="nb-l">׳₪׳—׳׳™׳׳•׳×</span></div>
-      <div class="nb p"><span class="nb-v" id="fd-nprot">0g</span><span class="nb-l">׳—׳׳‘׳•׳ ׳™׳</span></div>
-      <div class="nb f"><span class="nb-v" id="fd-nfat">0g</span><span class="nb-l">׳©׳•׳׳ ׳™׳</span></div>
+      <div class="nb c"><span class="nb-v" id="fd-ncal">0</span><span class="nb-l">קלוריות</span></div>
+      <div class="nb h"><span class="nb-v" id="fd-ncarb">0g</span><span class="nb-l">פחמימות</span></div>
+      <div class="nb p"><span class="nb-v" id="fd-nprot">0g</span><span class="nb-l">חלבונים</span></div>
+      <div class="nb f"><span class="nb-v" id="fd-nfat">0g</span><span class="nb-l">שומנים</span></div>
     </div>
     <div class="fd-picker-btns">
-      <button class="fd-btn-add" onclick="fdAdd()">׳”׳•׳¡׳£ ׳׳¨׳©׳™׳׳” ג“</button>
-      <button class="fd-btn-cancel" onclick="fdClose()">׳‘׳™׳˜׳•׳</button>
+      <button class="fd-btn-add" onclick="fdAdd()">הוסף לרשימה ✓</button>
+      <button class="fd-btn-cancel" onclick="fdClose()">ביטול</button>
     </div>`;
   _acList.insertAdjacentElement('afterend', div);
 }
@@ -1685,13 +1605,13 @@ function showServingPicker(fdResult, rawInput) {
   document.getElementById('fd-fname').textContent = fdResult.food.n[0];
 
   const defaults = [
-    { label: '100 ׳’׳¨׳', grams: 100 },
-    { label: '150 ׳’׳¨׳', grams: 150 },
-    { label: '200 ׳’׳¨׳', grams: 200 },
+    { label: '100 גרם', grams: 100 },
+    { label: '150 גרם', grams: 150 },
+    { label: '200 גרם', grams: 200 },
   ];
   const sizes = fdResult.servingSizes.length > 0
-    ? [...fdResult.servingSizes, { label: '׳׳•׳×׳׳ ׳׳™׳©׳™׳×', grams: -1 }]
-    : [...defaults, { label: '׳׳•׳×׳׳ ׳׳™׳©׳™׳×', grams: -1 }];
+    ? [...fdResult.servingSizes, { label: 'מותאם אישית', grams: -1 }]
+    : [...defaults, { label: 'מותאם אישית', grams: -1 }];
   _fdPickerData._sizes = sizes;
 
   const sel = document.getElementById('fd-serving-sel');
@@ -1742,7 +1662,7 @@ function fdAdd() {
   let grams;
   if (size.grams === -1) {
     grams = parseFloat(document.getElementById('fd-custom-g').value) || 0;
-    if (grams <= 0) { alert('׳™׳© ׳׳”׳–׳™׳ ׳›׳׳•׳× ׳—׳™׳•׳‘׳™׳×'); return; }
+    if (grams <= 0) { alert('יש להזין כמות חיובית'); return; }
   } else {
     grams = size.grams;
   }
@@ -1772,8 +1692,8 @@ function fdAdd() {
   const warnBox = document.getElementById('warn-box');
   const total = totals();
   const warns = [];
-  if (total.cal   > GOALS.cal)   warns.push(`ג ן¸ ׳¢׳‘׳¨׳× ׳׳× ׳™׳¢׳“ ׳”׳§׳׳•׳¨׳™׳•׳× ׳”׳™׳•׳׳™ (${Math.round(total.cal)}/${GOALS.cal} ׳§׳׳³)`);
-  if (total.carbs > GOALS.carbs) warns.push(`ג ן¸ ׳¢׳‘׳¨׳× ׳׳× ׳™׳¢׳“ ׳”׳₪׳—׳׳™׳׳•׳× ׳”׳™׳•׳׳™`);
+  if (total.cal   > GOALS.cal)   warns.push(`⚠️ עברת את יעד הקלוריות היומי (${Math.round(total.cal)}/${GOALS.cal} קל׳)`);
+  if (total.carbs > GOALS.carbs) warns.push(`⚠️ עברת את יעד הפחמימות היומי`);
   warnBox.innerHTML = warns.map(w => `<div class="warn-box">${w}</div>`).join('');
 
   render();
@@ -1786,9 +1706,9 @@ function fdClose() {
   _fdPickerData = null;
 }
 
-/* ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€
+/* ─────────────────────────────────────────────────────────
    REMAINING NUTRITION
-   ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ */
+   ─────────────────────────────────────────────────────── */
 function renderTracker() {
   const t = totals();
   if (_showRemaining) {
@@ -1798,12 +1718,12 @@ function renderTracker() {
       protein: Math.max(0, Math.round(GOALS.protein - t.protein)),
       fat:     Math.max(0, Math.round(GOALS.fat     - t.fat)),
     };
-    document.getElementById('pt-cal').textContent = r.cal+" ׳§׳'";
+    document.getElementById('pt-cal').textContent = r.cal+" קל'";
     document.getElementById('pt-crb').textContent = r.carbs+'g';
     document.getElementById('pt-prt').textContent = r.protein+'g';
     document.getElementById('pt-fat').textContent = r.fat+'g';
   } else {
-    document.getElementById('pt-cal').textContent = Math.round(t.cal)+' / '+GOALS.cal+" ׳§׳'";
+    document.getElementById('pt-cal').textContent = Math.round(t.cal)+' / '+GOALS.cal+" קל'";
     document.getElementById('pt-crb').textContent = Math.round(t.carbs)+' / '+GOALS.carbs+'g';
     document.getElementById('pt-prt').textContent = Math.round(t.protein)+' / '+GOALS.protein+'g';
     document.getElementById('pt-fat').textContent = Math.round(t.fat)+' / '+GOALS.fat+'g';
@@ -1821,9 +1741,9 @@ function showRemaining() {
   setTrackerMode(_showRemaining ? 'consumed' : 'remaining');
 }
 
-/* ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€
+/* ─────────────────────────────────────────────────────────
    MIRI CHAT
-   ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ */
+   ─────────────────────────────────────────────────────── */
 function getMiriFeedback() {
   const t = totals();
   const hour = new Date().getHours();
@@ -1835,30 +1755,30 @@ function getMiriFeedback() {
   const expectedProgress = hour / 24;
 
   if (t.cal > GOALS.cal) {
-    return '׳¢׳‘׳¨׳× ׳׳× ׳”׳™׳¢׳“ ׳”׳§׳׳•׳¨׳™ ׳׳”׳™׳•׳. ׳׳¢׳›׳©׳™׳• ׳¢׳“׳™׳£ ׳׳׳›׳× ׳¢׳ ׳׳–׳•׳ ׳§׳ ׳׳׳•׳“ ׳׳• ׳׳¢׳¦׳•׳¨ ׳›׳׳.';
+    return 'עברת את היעד הקלורי להיום. מעכשיו עדיף ללכת על מזון קל מאוד או לעצור כאן.';
   }
   if (t.carbs > GOALS.carbs) {
-    return '׳¢׳‘׳¨׳× ׳׳× ׳™׳¢׳“ ׳”׳₪׳—׳׳™׳׳•׳× ׳׳”׳™׳•׳. ׳׳¢׳›׳©׳™׳• ׳¢׳“׳™׳£ ׳׳‘׳—׳•׳¨ ׳—׳׳‘׳•׳ ׳¨׳–׳” ׳•׳™׳¨׳§׳•׳×.';
+    return 'עברת את יעד הפחמימות להיום. מעכשיו עדיף לבחור חלבון רזה וירקות.';
   }
   if (t.fat > GOALS.fat) {
-    return '׳¢׳‘׳¨׳× ׳׳× ׳™׳¢׳“ ׳”׳©׳•׳׳ ׳׳”׳™׳•׳. ׳¢׳“׳™׳£ ׳׳”׳׳©׳™׳ ׳¢׳ ׳׳–׳•׳ ׳§׳ ׳•׳“׳ ׳©׳•׳׳.';
+    return 'עברת את יעד השומן להיום. עדיף להמשיך עם מזון קל ודל שומן.';
   }
   if (t.protein > GOALS.protein) {
-    return '׳¢׳‘׳¨׳× ׳׳× ׳™׳¢׳“ ׳”׳—׳׳‘׳•׳ ׳׳”׳™׳•׳. ׳׳™׳ ׳¦׳•׳¨׳ ׳׳”׳•׳¡׳™׳£ ׳¢׳•׳“ ׳—׳׳‘׳•׳ ׳›׳¨׳’׳¢.';
+    return 'עברת את יעד החלבון להיום. אין צורך להוסיף עוד חלבון כרגע.';
   }
   if (caloriesConsumedPercent > expectedProgress + 0.2) {
-    return '׳׳×׳” ׳׳×׳§׳“׳ ׳׳”׳¨ ׳׳“׳™ ׳‘׳™׳—׳¡ ׳׳©׳¢׳”. ׳›׳“׳׳™ ׳׳”׳׳˜ ׳•׳׳‘׳—׳•׳¨ ׳׳–׳•׳ ׳§׳ ׳™׳•׳×׳¨.';
+    return 'אתה מתקדם מהר מדי ביחס לשעה. כדאי להאט ולבחור מזון קל יותר.';
   }
   if (proteinLeft > Math.max(20, GOALS.protein * 0.35)) {
-    return '׳—׳¡׳¨ ׳׳ ׳—׳׳‘׳•׳, ׳–׳” ׳–׳׳ ׳˜׳•׳‘ ׳׳”׳•׳¡׳™׳£ ׳׳§׳•׳¨ ׳—׳׳‘׳•׳ ׳׳™׳›׳•׳×׳™ נ’×';
+    return 'חסר לך חלבון, זה זמן טוב להוסיף מקור חלבון איכותי 💪';
   }
   if (caloriesConsumedPercent < expectedProgress - 0.2 && hour >= 8) {
-    return '׳׳×׳” ׳™׳›׳•׳ ׳׳׳›׳•׳ ׳™׳•׳×׳¨ ׳›׳¨׳’׳¢ ׳•׳׳”׳×׳§׳“׳ ׳‘׳§׳¦׳‘ ׳ ׳›׳•׳.';
+    return 'אתה יכול לאכול יותר כרגע ולהתקדם בקצב נכון.';
   }
   if (caloriesLeft <= GOALS.cal * 0.15 && proteinLeft <= GOALS.protein * 0.2 && carbsLeft <= GOALS.carbs * 0.2 && fatLeft <= GOALS.fat * 0.2) {
-    return '׳׳×׳” ׳‘׳“׳™׳•׳§ ׳¢׳ ׳”׳׳¡׳׳•׳, ׳×׳׳©׳™׳ ׳›׳›׳” נ‘';
+    return 'אתה בדיוק על המסלול, תמשיך ככה 👌';
   }
-  return '׳׳×׳” ׳‘׳“׳™׳•׳§ ׳¢׳ ׳”׳׳¡׳׳•׳, ׳×׳׳©׳™׳ ׳›׳›׳” נ‘';
+  return 'אתה בדיוק על המסלול, תמשיך ככה 👌';
 }
 
 function getMiriRecommendation(excluded = []) {
@@ -1883,23 +1803,23 @@ function getMiriRecommendation(excluded = []) {
   };
 
   if (rem.cal < 50 && rem.protein < 5 && rem.carbs < 10 && rem.fat < 5) {
-    return '׳”׳’׳¢׳× ׳׳™׳¢׳“׳™׳ ׳©׳׳ ׳׳”׳™׳•׳. ׳›׳ ׳”׳›׳‘׳•׳“!';
+    return 'הגעת ליעדים שלך להיום. כל הכבוד!';
   }
 
   const options = [
-    rem.protein > 0 && { food: findFood(['׳—׳–׳” ׳¢׳•׳£', '׳¢׳•׳£', '׳˜׳•׳ ׳”', '׳‘׳™׳¦׳”']), macro: 'protein', amount: rem.protein },
-    rem.carbs > 0 && { food: findFood(['׳׳•׳¨׳–', '׳×׳₪׳•׳— ׳׳“׳׳”', '׳×׳₪׳•"׳', '׳×׳₪׳•׳—׳™ ׳׳“׳׳”']), macro: 'carbs', amount: rem.carbs },
-    rem.fat > 0 && { food: findFood(['׳׳‘׳•׳§׳“׳•', '׳˜׳—׳™׳ ׳”']), macro: 'fat', amount: rem.fat },
+    rem.protein > 0 && { food: findFood(['חזה עוף', 'עוף', 'טונה', 'ביצה']), macro: 'protein', amount: rem.protein },
+    rem.carbs > 0 && { food: findFood(['אורז', 'תפוח אדמה', 'תפו"א', 'תפוחי אדמה']), macro: 'carbs', amount: rem.carbs },
+    rem.fat > 0 && { food: findFood(['אבוקדו', 'טחינה']), macro: 'fat', amount: rem.fat },
   ].filter(x => x && x.food).slice(0, 3);
 
   _lastRecommendedFoods = options.map(x => x.food);
 
-  if (options.length === 0) return '׳׳ ׳׳¦׳׳×׳™ ׳›׳¨׳’׳¢ ׳”׳׳׳¦׳” ׳׳×׳׳™׳׳” ׳׳₪׳™ ׳”׳ ׳×׳•׳ ׳™׳ ׳”׳§׳™׳™׳׳™׳.';
+  if (options.length === 0) return 'לא מצאתי כרגע המלצה מתאימה לפי הנתונים הקיימים.';
 
-  let msg = `׳ ׳©׳׳¨ ׳׳:\n${rem.cal} ׳§׳׳•׳¨׳™׳•׳×\n${rem.protein} ׳—׳׳‘׳•׳\n${rem.carbs} ׳₪׳—׳׳™׳׳•׳×\n${rem.fat} ׳©׳•׳׳\n\n׳”׳™׳™׳×׳™ ׳׳׳׳™׳¦׳”:`;
+  let msg = `נשאר לך:\n${rem.cal} קלוריות\n${rem.protein} חלבון\n${rem.carbs} פחמימות\n${rem.fat} שומן\n\nהייתי ממליצה:`;
 
   for (const item of options) {
-    msg += `\n- ${gramsFor(item.food, item.macro, item.amount)} ׳’׳¨׳ ${item.food.n[0]}`;
+    msg += `\n- ${gramsFor(item.food, item.macro, item.amount)} גרם ${item.food.n[0]}`;
   }
 
   return msg;
@@ -1911,7 +1831,7 @@ let _rejectedFoods = [];
 function _getMacroRole(f) {
   const cal = f.cal || 1;
   const cat = (f.cat || '').toLowerCase();
-  if (/׳™׳¨׳§/.test(cat)) return 'vegetable';
+  if (/ירק/.test(cat)) return 'vegetable';
   if ((f.p * 4) / cal >= 0.3) return 'protein';
   if ((f.c * 4) / cal >= 0.5) return 'carbs';
   return 'other';
@@ -1929,7 +1849,7 @@ function _findAltFood(target, excluded) {
 }
 
 function _handleRejection(text) {
-  const prefix = '׳׳™׳ ׳‘׳¢׳™׳” נ˜ ׳׳ ׳™ ׳׳—׳׳™׳₪׳” ׳׳ ׳׳× ׳–׳” ׳׳׳©׳”׳• ׳©׳׳×׳׳™׳ ׳™׳•׳×׳¨ ׳•׳¢׳“׳™׳™׳ ׳©׳•׳׳¨ ׳¢׳ ׳”׳™׳¢׳“׳™׳ ׳©׳׳ ׳׳”׳™׳•׳.\n\n';
+  const prefix = 'אין בעיה 😊 אני מחליפה לך את זה למשהו שמתאים יותר ועדיין שומר על היעדים שלך להיום.\n\n';
   let rejectedFood = null;
   for (const f of _lastRecommendedFoods) {
     if (f.n.some(name => text.includes(name))) { rejectedFood = f; break; }
@@ -1964,10 +1884,10 @@ function _handleRejection(text) {
   }
 
   if (altFoods.length === 0)
-    return prefix + '׳׳ ׳׳¦׳׳×׳™ ׳×׳—׳׳™׳£ ׳׳×׳׳™׳ ׳‘׳׳׳’׳¨. ׳ ׳¡׳™ ׳׳₪׳ ׳•׳× ׳׳׳™׳™ ׳¢׳ ׳‘׳§׳©׳” ׳׳—׳¨׳×.';
+    return prefix + 'לא מצאתי תחליף מתאים במאגר. נסי לפנות אליי עם בקשה אחרת.';
 
   _lastRecommendedFoods = altFoods;
-  let msg = prefix + '׳”׳¦׳¢׳” ׳—׳׳•׳₪׳™׳×:\n';
+  let msg = prefix + 'הצעה חלופית:\n';
   let totCal = 0, totProt = 0, totCarbs = 0, totFat = 0;
   for (const f of altFoods) {
     const g = Math.min(Math.max(f.dw || 100, 50), 300);
@@ -1976,21 +1896,21 @@ function _handleRejection(text) {
     const p  = Math.round(f.p   * fac);
     const h  = Math.round(f.c   * fac);
     const ft = Math.round(f.f   * fac);
-    msg += `ג€¢ ${f.n[0]} ג€” ${g}g\n`;
+    msg += `• ${f.n[0]} — ${g}g\n`;
     totCal += c; totProt += p; totCarbs += h; totFat += ft;
   }
-  msg += `\n׳¡׳™׳›׳•׳:\n${totCal} ׳§׳׳³ | ׳—׳׳‘׳•׳ ${totProt}g | ׳₪׳—׳׳™׳׳•׳× ${totCarbs}g | ׳©׳•׳׳ ${totFat}g`;
+  msg += `\nסיכום:\n${totCal} קל׳ | חלבון ${totProt}g | פחמימות ${totCarbs}g | שומן ${totFat}g`;
   return msg;
 }
 
 function _proteinFoodSuggest(grams) {
-  if (grams <= 6)  return `׳׳” ׳׳ ׳×׳׳›׳ ׳‘׳™׳¦׳” ׳׳—׳×? ׳‘׳“׳™׳•׳§ ~6g ׳—׳׳‘׳•׳! נ¥`;
-  if (grams <= 10) return `׳™׳•׳’׳•׳¨׳˜ ׳™׳•׳•׳ ׳™ 100g ג€” ׳‘׳“׳™׳•׳§ ׳‘׳©׳‘׳™׳׳! ~10g ׳—׳׳‘׳•׳ נ¥›`;
-  if (grams <= 12) return `׳׳” ׳׳×׳” ׳׳•׳׳¨ ׳¢׳ ׳§׳•׳˜׳’׳³ 100g? ׳™׳© ׳©׳ ~12g ׳—׳׳‘׳•׳ נ˜`;
-  if (grams <= 17) return `׳™׳•׳’׳•׳¨׳˜ ׳™׳•׳•׳ ׳™ 170g ׳™׳¡׳’׳•׳¨ ׳׳ ׳׳× ׳–׳” ׳™׳₪׳”! ~17g נ¥›`;
-  if (grams <= 25) return `׳§׳•׳₪׳¡׳× ׳˜׳•׳ ׳” ׳×׳¡׳’׳•׳¨ ׳׳ ׳׳× ׳”׳›׳ ג€” ~25g ׳—׳׳‘׳•׳! נ`;
-  if (grams <= 31) return `100g ׳—׳–׳” ׳¢׳•׳£ ׳•׳™׳¡׳™׳™׳! ~31g ׳—׳׳‘׳•׳ נ—`;
-  return `׳›׳“׳׳™ ׳׳ ׳× ׳—׳׳‘׳•׳ ׳˜׳•׳‘׳” ג€” ׳¢׳•׳£, ׳˜׳•׳ ׳” ׳׳• ׳‘׳™׳¦׳™׳ נ’×`;
+  if (grams <= 6)  return `מה אם תאכל ביצה אחת? בדיוק ~6g חלבון! 🥚`;
+  if (grams <= 10) return `יוגורט יווני 100g — בדיוק בשבילך! ~10g חלבון 🥛`;
+  if (grams <= 12) return `מה אתה אומר על קוטג׳ 100g? יש שם ~12g חלבון 😊`;
+  if (grams <= 17) return `יוגורט יווני 170g יסגור לך את זה יפה! ~17g 🥛`;
+  if (grams <= 25) return `קופסת טונה תסגור לך את הכל — ~25g חלבון! 🐟`;
+  if (grams <= 31) return `100g חזה עוף ויסיים! ~31g חלבון 🍗`;
+  return `כדאי מנת חלבון טובה — עוף, טונה או ביצים 💪`;
 }
 
 function _coachLine(rem, over, pct, t) {
@@ -1999,30 +1919,30 @@ function _coachLine(rem, over, pct, t) {
   const expectedProgress = hour / 24;
 
   if (t.cal > GOALS.cal) {
-    return '׳¢׳‘׳¨׳× ׳׳× ׳”׳™׳¢׳“ ׳”׳§׳׳•׳¨׳™ ׳׳”׳™׳•׳. ׳׳¢׳›׳©׳™׳• ׳¢׳“׳™׳£ ׳׳׳›׳× ׳¢׳ ׳׳–׳•׳ ׳§׳ ׳׳׳•׳“ ׳׳• ׳׳¢׳¦׳•׳¨ ׳›׳׳.';
+    return 'עברת את היעד הקלורי להיום. מעכשיו עדיף ללכת על מזון קל מאוד או לעצור כאן.';
   }
   if (t.carbs > GOALS.carbs) {
-    return '׳¢׳‘׳¨׳× ׳׳× ׳™׳¢׳“ ׳”׳₪׳—׳׳™׳׳•׳× ׳׳”׳™׳•׳. ׳׳¢׳›׳©׳™׳• ׳¢׳“׳™׳£ ׳׳‘׳—׳•׳¨ ׳—׳׳‘׳•׳ ׳¨׳–׳” ׳•׳™׳¨׳§׳•׳×.';
+    return 'עברת את יעד הפחמימות להיום. מעכשיו עדיף לבחור חלבון רזה וירקות.';
   }
   if (t.fat > GOALS.fat) {
-    return '׳¢׳‘׳¨׳× ׳׳× ׳™׳¢׳“ ׳”׳©׳•׳׳ ׳׳”׳™׳•׳. ׳¢׳“׳™׳£ ׳׳”׳׳©׳™׳ ׳¢׳ ׳׳–׳•׳ ׳§׳ ׳•׳“׳ ׳©׳•׳׳.';
+    return 'עברת את יעד השומן להיום. עדיף להמשיך עם מזון קל ודל שומן.';
   }
   if (t.protein > GOALS.protein) {
-    return '׳¢׳‘׳¨׳× ׳׳× ׳™׳¢׳“ ׳”׳—׳׳‘׳•׳ ׳׳”׳™׳•׳. ׳׳™׳ ׳¦׳•׳¨׳ ׳׳”׳•׳¡׳™׳£ ׳¢׳•׳“ ׳—׳׳‘׳•׳ ׳›׳¨׳’׳¢.';
+    return 'עברת את יעד החלבון להיום. אין צורך להוסיף עוד חלבון כרגע.';
   }
   if (caloriesConsumedPercent > expectedProgress + 0.2) {
-    return '׳׳×׳” ׳׳×׳§׳“׳ ׳׳”׳¨ ׳׳“׳™ ׳‘׳™׳—׳¡ ׳׳©׳¢׳”. ׳›׳“׳׳™ ׳׳”׳׳˜ ׳•׳׳‘׳—׳•׳¨ ׳׳–׳•׳ ׳§׳ ׳™׳•׳×׳¨.';
+    return 'אתה מתקדם מהר מדי ביחס לשעה. כדאי להאט ולבחור מזון קל יותר.';
   }
   if (rem.protein > Math.max(20, GOALS.protein * 0.35)) {
-    return '׳—׳¡׳¨ ׳׳ ׳—׳׳‘׳•׳, ׳–׳” ׳–׳׳ ׳˜׳•׳‘ ׳׳”׳•׳¡׳™׳£ ׳׳§׳•׳¨ ׳—׳׳‘׳•׳ ׳׳™׳›׳•׳×׳™ נ’×';
+    return 'חסר לך חלבון, זה זמן טוב להוסיף מקור חלבון איכותי 💪';
   }
   if (caloriesConsumedPercent < expectedProgress - 0.2 && hour >= 8) {
-    return '׳׳×׳” ׳™׳›׳•׳ ׳׳׳›׳•׳ ׳™׳•׳×׳¨ ׳›׳¨׳’׳¢ ׳•׳׳”׳×׳§׳“׳ ׳‘׳§׳¦׳‘ ׳ ׳›׳•׳.';
+    return 'אתה יכול לאכול יותר כרגע ולהתקדם בקצב נכון.';
   }
   if (rem.cal <= GOALS.cal * 0.15 && rem.protein <= GOALS.protein * 0.2 && rem.carbs <= GOALS.carbs * 0.2 && rem.fat <= GOALS.fat * 0.2) {
-    return '׳׳×׳” ׳‘׳“׳™׳•׳§ ׳¢׳ ׳”׳׳¡׳׳•׳, ׳×׳׳©׳™׳ ׳›׳›׳” נ‘';
+    return 'אתה בדיוק על המסלול, תמשיך ככה 👌';
   }
-  return '׳׳×׳” ׳‘׳“׳™׳•׳§ ׳¢׳ ׳”׳׳¡׳׳•׳, ׳×׳׳©׳™׳ ׳›׳›׳” נ‘';
+  return 'אתה בדיוק על המסלול, תמשיך ככה 👌';
 }
 
 function _miriCtx() {
@@ -2045,11 +1965,11 @@ function _miriCtx() {
   };
   const hour = new Date().getHours();
   const d = JSON.parse(localStorage.getItem(_DIET_KEY) || '{}');
-  const name = (_currentUser.fullName || '').split(' ')[0] || '׳—׳‘׳¨';
+  const name = (_currentUser.fullName || '').split(' ')[0] || 'חבר';
   const goal = d.goal || 'loss';
   const tdee = d.tdee || GOALS.cal;
   const isLoss = goal === 'loss';
-  const timeGreet = hour < 12 ? '׳‘׳•׳§׳¨ ׳˜׳•׳‘' : hour < 17 ? '׳¦׳”׳¨׳™׳™׳ ׳˜׳•׳‘׳™׳' : '׳¢׳¨׳‘ ׳˜׳•׳‘';
+  const timeGreet = hour < 12 ? 'בוקר טוב' : hour < 17 ? 'צהריים טובים' : 'ערב טוב';
   return {t, rem, over, pct, hour, d, name, goal, tdee, isLoss, timeGreet};
 }
 
@@ -2059,319 +1979,319 @@ function _getMiriAnswer(text) {
   const calOver = t.cal > GOALS.cal * 1.05;
 
   const Q = [
-    [/׳›׳׳” ׳§׳׳•׳¨׳™.*׳׳›׳׳×׳™|׳›׳׳” ׳׳›׳׳×׳™|׳¡׳”"׳› ׳§׳׳•׳¨׳™|׳¡׳ ׳”׳›׳ ׳§׳׳•׳¨׳™/, () => {
+    [/כמה קלורי.*אכלתי|כמה אכלתי|סה"כ קלורי|סך הכל קלורי/, () => {
       const coach = _coachLine(rem, over, pct, t);
-      let msg = `׳׳›׳׳× ${Math.round(t.cal)} ׳§׳׳³ ׳׳×׳•׳ ${GOALS.cal}. ׳ ׳©׳׳¨ ׳׳ ${rem.cal} ׳§׳׳³ ׳׳”׳™׳•׳.`;
+      let msg = `אכלת ${Math.round(t.cal)} קל׳ מתוך ${GOALS.cal}. נשאר לך ${rem.cal} קל׳ להיום.`;
       if (coach) msg += `\n${coach}`;
       return msg;
     }],
 
-    [/׳›׳׳” ׳ ׳©׳׳¨|׳׳” ׳ ׳©׳׳¨|׳¢׳•׳“ ׳›׳׳” ׳§׳׳•׳¨׳™/, () => {
+    [/כמה נשאר|מה נשאר|עוד כמה קלורי/, () => {
       const coach = _coachLine(rem, over, pct, t);
       if (over.cal > 0) return coach;
-      if (rem.cal === 0) return `׳”׳’׳¢׳× ׳׳™׳¢׳“! ${over.cal > 0 ? `׳¢׳‘׳¨׳× ׳‘-${over.cal} ׳§׳׳³.` : '׳‘׳“׳™׳•׳§ ׳¢׳ ׳”׳’׳‘׳•׳'} ${coach || ''}`.trim();
-      let msg = `׳ ׳©׳׳¨ ׳׳:\nג€¢ ${rem.cal} ׳§׳׳³\nג€¢ ${rem.protein}g ׳—׳׳‘׳•׳\nג€¢ ${rem.carbs}g ׳₪׳—׳׳™׳׳•׳×\nג€¢ ${rem.fat}g ׳©׳•׳׳`;
+      if (rem.cal === 0) return `הגעת ליעד! ${over.cal > 0 ? `עברת ב-${over.cal} קל׳.` : 'בדיוק על הגבול'} ${coach || ''}`.trim();
+      let msg = `נשאר לך:\n• ${rem.cal} קל׳\n• ${rem.protein}g חלבון\n• ${rem.carbs}g פחמימות\n• ${rem.fat}g שומן`;
       if (coach) msg += `\n\n${coach}`;
       return msg;
     }],
 
-    [/׳›׳׳” ׳₪׳—׳׳™׳.*׳׳›׳׳×׳™|׳₪׳—׳׳™׳׳•׳× ׳©׳׳›׳׳×׳™|׳›׳׳” ׳₪׳—׳׳™׳.*׳”׳™׳•׳/, () =>
-      `׳׳›׳׳× ${Math.round(t.carbs)}g ׳₪׳—׳׳™׳׳•׳× ׳׳×׳•׳ ${GOALS.carbs}g. ׳ ׳©׳׳¨ ${rem.carbs}g.`],
+    [/כמה פחמימ.*אכלתי|פחמימות שאכלתי|כמה פחמימ.*היום/, () =>
+      `אכלת ${Math.round(t.carbs)}g פחמימות מתוך ${GOALS.carbs}g. נשאר ${rem.carbs}g.`],
 
-    [/׳›׳׳” ׳—׳׳‘׳•׳.*׳׳›׳׳×׳™|׳—׳׳‘׳•׳ ׳™׳ ׳©׳׳›׳׳×׳™|׳›׳׳” ׳—׳׳‘׳•׳.*׳”׳™׳•׳/, () => {
-      let msg = `׳׳›׳׳× ${Math.round(t.protein)}g ׳—׳׳‘׳•׳ ׳׳×׳•׳ ${GOALS.protein}g. ׳ ׳©׳׳¨ ${rem.protein}g.`;
-      if (rem.protein === 0) msg += `\nג… ׳”׳’׳¢׳× ׳׳—׳׳‘׳•׳ ג€” ׳›׳ ׳”׳›׳‘׳•׳“!`;
+    [/כמה חלבון.*אכלתי|חלבונים שאכלתי|כמה חלבון.*היום/, () => {
+      let msg = `אכלת ${Math.round(t.protein)}g חלבון מתוך ${GOALS.protein}g. נשאר ${rem.protein}g.`;
+      if (rem.protein === 0) msg += `\n✅ הגעת לחלבון — כל הכבוד!`;
       else if (rem.protein <= 30) msg += `\n${_proteinFoodSuggest(rem.protein)}`;
       return msg;
     }],
 
-    [/׳›׳׳” ׳©׳•׳׳.*׳׳›׳׳×׳™|׳©׳•׳׳ ׳™׳ ׳©׳׳›׳׳×׳™|׳›׳׳” ׳©׳•׳׳.*׳”׳™׳•׳/, () =>
-      `׳׳›׳׳× ${Math.round(t.fat)}g ׳©׳•׳׳ ׳׳×׳•׳ ${GOALS.fat}g. ׳ ׳©׳׳¨ ${rem.fat}g.`],
+    [/כמה שומן.*אכלתי|שומנים שאכלתי|כמה שומן.*היום/, () =>
+      `אכלת ${Math.round(t.fat)}g שומן מתוך ${GOALS.fat}g. נשאר ${rem.fat}g.`],
 
-    [/׳׳” ׳”׳׳¦׳‘|׳׳™׳ ׳”׳׳¦׳‘|׳¢׳“׳›׳ ׳™|׳¢׳“׳›׳ ׳׳•׳×׳™|׳׳™׳₪׳” ׳׳ ׳™ ׳¢׳•׳׳“|׳׳” ׳”׳¡׳˜׳˜׳•׳¡|׳׳™׳ ׳׳ ׳™ ׳”׳™׳•׳|׳׳™׳ ׳׳ ׳™ ׳¢׳•׳׳“|׳¡׳₪׳¨׳™ ׳׳™|׳׳” ׳§׳•׳¨׳”|׳׳™׳ ׳”׳•׳׳/, () => {
+    [/מה המצב|איך המצב|עדכני|עדכן אותי|איפה אני עומד|מה הסטטוס|איך אני היום|איך אני עומד|ספרי לי|מה קורה|איך הולך/, () => {
       const coach = _coachLine(rem, over, pct, t);
-      let msg = `${timeGreet} ${name}! נ“\nג€¢ ׳§׳׳•׳¨׳™׳•׳×: ${Math.round(t.cal)}/${GOALS.cal} (${pct.cal}%)\nג€¢ ׳—׳׳‘׳•׳: ${Math.round(t.protein)}/${GOALS.protein}g (${pct.protein}%)\nג€¢ ׳₪׳—׳׳™׳׳•׳×: ${Math.round(t.carbs)}/${GOALS.carbs}g\nג€¢ ׳©׳•׳׳: ${Math.round(t.fat)}/${GOALS.fat}g`;
+      let msg = `${timeGreet} ${name}! 📊\n• קלוריות: ${Math.round(t.cal)}/${GOALS.cal} (${pct.cal}%)\n• חלבון: ${Math.round(t.protein)}/${GOALS.protein}g (${pct.protein}%)\n• פחמימות: ${Math.round(t.carbs)}/${GOALS.carbs}g\n• שומן: ${Math.round(t.fat)}/${GOALS.fat}g`;
       if (coach) msg += `\n\n${coach}`;
       return msg;
     }],
 
-    [/׳›׳׳” ׳׳—׳•׳–|׳׳” ׳”׳׳—׳•׳–/, () =>
-      `׳”׳©׳’׳× ${pct.cal}% ׳׳™׳¢׳“ ׳”׳§׳׳•׳¨׳™׳•׳×. ׳—׳׳‘׳•׳: ${pct.protein}%.`],
+    [/כמה אחוז|מה האחוז/, () =>
+      `השגת ${pct.cal}% מיעד הקלוריות. חלבון: ${pct.protein}%.`],
 
-    [/׳׳” ׳™׳¢׳“|׳›׳׳” ׳™׳¢׳“|׳™׳¢׳“ ׳©׳׳™|׳™׳¢׳“ ׳§׳׳•׳¨׳™/, () =>
-      `׳™׳¢׳“ ׳™׳•׳׳™: ${GOALS.cal} ׳§׳׳³ | ${GOALS.protein}g ׳—׳׳‘׳•׳ | ${GOALS.carbs}g ׳₪׳—׳׳™׳׳•׳× | ${GOALS.fat}g ׳©׳•׳׳.`],
+    [/מה יעד|כמה יעד|יעד שלי|יעד קלורי/, () =>
+      `יעד יומי: ${GOALS.cal} קל׳ | ${GOALS.protein}g חלבון | ${GOALS.carbs}g פחמימות | ${GOALS.fat}g שומן.`],
 
-    [/׳׳” ׳”׳׳˜׳¨׳”|׳׳” ׳”׳’׳•׳|׳׳” ׳׳˜׳¨׳×׳™/, () =>
+    [/מה המטרה|מה הגול|מה מטרתי/, () =>
       isLoss
-        ? `׳”׳׳˜׳¨׳” ׳©׳׳: ׳™׳¨׳™׳“׳” ׳‘׳׳©׳§׳. ׳™׳¢׳“ ${GOALS.cal} ׳§׳׳³ (׳׳×׳—׳× ׳-TDEE ${tdee} ׳§׳׳³).`
-        : `׳”׳׳˜׳¨׳” ׳©׳׳: ׳¢׳׳™׳™׳” ׳‘׳׳¡׳”. ׳™׳¢׳“ ${GOALS.cal} ׳§׳׳³ (׳׳¢׳ TDEE ${tdee} ׳§׳׳³).`],
+        ? `המטרה שלך: ירידה במשקל. יעד ${GOALS.cal} קל׳ (מתחת ל-TDEE ${tdee} קל׳).`
+        : `המטרה שלך: עלייה במסה. יעד ${GOALS.cal} קל׳ (מעל TDEE ${tdee} קל׳).`],
 
-    [/׳׳” ׳׳›׳׳×׳™|׳¨׳©׳™׳׳× ׳”׳׳•׳›׳|׳׳” ׳”׳•׳¡׳₪׳×׳™ ׳”׳™׳•׳/, () =>
+    [/מה אכלתי|רשימת האוכל|מה הוספתי היום/, () =>
       log.length === 0
-        ? `׳¢׳“׳™׳™׳ ׳׳ ׳¨׳©׳׳× ׳׳•׳›׳ ׳”׳™׳•׳.`
-        : `׳׳›׳׳× ׳”׳™׳•׳:\n${log.map(e => `ג€¢ ${e.food.n[0]} (${Math.round(e.grams)}g) ג€” ${e.cal} ׳§׳׳³`).join('\n')}`],
+        ? `עדיין לא רשמת אוכל היום.`
+        : `אכלת היום:\n${log.map(e => `• ${e.food.n[0]} (${Math.round(e.grams)}g) — ${e.cal} קל׳`).join('\n')}`],
 
-    [/׳›׳׳” ׳׳¨׳•׳—׳•׳×|׳›׳׳” ׳₪׳¨׳™׳˜׳™׳|׳›׳׳” ׳׳׳›׳׳™׳/, () =>
-      log.length === 0 ? `׳׳ ׳¨׳©׳׳× ׳׳¨׳•׳—׳•׳×.` : `׳¨׳©׳׳× ${log.length} ׳׳׳›׳׳™׳ ׳”׳™׳•׳.`],
+    [/כמה ארוחות|כמה פריטים|כמה מאכלים/, () =>
+      log.length === 0 ? `לא רשמת ארוחות.` : `רשמת ${log.length} מאכלים היום.`],
 
-    [/׳׳¨׳•׳—׳” ׳׳—׳¨׳•׳ ׳”|׳׳” ׳׳›׳׳×׳™ ׳׳׳—׳¨׳•׳ ׳”/, () =>
+    [/ארוחה אחרונה|מה אכלתי לאחרונה/, () =>
       log.length === 0
-        ? `׳׳ ׳¨׳©׳׳× ׳׳¨׳•׳—׳” ׳¢׳“׳™׳™׳.`
-        : `׳׳¨׳•׳—׳” ׳׳—׳¨׳•׳ ׳”: ${log[log.length-1].food.n[0]} (${Math.round(log[log.length-1].grams)}g) ג€” ${log[log.length-1].cal} ׳§׳׳³.`],
+        ? `לא רשמת ארוחה עדיין.`
+        : `ארוחה אחרונה: ${log[log.length-1].food.n[0]} (${Math.round(log[log.length-1].grams)}g) — ${log[log.length-1].cal} קל׳.`],
 
-    [/׳”׳›׳™ ׳”׳¨׳‘׳” ׳§׳׳•׳¨׳™|׳׳” ׳”׳›׳™ ׳§׳׳•׳¨׳™|׳׳¨׳•׳—׳” ׳›׳‘׳“׳”/, () => {
-      if (log.length === 0) return `׳׳ ׳¨׳©׳׳× ׳›׳׳•׳ ׳¢׳“׳™׳™׳.`;
+    [/הכי הרבה קלורי|מה הכי קלורי|ארוחה כבדה/, () => {
+      if (log.length === 0) return `לא רשמת כלום עדיין.`;
       const mx = log.reduce((a,b) => a.cal > b.cal ? a : b);
-      return `׳”׳׳¨׳•׳—׳” ׳”׳›׳‘׳“׳” ׳”׳™׳•׳: ${mx.food.n[0]} ג€” ${mx.cal} ׳§׳׳³.`;
+      return `הארוחה הכבדה היום: ${mx.food.n[0]} — ${mx.cal} קל׳.`;
     }],
 
-    [/׳׳” ׳׳׳›׳•׳.*׳‘׳•׳§׳¨|׳׳¨׳•׳—׳× ׳‘׳•׳§׳¨|׳׳׳›׳•׳.*׳‘׳‘׳•׳§׳¨/, () =>
-      `׳׳‘׳•׳§׳¨: ׳‘׳™׳¦׳™׳ + ׳׳—׳ ׳׳—׳™׳˜׳” ׳׳׳׳” + ׳™׳¨׳§׳•׳×, ׳׳• ׳©׳™׳‘׳•׳׳× ׳©׳•׳¢׳ ׳¢׳ ׳₪׳™׳¨׳•׳×.`],
+    [/מה לאכול.*בוקר|ארוחת בוקר|לאכול.*בבוקר/, () =>
+      `לבוקר: ביצים + לחם מחיטה מלאה + ירקות, או שיבולת שועל עם פירות.`],
 
-    [/׳׳” ׳׳׳›׳•׳.*׳¦׳”׳¨׳™׳™|׳׳¨׳•׳—׳× ׳¦׳”׳¨׳™׳™׳|׳׳׳›׳•׳.*׳‘׳¦׳”׳¨׳™׳™׳/, () =>
-      `׳׳¦׳”׳¨׳™׳™׳: ׳—׳–׳” ׳¢׳•׳£ + ׳׳•׳¨׳– ׳׳׳ + ׳¡׳׳˜. ׳—׳׳‘׳•׳ + ׳₪׳—׳׳™׳׳•׳× + ׳™׳¨׳§׳•׳×.`],
+    [/מה לאכול.*צהריי|ארוחת צהריים|לאכול.*בצהריים/, () =>
+      `לצהריים: חזה עוף + אורז מלא + סלט. חלבון + פחמימות + ירקות.`],
 
-    [/׳׳” ׳׳׳›׳•׳.*׳¢׳¨׳‘|׳׳¨׳•׳—׳× ׳¢׳¨׳‘|׳׳׳›׳•׳.*׳‘׳¢׳¨׳‘/, () =>
+    [/מה לאכול.*ערב|ארוחת ערב|לאכול.*בערב/, () =>
       rem.cal < 300
-        ? `׳”׳¢׳¨׳‘ ׳ ׳©׳׳¨ ${rem.cal} ׳§׳׳³ ג€” ׳¢׳“׳™׳£ ׳׳¨׳•׳—׳” ׳§׳׳”: ׳¡׳׳˜ + ׳˜׳•׳ ׳” ׳׳• ׳™׳•׳’׳•׳¨׳˜ ׳™׳•׳•׳ ׳™.`
-        : `׳׳¢׳¨׳‘: ׳¡׳׳׳•׳ + ׳™׳¨׳§׳•׳× ׳׳₪׳•׳™׳™׳ + ׳‘׳˜׳˜׳”.`],
+        ? `הערב נשאר ${rem.cal} קל׳ — עדיף ארוחה קלה: סלט + טונה או יוגורט יווני.`
+        : `לערב: סלמון + ירקות אפויים + בטטה.`],
 
-    [/׳׳₪׳ ׳™ ׳©׳™׳ ׳”|׳׳¨׳•׳—׳× ׳׳™׳׳”|׳׳׳›׳•׳.*׳‘׳׳™׳׳”/, () =>
+    [/לפני שינה|ארוחת לילה|לאכול.*בלילה/, () =>
       rem.protein > 20
-        ? `׳׳₪׳ ׳™ ׳©׳™׳ ׳”: ׳™׳•׳’׳•׳¨׳˜ ׳™׳•׳•׳ ׳™ ג€” ׳™׳¢׳–׳•׳¨ ׳׳—׳׳‘׳•׳ ׳©׳ ׳©׳׳¨ (${rem.protein}g).`
-        : `׳›׳‘׳¨ ׳”׳’׳¢׳× ׳׳—׳׳‘׳•׳. ׳׳ ׳¨׳¢׳‘ ג€” ׳™׳¨׳§׳•׳× ׳‘׳׳‘׳“.`],
+        ? `לפני שינה: יוגורט יווני — יעזור לחלבון שנשאר (${rem.protein}g).`
+        : `כבר הגעת לחלבון. אם רעב — ירקות בלבד.`],
 
-    [/׳׳₪׳ ׳™ ׳׳™׳׳•׳|׳׳׳›׳•׳.*׳׳₪׳ ׳™ ׳¡׳₪׳•׳¨׳˜/, () =>
-      `׳׳₪׳ ׳™ ׳׳™׳׳•׳: ׳‘׳ ׳ ׳” + ׳›׳₪׳™׳× ׳—׳׳׳× ׳‘׳•׳˜׳ ׳™׳, 60-90 ׳“׳§׳•׳× ׳׳₪׳ ׳™.`],
+    [/לפני אימון|לאכול.*לפני ספורט/, () =>
+      `לפני אימון: בננה + כפית חמאת בוטנים, 60-90 דקות לפני.`],
 
-    [/׳׳—׳¨׳™ ׳׳™׳׳•׳|׳׳׳›׳•׳.*׳׳—׳¨׳™ ׳¡׳₪׳•׳¨׳˜/, () =>
+    [/אחרי אימון|לאכול.*אחרי ספורט/, () =>
       rem.protein > 0
-        ? `׳׳—׳¨׳™ ׳׳™׳׳•׳: ׳—׳׳‘׳•׳ ׳׳”׳™׳¨ ג€” ׳©׳™׳™׳§ ׳׳• ׳—׳–׳” ׳¢׳•׳£. ׳ ׳©׳׳¨ ׳׳ ${rem.protein}g.`
-        : `׳›׳‘׳¨ ׳”׳’׳¢׳× ׳׳—׳׳‘׳•׳, ׳׳‘׳ ׳™׳•׳’׳•׳¨׳˜ ׳™׳•׳•׳ ׳™ ׳׳ ׳™׳–׳™׳§.`],
+        ? `אחרי אימון: חלבון מהיר — שייק או חזה עוף. נשאר לך ${rem.protein}g.`
+        : `כבר הגעת לחלבון, אבל יוגורט יווני לא יזיק.`],
 
-    [/׳‘׳™׳ ׳׳¨׳•׳—׳•׳×|׳—׳˜׳™׳£|׳ ׳©׳ ׳•׳©/, () =>
+    [/בין ארוחות|חטיף|נשנוש/, () =>
       rem.cal > 200
-        ? `׳—׳˜׳™׳£ ׳˜׳•׳‘: 15 ׳©׳§׳“׳™׳ (90 ׳§׳׳³), ׳×׳₪׳•׳— + ׳—׳׳׳× ׳‘׳•׳˜׳ ׳™׳, ׳׳• ׳§׳•׳˜׳’׳³.`
-        : `׳ ׳©׳׳¨ ${rem.cal} ׳§׳׳³ ג€” ׳¢׳“׳™׳£ ׳™׳¨׳§׳•׳× (׳׳׳₪׳₪׳•׳, ׳’׳׳‘׳”).`],
+        ? `חטיף טוב: 15 שקדים (90 קל׳), תפוח + חמאת בוטנים, או קוטג׳.`
+        : `נשאר ${rem.cal} קל׳ — עדיף ירקות (מלפפון, גמבה).`],
 
-    [/׳׳” ׳׳׳›׳•׳.*׳¢׳›׳©׳™׳•|׳׳” ׳׳•׳›׳|׳×׳׳׳™׳¦׳™ ׳¢׳›׳©׳™׳•/, () => {
-      if (hour < 10) return `׳‘׳•׳§׳¨ ג€” ׳‘׳™׳¦׳™׳ + ׳׳—׳ ׳׳׳ ׳׳×׳—׳™׳ ׳™׳₪׳”.`;
-      if (hour < 13) return rem.cal > 400 ? `׳—׳˜׳™׳£: ׳₪׳¨׳™ + ׳’׳‘׳™׳ ׳” ׳׳‘׳ ׳”.` : `׳›׳‘׳¨ ׳׳›׳׳× ׳¨׳•׳‘ ׳”׳§׳׳•׳¨׳™׳•׳×, ׳”׳׳×׳ ׳׳¦׳”׳¨׳™׳™׳.`;
-      if (hour < 17) return rem.cal > 300 ? `׳¢׳•׳£ + ׳׳•׳¨׳– + ׳¡׳׳˜.` : `׳׳¨׳•׳—׳” ׳§׳׳” ג€” ׳ ׳©׳׳¨ ${rem.cal} ׳§׳׳³.`;
-      if (hour < 20) return rem.cal > 200 ? `׳—׳˜׳™׳£: ׳©׳§׳“׳™׳ ׳׳• ׳₪׳¨׳™.` : `׳§׳¨׳•׳‘ ׳׳™׳¢׳“, ׳”׳׳×׳ ׳׳¢׳¨׳‘.`;
-      return rem.cal > 150 ? `׳׳¨׳•׳—׳× ׳¢׳¨׳‘: ׳¡׳׳˜ + ׳—׳׳‘׳•׳.` : `׳™׳¨׳§׳•׳× ׳•׳™׳•׳’׳•׳¨׳˜ ג€” ׳ ׳©׳׳¨ ${rem.cal} ׳§׳׳³.`;
+    [/מה לאכול.*עכשיו|מה אוכל|תמליצי עכשיו/, () => {
+      if (hour < 10) return `בוקר — ביצים + לחם מלא מתחיל יפה.`;
+      if (hour < 13) return rem.cal > 400 ? `חטיף: פרי + גבינה לבנה.` : `כבר אכלת רוב הקלוריות, המתן לצהריים.`;
+      if (hour < 17) return rem.cal > 300 ? `עוף + אורז + סלט.` : `ארוחה קלה — נשאר ${rem.cal} קל׳.`;
+      if (hour < 20) return rem.cal > 200 ? `חטיף: שקדים או פרי.` : `קרוב ליעד, המתן לערב.`;
+      return rem.cal > 150 ? `ארוחת ערב: סלט + חלבון.` : `ירקות ויוגורט — נשאר ${rem.cal} קל׳.`;
     }],
 
-    [/׳׳¡׳₪׳™׳§ ׳—׳׳‘׳•׳|׳”׳׳ ׳—׳׳‘׳•׳.*׳‘׳¡׳“׳¨|׳—׳׳‘׳•׳.*׳׳¡׳₪׳™׳§/, () =>
+    [/מספיק חלבון|האם חלבון.*בסדר|חלבון.*מספיק/, () =>
       t.protein >= GOALS.protein * 0.9
-        ? `׳›׳! ${Math.round(t.protein)}g ג€” ׳›׳׳¢׳˜ ׳‘׳™׳¢׳“ (${GOALS.protein}g). נ’×`
-        : `׳¢׳•׳“ ׳׳. ${Math.round(t.protein)}g ׳׳×׳•׳ ${GOALS.protein}g. ׳—׳¡׳¨ ${rem.protein}g.`],
+        ? `כן! ${Math.round(t.protein)}g — כמעט ביעד (${GOALS.protein}g). 💪`
+        : `עוד לא. ${Math.round(t.protein)}g מתוך ${GOALS.protein}g. חסר ${rem.protein}g.`],
 
-    [/׳×׳׳׳™׳¦׳™.*׳—׳׳‘׳•׳|׳׳§׳•׳¨.*׳—׳׳‘׳•׳|׳׳”.*׳¢׳©׳™׳¨.*׳—׳׳‘׳•׳/, () =>
-      `׳׳§׳•׳¨׳•׳× ׳—׳׳‘׳•׳: ׳—׳–׳” ׳¢׳•׳£ (31g/100g), ׳˜׳•׳ ׳” (25g/100g), ׳‘׳™׳¦׳” (6g), ׳§׳•׳˜׳’׳³ (12g/100g), ׳™׳•׳’׳•׳¨׳˜ ׳™׳•׳•׳ ׳™ (10g/100g).`],
+    [/תמליצי.*חלבון|מקור.*חלבון|מה.*עשיר.*חלבון/, () =>
+      `מקורות חלבון: חזה עוף (31g/100g), טונה (25g/100g), ביצה (6g), קוטג׳ (12g/100g), יוגורט יווני (10g/100g).`],
 
-    [/׳—׳׳‘׳•׳ ׳‘?׳‘׳™׳¦׳”|׳›׳׳” ׳—׳׳‘׳•׳.*׳‘׳™׳¦׳”/, () => `׳‘׳™׳¦׳” ׳‘׳™׳ ׳•׳ ׳™׳×: ~6g ׳—׳׳‘׳•׳, ~70 ׳§׳׳³.`],
-    [/׳—׳׳‘׳•׳ ׳‘?׳¢׳•׳£|׳›׳׳” ׳—׳׳‘׳•׳.*׳¢׳•׳£/, () => `׳—׳–׳” ׳¢׳•׳£ (100g): ~31g ׳—׳׳‘׳•׳, ~165 ׳§׳׳³.`],
-    [/׳—׳׳‘׳•׳ ׳‘?׳˜׳•׳ ׳”|׳›׳׳” ׳—׳׳‘׳•׳.*׳˜׳•׳ ׳”/, () => `׳˜׳•׳ ׳” ׳‘׳§׳•׳₪׳¡׳” (100g): ~25g ׳—׳׳‘׳•׳, ~110 ׳§׳׳³.`],
-    [/׳—׳׳‘׳•׳ ׳‘?׳¡׳׳׳•׳|׳›׳׳” ׳—׳׳‘׳•׳.*׳¡׳׳׳•׳/, () => `׳¡׳׳׳•׳ (100g): ~25g ׳—׳׳‘׳•׳, ~208 ׳§׳׳³.`],
-    [/׳—׳׳‘׳•׳ ׳‘?׳§׳•׳˜׳’|׳›׳׳” ׳—׳׳‘׳•׳.*׳§׳•׳˜׳’/, () => `׳’׳‘׳™׳ ׳× ׳§׳•׳˜׳’׳³ (100g): ~12g ׳—׳׳‘׳•׳, ~72 ׳§׳׳³.`],
-    [/׳—׳׳‘׳•׳ ׳‘?׳™׳•׳’׳•׳¨׳˜|׳›׳׳” ׳—׳׳‘׳•׳.*׳™׳•׳’׳•׳¨׳˜/, () => `׳™׳•׳’׳•׳¨׳˜ ׳™׳•׳•׳ ׳™ 0% (100g): ~10g ׳—׳׳‘׳•׳, ~59 ׳§׳׳³.`],
+    [/חלבון ב?ביצה|כמה חלבון.*ביצה/, () => `ביצה בינונית: ~6g חלבון, ~70 קל׳.`],
+    [/חלבון ב?עוף|כמה חלבון.*עוף/, () => `חזה עוף (100g): ~31g חלבון, ~165 קל׳.`],
+    [/חלבון ב?טונה|כמה חלבון.*טונה/, () => `טונה בקופסה (100g): ~25g חלבון, ~110 קל׳.`],
+    [/חלבון ב?סלמון|כמה חלבון.*סלמון/, () => `סלמון (100g): ~25g חלבון, ~208 קל׳.`],
+    [/חלבון ב?קוטג|כמה חלבון.*קוטג/, () => `גבינת קוטג׳ (100g): ~12g חלבון, ~72 קל׳.`],
+    [/חלבון ב?יוגורט|כמה חלבון.*יוגורט/, () => `יוגורט יווני 0% (100g): ~10g חלבון, ~59 קל׳.`],
 
-    [/׳™׳•׳×׳¨ ׳׳“׳™ ׳©׳•׳׳|׳¢׳‘׳¨׳×׳™.*׳©׳•׳׳|׳©׳•׳׳ ׳’׳‘׳•׳”/, () =>
+    [/יותר מדי שומן|עברתי.*שומן|שומן גבוה/, () =>
       over.fat > 0
-        ? `׳›׳, ׳¢׳‘׳¨׳× ׳‘-${over.fat}g ׳©׳•׳׳. ׳©׳׳•׳¨ ׳¢׳ ׳©׳׳¨ ׳”׳™׳•׳.`
-        : `׳׳ ג€” ${Math.round(t.fat)}g ׳׳×׳•׳ ${GOALS.fat}g. ׳¢׳•׳“ ${rem.fat}g.`],
+        ? `כן, עברת ב-${over.fat}g שומן. שמור על שאר היום.`
+        : `לא — ${Math.round(t.fat)}g מתוך ${GOALS.fat}g. עוד ${rem.fat}g.`],
 
-    [/׳©׳•׳׳ ׳‘?׳׳‘׳•׳§׳“׳•|׳›׳׳” ׳©׳•׳׳.*׳׳‘׳•׳§׳“׳•/, () => `׳׳‘׳•׳§׳“׳• (~150g): ~21g ׳©׳•׳׳, 240 ׳§׳׳³.`],
-    [/׳©׳•׳׳ ׳‘?׳©׳׳ ׳–׳™׳×|׳›׳׳” ׳©׳•׳׳.*׳©׳׳ ׳–׳™׳×/, () => `׳›׳£ ׳©׳׳ ׳–׳™׳×: ~14g ׳©׳•׳׳, 120 ׳§׳׳³.`],
+    [/שומן ב?אבוקדו|כמה שומן.*אבוקדו/, () => `אבוקדו (~150g): ~21g שומן, 240 קל׳.`],
+    [/שומן ב?שמן זית|כמה שומן.*שמן זית/, () => `כף שמן זית: ~14g שומן, 120 קל׳.`],
 
-    [/׳™׳•׳×׳¨ ׳׳“׳™ ׳₪׳—׳׳™׳|׳¢׳‘׳¨׳×׳™.*׳₪׳—׳׳™׳|׳₪׳—׳׳™׳׳•׳×.*׳’׳‘׳•׳”/, () =>
+    [/יותר מדי פחמימ|עברתי.*פחמימ|פחמימות.*גבוה/, () =>
       over.carbs > 0
-        ? `׳¢׳‘׳¨׳× ׳‘-${over.carbs}g ׳₪׳—׳׳™׳׳•׳×. ׳—׳׳‘׳•׳ ׳•׳©׳•׳׳ ׳‘׳©׳׳¨ ׳”׳™׳•׳.`
-        : `׳׳ ג€” ${Math.round(t.carbs)}g ׳׳×׳•׳ ${GOALS.carbs}g.`],
+        ? `עברת ב-${over.carbs}g פחמימות. חלבון ושומן בשאר היום.`
+        : `לא — ${Math.round(t.carbs)}g מתוך ${GOALS.carbs}g.`],
 
-    [/׳₪׳—׳׳™׳׳•׳× ׳‘?׳׳•׳¨׳–|׳›׳׳” ׳₪׳—׳׳™׳.*׳׳•׳¨׳–/, () => `׳׳•׳¨׳– ׳׳‘׳ ׳׳‘׳•׳©׳ (100g): ~28g ׳₪׳—׳׳™׳׳•׳×, ~130 ׳§׳׳³.`],
-    [/׳₪׳—׳׳™׳׳•׳× ׳‘?׳׳—׳|׳›׳׳” ׳₪׳—׳׳™׳.*׳׳—׳/, () => `׳₪׳¨׳•׳¡׳× ׳׳—׳ ׳׳—׳™׳˜׳” ׳׳׳׳”: ~13g ׳₪׳—׳׳™׳׳•׳×, ~75 ׳§׳׳³.`],
-    [/׳₪׳—׳׳™׳׳•׳× ׳‘?׳‘׳˜׳˜׳”|׳›׳׳” ׳₪׳—׳׳™׳.*׳‘׳˜׳˜׳”/, () => `׳‘׳˜׳˜׳” (100g): ~20g ׳₪׳—׳׳™׳׳•׳×, ~86 ׳§׳׳³.`],
-    [/׳₪׳—׳׳™׳׳•׳× ׳‘?׳‘׳ ׳ ׳”|׳›׳׳” ׳₪׳—׳׳™׳.*׳‘׳ ׳ ׳”/, () => `׳‘׳ ׳ ׳” ׳‘׳™׳ ׳•׳ ׳™׳×: ~27g ׳₪׳—׳׳™׳׳•׳×, ~105 ׳§׳׳³.`],
+    [/פחמימות ב?אורז|כמה פחמימ.*אורז/, () => `אורז לבן מבושל (100g): ~28g פחמימות, ~130 קל׳.`],
+    [/פחמימות ב?לחם|כמה פחמימ.*לחם/, () => `פרוסת לחם מחיטה מלאה: ~13g פחמימות, ~75 קל׳.`],
+    [/פחמימות ב?בטטה|כמה פחמימ.*בטטה/, () => `בטטה (100g): ~20g פחמימות, ~86 קל׳.`],
+    [/פחמימות ב?בננה|כמה פחמימ.*בננה/, () => `בננה בינונית: ~27g פחמימות, ~105 קל׳.`],
 
-    [/׳¢׳‘׳¨׳×׳™.*׳™׳¢׳“|׳¢׳‘׳¨׳×׳™.*׳§׳׳•׳¨׳™|׳׳›׳׳×׳™ ׳™׳•׳×׳¨ ׳׳“׳™|׳׳›׳׳×׳™ ׳”׳¨׳‘׳”|׳—׳¨׳’׳×׳™|׳—׳¨׳™׳’׳” ׳”׳™׳•׳/, () =>
+    [/עברתי.*יעד|עברתי.*קלורי|אכלתי יותר מדי|אכלתי הרבה|חרגתי|חריגה היום/, () =>
       calOver
-        ? `׳¢׳‘׳¨׳× ׳‘-${over.cal} ׳§׳׳³ ג€” ׳’׳ ׳™׳•׳ ׳›׳–׳” ׳§׳•׳¨׳” נ˜ ׳׳ ׳׳₪׳¦׳•׳× ׳׳—׳¨, ׳₪׳©׳•׳˜ ׳—׳•׳–׳¨׳™׳ ׳׳׳¡׳׳•׳!`
+        ? `עברת ב-${over.cal} קל׳ — גם יום כזה קורה 😊 לא לפצות מחר, פשוט חוזרים למסלול!`
         : calDone
-          ? `׳”׳’׳¢׳× ׳‘׳“׳™׳•׳§ ׳׳™׳¢׳“ ג€” ${Math.round(t.cal)} ׳§׳׳³. ׳׳“׳”׳™׳! נ‰נ`
-          : `׳׳ ׳¢׳‘׳¨׳× ג€” ׳ ׳©׳׳¨ ׳׳ ׳¢׳•׳“ ${rem.cal} ׳§׳׳³ ׳׳”׳™׳•׳.`],
+          ? `הגעת בדיוק ליעד — ${Math.round(t.cal)} קל׳. מדהים! 🎉🌟`
+          : `לא עברת — נשאר לך עוד ${rem.cal} קל׳ להיום.`],
 
-    [/׳›׳׳” ׳¢׳‘׳¨׳×׳™|׳‘.?׳›׳׳” ׳¢׳‘׳¨׳×׳™/, () =>
-      over.cal > 0 ? `׳¢׳‘׳¨׳× ׳‘-${over.cal} ׳§׳׳³.` : `׳׳ ׳¢׳‘׳¨׳×. ׳ ׳©׳׳¨ ${rem.cal} ׳§׳׳³.`],
+    [/כמה עברתי|ב.?כמה עברתי/, () =>
+      over.cal > 0 ? `עברת ב-${over.cal} קל׳.` : `לא עברת. נשאר ${rem.cal} קל׳.`],
 
-    [/׳¢׳©׳™׳×׳™ ׳˜׳•׳‘|׳›׳ ׳”׳›׳‘׳•׳“|׳”׳¦׳׳—׳×׳™|׳’׳׳” ׳‘׳™/, () => {
+    [/עשיתי טוב|כל הכבוד|הצלחתי|גאה בי/, () => {
       if (pct.cal >= 90 && t.protein >= GOALS.protein * 0.85)
-        return `׳׳׳© ׳›׳ ׳”׳›׳‘׳•׳“ ${name}! ׳™׳•׳ ׳׳¦׳•׳™׳ נ`;
+        return `ממש כל הכבוד ${name}! יום מצוין 🌟`;
       if (pct.cal < 50)
-        return `׳׳×׳” ׳‘׳“׳¨׳! ׳¨׳§ ${Math.round(t.cal)} ׳§׳׳³ ג€” ׳¢׳•׳“ ׳™׳© ׳׳§׳•׳ ׳׳׳›׳•׳.`;
-      return `׳™׳•׳₪׳™ ${name}! ׳‘׳›׳™׳•׳•׳. ׳ ׳©׳׳¨ ${rem.cal} ׳§׳׳³.`;
+        return `אתה בדרך! רק ${Math.round(t.cal)} קל׳ — עוד יש מקום לאכול.`;
+      return `יופי ${name}! בכיוון. נשאר ${rem.cal} קל׳.`;
     }],
 
-    [/׳׳ ׳׳¦׳׳™׳—|׳§׳©׳” ׳׳™|׳׳×׳™׳™׳׳©|׳׳•׳•׳×׳¨|׳¢׳™׳™׳£ ׳/, () =>
+    [/לא מצליח|קשה לי|מתייאש|לוותר|עייף מ/, () =>
       isLoss
-        ? `׳–׳” ׳ ׳•׳¨׳׳׳™. ׳׳ ׳×׳•׳•׳×׳¨ ׳¢׳ ׳™׳•׳ ׳©׳׳ ׳‘׳’׳׳ ׳׳¨׳•׳—׳” ׳׳—׳×.`
-        : `׳¢׳׳™׳™׳” ׳‘׳׳¡׳” ׳׳•׳§׳—׳× ׳–׳׳ ג€” ׳¢׳§׳‘׳™׳•׳× ׳”׳™׳ ׳”׳׳₪׳×׳—.`],
+        ? `זה נורמלי. אל תוותר על יום שלם בגלל ארוחה אחת.`
+        : `עלייה במסה לוקחת זמן — עקביות היא המפתח.`],
 
-    [/׳׳” ׳”׳¦׳¢׳“ ׳”׳‘׳|׳׳” ׳׳¢׳©׳•׳× ׳¢׳›׳©׳™׳•/, () =>
+    [/מה הצעד הבא|מה לעשות עכשיו/, () =>
       rem.protein > 20
-        ? `׳”׳•׳¡׳£ ׳—׳׳‘׳•׳ ג€” ׳¢׳•׳“ ${rem.protein}g. ׳¢׳•׳£, ׳‘׳™׳¦׳™׳, ׳˜׳•׳ ׳”.`
+        ? `הוסף חלבון — עוד ${rem.protein}g. עוף, ביצים, טונה.`
         : rem.cal > 200
-          ? `׳ ׳©׳׳¨ ${rem.cal} ׳§׳׳³ ג€” ׳׳¨׳•׳—׳” ׳§׳׳” ׳¢׳ ׳™׳¨׳§׳•׳×.`
-          : `׳›׳׳¢׳˜ ׳¡׳™׳™׳׳× ׳™׳₪׳”! ׳׳ ׳¨׳¢׳‘ ג€” ׳™׳¨׳§׳•׳× ׳—׳•׳₪׳©׳™׳™׳.`],
+          ? `נשאר ${rem.cal} קל׳ — ארוחה קלה עם ירקות.`
+          : `כמעט סיימת יפה! אם רעב — ירקות חופשיים.`],
 
-    [/׳‘׳¡׳₪׳§|׳׳ ׳‘׳˜׳•׳—|׳׳” ׳¢׳“׳™׳£/, () =>
-      `׳×׳׳™׳“ ׳‘׳—׳¨ ׳’׳‘׳•׳” ׳™׳•׳×׳¨ ׳‘׳—׳׳‘׳•׳ ׳•׳ ׳׳•׳ ׳™׳•׳×׳¨ ׳‘׳©׳•׳׳ ׳¨׳•׳•׳™.`],
+    [/בספק|לא בטוח|מה עדיף/, () =>
+      `תמיד בחר גבוה יותר בחלבון ונמוך יותר בשומן רווי.`],
 
-    [/׳§׳׳•׳¨׳™ ׳‘?׳‘׳™׳¦׳”|׳›׳׳” ׳§׳׳•׳¨׳™.*׳‘׳™׳¦׳”/, () => `׳‘׳™׳¦׳” ׳’׳“׳•׳׳”: ~75 ׳§׳׳³. ׳׳‘׳ ׳” ׳‘׳׳‘׳“: ~17 ׳§׳׳³.`],
-    [/׳§׳׳•׳¨׳™ ׳‘?׳¢׳•׳£|׳›׳׳” ׳§׳׳•׳¨׳™.*׳¢׳•׳£/, () => `׳—׳–׳” ׳¢׳•׳£ ׳׳‘׳•׳©׳ (100g): ~165 ׳§׳׳³, 31g ׳—׳׳‘׳•׳.`],
-    [/׳§׳׳•׳¨׳™ ׳‘?׳׳•׳¨׳–|׳›׳׳” ׳§׳׳•׳¨׳™.*׳׳•׳¨׳–/, () => `׳׳•׳¨׳– ׳׳‘׳ ׳׳‘׳•׳©׳ (100g): ~130 ׳§׳׳³.`],
-    [/׳§׳׳•׳¨׳™ ׳‘?׳₪׳™׳×׳”|׳›׳׳” ׳§׳׳•׳¨׳™.*׳₪׳™׳×׳”/, () => `׳₪׳™׳×׳” (~60g): ~165 ׳§׳׳³, 33g ׳₪׳—׳׳™׳׳•׳×.`],
-    [/׳§׳׳•׳¨׳™ ׳‘?׳׳—׳|׳›׳׳” ׳§׳׳•׳¨׳™.*׳׳—׳/, () => `׳₪׳¨׳•׳¡׳× ׳׳—׳ ׳׳—׳™׳˜׳” ׳׳׳׳”: ~75 ׳§׳׳³.`],
-    [/׳§׳׳•׳¨׳™ ׳‘?׳‘׳ ׳ ׳”|׳›׳׳” ׳§׳׳•׳¨׳™.*׳‘׳ ׳ ׳”/, () => `׳‘׳ ׳ ׳” ׳‘׳™׳ ׳•׳ ׳™׳×: ~105 ׳§׳׳³.`],
-    [/׳§׳׳•׳¨׳™ ׳‘?׳©׳§׳“׳™׳|׳›׳׳” ׳§׳׳•׳¨׳™.*׳©׳§׳“׳™׳/, () => `23 ׳©׳§׳“׳™׳ (28g): ~160 ׳§׳׳³, 6g ׳—׳׳‘׳•׳.`],
-    [/׳§׳׳•׳¨׳™ ׳‘?׳׳‘׳•׳§׳“׳•|׳›׳׳” ׳§׳׳•׳¨׳™.*׳׳‘׳•׳§׳“׳•/, () => `׳׳‘׳•׳§׳“׳• (~150g): ~240 ׳§׳׳³, 21g ׳©׳•׳׳.`],
-    [/׳§׳׳•׳¨׳™ ׳‘?׳™׳•׳’׳•׳¨׳˜|׳›׳׳” ׳§׳׳•׳¨׳™.*׳™׳•׳’׳•׳¨׳˜/, () => `׳™׳•׳’׳•׳¨׳˜ ׳™׳•׳•׳ ׳™ 0% (100g): ~59 ׳§׳׳³, 10g ׳—׳׳‘׳•׳.`],
-    [/׳§׳׳•׳¨׳™ ׳‘?׳’׳‘׳™׳ |׳›׳׳” ׳§׳׳•׳¨׳™.*׳’׳‘׳™׳ /, () => `׳’׳‘׳™׳ ׳” ׳׳‘׳ ׳” 5% (100g): ~90 ׳§׳׳³. ׳’׳‘׳™׳ ׳” ׳¦׳”׳•׳‘׳” (30g): ~100 ׳§׳׳³.`],
-    [/׳§׳׳•׳¨׳™ ׳‘?׳˜׳•׳ ׳”|׳›׳׳” ׳§׳׳•׳¨׳™.*׳˜׳•׳ ׳”/, () => `׳˜׳•׳ ׳” ׳‘׳§׳•׳₪׳¡׳” (100g): ~110 ׳§׳׳³, 25g ׳—׳׳‘׳•׳.`],
-    [/׳§׳׳•׳¨׳™ ׳‘?׳¡׳׳׳•׳|׳›׳׳” ׳§׳׳•׳¨׳™.*׳¡׳׳׳•׳/, () => `׳¡׳׳׳•׳ (100g): ~208 ׳§׳׳³, 25g ׳—׳׳‘׳•׳.`],
-    [/׳§׳׳•׳¨׳™ ׳‘?׳©׳•׳§׳•׳׳“|׳›׳׳” ׳§׳׳•׳¨׳™.*׳©׳•׳§׳•׳׳“/, () => `׳©׳•׳§׳•׳׳“ ׳׳¨׳™׳¨ (30g): ~170 ׳§׳׳³. ׳‘׳׳™׳ ׳•׳ ג€” ׳‘׳¡׳“׳¨.`],
-    [/׳§׳׳•׳¨׳™ ׳‘?׳—׳•׳׳•׳¡|׳›׳׳” ׳§׳׳•׳¨׳™.*׳—׳•׳׳•׳¡/, () => `׳—׳•׳׳•׳¡ (100g): ~164 ׳§׳׳³, 9g ׳—׳׳‘׳•׳.`],
-    [/׳§׳׳•׳¨׳™ ׳‘?׳˜׳—׳™׳ ׳”|׳›׳׳” ׳§׳׳•׳¨׳™.*׳˜׳—׳™׳ ׳”/, () => `׳›׳£ ׳˜׳—׳™׳ ׳” (15g): ~90 ׳§׳׳³.`],
-    [/׳§׳׳•׳¨׳™ ׳‘?׳‘׳™׳¦.*׳§׳©׳”|׳‘׳™׳¦׳” ׳§׳©׳”/, () => `׳‘׳™׳¦׳” ׳§׳©׳”: ~78 ׳§׳׳³, 6g ׳—׳׳‘׳•׳.`],
-    [/׳§׳׳•׳¨׳™ ׳‘?׳§׳•׳˜׳’|׳›׳׳” ׳§׳׳•׳¨׳™.*׳§׳•׳˜׳’/, () => `׳§׳•׳˜׳’׳³ 3% (100g): ~72 ׳§׳׳³, 12g ׳—׳׳‘׳•׳.`],
+    [/קלורי ב?ביצה|כמה קלורי.*ביצה/, () => `ביצה גדולה: ~75 קל׳. לבנה בלבד: ~17 קל׳.`],
+    [/קלורי ב?עוף|כמה קלורי.*עוף/, () => `חזה עוף מבושל (100g): ~165 קל׳, 31g חלבון.`],
+    [/קלורי ב?אורז|כמה קלורי.*אורז/, () => `אורז לבן מבושל (100g): ~130 קל׳.`],
+    [/קלורי ב?פיתה|כמה קלורי.*פיתה/, () => `פיתה (~60g): ~165 קל׳, 33g פחמימות.`],
+    [/קלורי ב?לחם|כמה קלורי.*לחם/, () => `פרוסת לחם מחיטה מלאה: ~75 קל׳.`],
+    [/קלורי ב?בננה|כמה קלורי.*בננה/, () => `בננה בינונית: ~105 קל׳.`],
+    [/קלורי ב?שקדים|כמה קלורי.*שקדים/, () => `23 שקדים (28g): ~160 קל׳, 6g חלבון.`],
+    [/קלורי ב?אבוקדו|כמה קלורי.*אבוקדו/, () => `אבוקדו (~150g): ~240 קל׳, 21g שומן.`],
+    [/קלורי ב?יוגורט|כמה קלורי.*יוגורט/, () => `יוגורט יווני 0% (100g): ~59 קל׳, 10g חלבון.`],
+    [/קלורי ב?גבינ|כמה קלורי.*גבינ/, () => `גבינה לבנה 5% (100g): ~90 קל׳. גבינה צהובה (30g): ~100 קל׳.`],
+    [/קלורי ב?טונה|כמה קלורי.*טונה/, () => `טונה בקופסה (100g): ~110 קל׳, 25g חלבון.`],
+    [/קלורי ב?סלמון|כמה קלורי.*סלמון/, () => `סלמון (100g): ~208 קל׳, 25g חלבון.`],
+    [/קלורי ב?שוקולד|כמה קלורי.*שוקולד/, () => `שוקולד מריר (30g): ~170 קל׳. במינון — בסדר.`],
+    [/קלורי ב?חומוס|כמה קלורי.*חומוס/, () => `חומוס (100g): ~164 קל׳, 9g חלבון.`],
+    [/קלורי ב?טחינה|כמה קלורי.*טחינה/, () => `כף טחינה (15g): ~90 קל׳.`],
+    [/קלורי ב?ביצ.*קשה|ביצה קשה/, () => `ביצה קשה: ~78 קל׳, 6g חלבון.`],
+    [/קלורי ב?קוטג|כמה קלורי.*קוטג/, () => `קוטג׳ 3% (100g): ~72 קל׳, 12g חלבון.`],
 
-    [/׳›׳׳” ׳׳™׳|׳׳™׳ ׳׳™׳•׳|׳©׳×׳™׳×׳™ ׳׳¡׳₪׳™׳§/, () =>
-      `׳׳•׳׳׳¥ 35ml ׳׳›׳ ׳§"׳’ ׳’׳•׳£ ג€” ׳‘׳׳׳•׳¦׳¢ 2.5-3 ׳׳™׳˜׳¨ ׳‘׳™׳•׳.`],
+    [/כמה מים|מים ליום|שתיתי מספיק/, () =>
+      `מומלץ 35ml לכל ק"ג גוף — בממוצע 2.5-3 ליטר ביום.`],
 
-    [/׳׳™׳ ׳׳₪׳ ׳™ ׳׳›׳™׳׳”|׳׳©׳×׳•׳× ׳׳₪׳ ׳™ ׳׳¨׳•׳—׳”/, () =>
-      `׳›׳•׳¡ ׳׳™׳ ׳׳₪׳ ׳™ ׳׳¨׳•׳—׳” ׳׳₪׳—׳™׳×׳” ׳×׳™׳׳‘׳•׳ ׳‘׳›-20%.`],
+    [/מים לפני אכילה|לשתות לפני ארוחה/, () =>
+      `כוס מים לפני ארוחה מפחיתה תיאבון בכ-20%.`],
 
-    [/׳׳×׳™ ׳׳¨׳“ ׳§׳™׳׳•|׳›׳׳” ׳–׳׳.*׳׳¨׳“׳×|׳׳×׳™ ׳׳•׳¨׳™׳“ ׳§/, () => {
+    [/מתי ארד קילו|כמה זמן.*לרדת|מתי אוריד ק/, () => {
       const deficit = tdee - GOALS.cal;
-      if (deficit <= 0) return `׳׳×׳” ׳‘׳׳¡׳׳•׳ ׳¢׳׳™׳™׳” ג€” ׳׳ ׳™׳¨׳™׳“׳”.`;
-      return `׳¢׳ ׳’׳¨׳¢׳•׳ ${deficit} ׳§׳׳³ ׳‘׳™׳•׳ ג€” ׳§"׳’ ׳׳—׳“ ׳‘׳›-${Math.round(7700/deficit)} ׳™׳׳™׳.`;
+      if (deficit <= 0) return `אתה במסלול עלייה — לא ירידה.`;
+      return `עם גרעון ${deficit} קל׳ ביום — ק"ג אחד בכ-${Math.round(7700/deficit)} ימים.`;
     }],
 
-    [/׳›׳׳” ׳’׳¨׳¢׳•׳|׳׳” ׳”׳’׳¨׳¢׳•׳|׳’׳™׳¨׳¢׳•׳ ׳§׳׳•׳¨׳™/, () => {
+    [/כמה גרעון|מה הגרעון|גירעון קלורי/, () => {
       const deficit = tdee - GOALS.cal;
       return deficit > 0
-        ? `׳’׳¨׳¢׳•׳ ׳™׳•׳׳™: ${deficit} ׳§׳׳³ (TDEE ${tdee} גˆ’ ׳™׳¢׳“ ${GOALS.cal}).`
-        : `׳׳×׳” ׳‘׳¢׳•׳“׳£ ׳©׳ ${Math.abs(deficit)} ׳§׳׳³ (׳׳¡׳׳•׳ ׳¢׳׳™׳™׳”).`;
+        ? `גרעון יומי: ${deficit} קל׳ (TDEE ${tdee} − יעד ${GOALS.cal}).`
+        : `אתה בעודף של ${Math.abs(deficit)} קל׳ (מסלול עלייה).`;
     }],
 
-    [/tdee|׳›׳׳” ׳©׳•׳¨׳£|׳§׳¦׳‘ ׳—׳™׳׳•׳£/, () =>
-      `׳”-TDEE ׳©׳׳: ${tdee} ׳§׳׳³ ׳‘׳™׳•׳.`],
+    [/tdee|כמה שורף|קצב חילוף/, () =>
+      `ה-TDEE שלך: ${tdee} קל׳ ביום.`],
 
-    [/׳”׳׳ ׳׳ ׳™ ׳‘׳›׳™׳•׳•׳|׳׳ ׳™ ׳‘׳¡׳“׳¨.*׳×׳–׳•׳ ׳”|׳¢׳•׳©׳”.*׳˜׳•׳‘.*׳”׳™׳•׳/, () => {
+    [/האם אני בכיוון|אני בסדר.*תזונה|עושה.*טוב.*היום/, () => {
       const ok = pct.cal <= 105 && t.protein >= GOALS.protein * 0.7;
       return ok
-        ? `׳›׳, ׳‘׳›׳™׳•׳•׳ ׳׳¦׳•׳™׳! ג… ${pct.cal}% ׳§׳׳•׳¨׳™׳•׳×, ${Math.round(t.protein)}g ׳—׳׳‘׳•׳.`
+        ? `כן, בכיוון מצוין! ✅ ${pct.cal}% קלוריות, ${Math.round(t.protein)}g חלבון.`
         : pct.cal > 105
-          ? `׳¢׳‘׳¨׳× ׳׳¢׳˜ (${pct.cal}%). ׳׳—׳¨ ׳×׳₪׳¦׳”.`
-          : `׳§׳׳•׳¨׳™׳•׳× ׳‘׳¡׳“׳¨, ׳—׳–׳§ ׳׳× ׳”׳—׳׳‘׳•׳ ג€” ׳¢׳•׳“ ${rem.protein}g.`;
+          ? `עברת מעט (${pct.cal}%). מחר תפצה.`
+          : `קלוריות בסדר, חזק את החלבון — עוד ${rem.protein}g.`;
     }],
 
-    [/׳׳” ׳–׳” ׳׳׳§׳¨׳•|׳׳׳§׳¨׳•׳ ׳•׳˜׳¨׳™׳׳ ׳˜/, () =>
-      `׳׳׳§׳¨׳• = ׳—׳׳‘׳•׳, ׳₪׳—׳׳™׳׳•׳×, ׳©׳•׳׳ ג€” ׳©׳׳•׳©׳× ׳׳‘׳•׳× ׳”׳׳–׳•׳ ׳©׳׳¡׳₪׳§׳™׳ ׳׳ ׳¨׳’׳™׳”.`],
+    [/מה זה מאקרו|מאקרונוטריאנט/, () =>
+      `מאקרו = חלבון, פחמימות, שומן — שלושת אבות המזון שמספקים אנרגיה.`],
 
-    [/׳׳” ׳–׳” tdee|׳׳” ׳–׳” ׳׳˜׳‘׳•׳׳™׳–׳/, () =>
-      `TDEE = ׳›׳׳•׳× ׳”׳§׳׳•׳¨׳™׳•׳× ׳©׳”׳’׳•׳£ ׳©׳•׳¨׳£ ׳‘׳™׳•׳ ׳›׳•׳׳ ׳₪׳¢׳™׳׳•׳×. ׳©׳׳: ${tdee} ׳§׳׳³.`],
+    [/מה זה tdee|מה זה מטבוליזם/, () =>
+      `TDEE = כמות הקלוריות שהגוף שורף ביום כולל פעילות. שלך: ${tdee} קל׳.`],
 
-    [/׳׳” ׳–׳” ׳’׳¨׳¢׳•׳|׳׳” ׳–׳” ׳’׳™׳¨׳¢׳•׳/, () =>
-      `׳’׳¨׳¢׳•׳ ׳§׳׳•׳¨׳™ = ׳׳›׳™׳׳” ׳₪׳—׳•׳× ׳׳׳” ׳©׳”׳’׳•׳£ ׳©׳•׳¨׳£. ׳׳” ׳©׳’׳•׳¨׳ ׳׳™׳¨׳™׳“׳” ׳‘׳׳©׳§׳.`],
+    [/מה זה גרעון|מה זה גירעון/, () =>
+      `גרעון קלורי = אכילה פחות ממה שהגוף שורף. מה שגורם לירידה במשקל.`],
 
-    [/׳׳” ׳–׳” ׳¢׳•׳“׳£ ׳§׳׳•׳¨׳™/, () =>
-      `׳¢׳•׳“׳£ = ׳׳›׳™׳׳” ׳™׳•׳×׳¨ ׳׳׳” ׳©׳”׳’׳•׳£ ׳©׳•׳¨׳£. ׳’׳•׳¨׳ ׳׳¢׳׳™׳™׳” ׳‘׳׳¡׳”.`],
+    [/מה זה עודף קלורי/, () =>
+      `עודף = אכילה יותר ממה שהגוף שורף. גורם לעלייה במסה.`],
 
-    [/׳©׳•׳׳ ׳‘׳¨׳™׳|׳©׳•׳׳ ׳˜׳•׳‘|׳׳•׳׳’׳”/, () =>
-      `׳©׳•׳׳ ׳‘׳¨׳™׳: ׳׳‘׳•׳§׳“׳•, ׳©׳׳ ׳–׳™׳×, ׳׳’׳•׳–׳™׳, ׳©׳§׳“׳™׳, ׳¡׳׳׳•׳.`],
+    [/שומן בריא|שומן טוב|אומגה/, () =>
+      `שומן בריא: אבוקדו, שמן זית, אגוזים, שקדים, סלמון.`],
 
-    [/׳₪׳—׳׳™׳׳•׳× ׳˜׳•׳‘׳•׳×|׳₪׳—׳׳™׳׳•׳× ׳׳•׳¨׳›׳‘׳•׳×|׳₪׳—׳׳™׳׳” ׳‘׳¨׳™׳/, () =>
-      `׳₪׳—׳׳™׳׳•׳× ׳׳•׳¨׳›׳‘׳•׳×: ׳׳•׳¨׳– ׳׳׳, ׳‘׳˜׳˜׳”, ׳©׳™׳‘׳•׳׳× ׳©׳•׳¢׳, ׳׳—׳ ׳׳—׳™׳˜׳” ׳׳׳׳”.`],
+    [/פחמימות טובות|פחמימות מורכבות|פחמימה בריא/, () =>
+      `פחמימות מורכבות: אורז מלא, בטטה, שיבולת שועל, לחם מחיטה מלאה.`],
 
-    [/׳׳“׳“ ׳’׳׳™׳§׳׳™|׳’׳׳™׳§׳׳™/, () =>
-      `׳׳“׳“ ׳’׳׳™׳§׳׳™ ג€” ׳¢׳“ ׳›׳׳” ׳׳”׳¨ ׳”׳׳–׳•׳ ׳׳¢׳׳” ׳¡׳•׳›׳¨. ׳ ׳׳•׳ (׳¢׳“ 55) = ׳˜׳•׳‘ ׳׳“׳™׳׳˜׳”.`],
+    [/מדד גליקמי|גליקמי/, () =>
+      `מדד גליקמי — עד כמה מהר המזון מעלה סוכר. נמוך (עד 55) = טוב לדיאטה.`],
 
-    [/׳¡׳™׳‘׳™׳ ׳×׳–׳•׳ ׳×׳™׳™׳|׳›׳׳” ׳¡׳™׳‘׳™׳/, () =>
-      `׳׳•׳׳׳¥ 25-35g ׳¡׳™׳‘׳™׳ ׳‘׳™׳•׳ ג€” ׳™׳¨׳§׳•׳×, ׳§׳˜׳ ׳™׳•׳×, ׳“׳’׳ ׳™׳ ׳׳׳׳™׳.`],
+    [/סיבים תזונתיים|כמה סיבים/, () =>
+      `מומלץ 25-35g סיבים ביום — ירקות, קטניות, דגנים מלאים.`],
 
-    [/׳¨׳¢׳‘\b|׳׳¨׳’׳™׳© ׳¨׳¢׳‘|׳׳ ׳™ ׳¨׳¢׳‘/, () => {
-      if (rem.cal > 400) return `׳׳•׳§׳™ ׳׳•׳§׳™, ׳׳•׳×׳¨ ׳׳׳›׳•׳! נ˜„ ׳ ׳©׳׳¨ ׳׳ ${rem.cal} ׳§׳׳³ ג€” ׳¢׳“׳™׳£ ׳׳©׳׳‘ ׳—׳׳‘׳•׳ ׳¢׳ ׳™׳¨׳§׳•׳×, ׳–׳” ׳™׳©׳‘׳™׳¢ ׳׳•׳×׳ ׳”׳›׳™ ׳˜׳•׳‘ נ’×`;
-      if (rem.cal > 150) return `׳™׳© ׳׳ ׳¢׳•׳“ ${rem.cal} ׳§׳׳³ ג€” ׳׳₪׳©׳¨ ׳׳׳›׳•׳ ׳‘׳”׳—׳׳˜! ${_proteinFoodSuggest(rem.protein > 0 ? rem.protein : 15)}`;
-      return `׳׳׳, ׳ ׳©׳׳¨ ׳׳ ׳¨׳§ ${rem.cal} ׳§׳׳³ ׳׳”׳™׳•׳ נ˜ ׳׳₪׳ ׳™ ׳©׳׳×׳” ׳׳•׳›׳ ג€” ׳©׳×׳” ׳›׳•׳¡ ׳׳™׳, ׳׳₪׳¢׳׳™׳ ׳”׳’׳•׳£ ׳׳×׳‘׳׳‘׳ ׳‘׳™׳ ׳¦׳׳ ׳׳¨׳¢׳‘. ׳׳ ׳¢׳“׳™׳™׳ ׳¨׳¢׳‘ ג€” ׳™׳¨׳§׳•׳× ׳—׳•׳₪׳©׳™׳™׳!`;
+    [/רעב\b|מרגיש רעב|אני רעב/, () => {
+      if (rem.cal > 400) return `אוקי אוקי, מותר לאכול! 😄 נשאר לך ${rem.cal} קל׳ — עדיף לשלב חלבון עם ירקות, זה ישביע אותך הכי טוב 💪`;
+      if (rem.cal > 150) return `יש לך עוד ${rem.cal} קל׳ — אפשר לאכול בהחלט! ${_proteinFoodSuggest(rem.protein > 0 ? rem.protein : 15)}`;
+      return `אממ, נשאר לך רק ${rem.cal} קל׳ להיום 😊 לפני שאתה אוכל — שתה כוס מים, לפעמים הגוף מתבלבל בין צמא לרעב. אם עדיין רעב — ירקות חופשיים!`;
     }],
 
-    [/׳׳ ׳¨׳¢׳‘|׳׳™׳ ׳×׳™׳׳‘׳•׳/, () =>
+    [/לא רעב|אין תיאבון/, () =>
       isLoss
-        ? `׳׳ ׳׳ ׳¨׳¢׳‘ ג€” ׳׳ ׳—׳™׳™׳‘ ׳׳׳›׳•׳. ׳¨׳§ ׳•׳•׳“׳ ${GOALS.protein}g ׳—׳׳‘׳•׳ ׳‘׳™׳•׳.`
-        : `׳‘׳¢׳׳™׳™׳” ׳—׳©׳•׳‘ ׳׳׳›׳•׳ ׳’׳ ׳׳ ׳׳ ׳¨׳¢׳‘ ג€” ׳›׳“׳™ ׳׳ ׳׳₪׳¡׳₪׳¡ ׳§׳׳•׳¨׳™׳•׳×.`],
+        ? `אם לא רעב — לא חייב לאכול. רק וודא ${GOALS.protein}g חלבון ביום.`
+        : `בעלייה חשוב לאכול גם אם לא רעב — כדי לא לפספס קלוריות.`],
 
-    [/׳–׳׳׳×׳™|׳׳›׳׳×׳™ ׳™׳•׳×׳¨ ׳׳“׳™.*׳¢׳¨׳‘|׳׳›׳׳×׳™.*׳¡׳•׳£ ׳”׳™׳•׳/, () =>
-      `׳–׳” ׳§׳•׳¨׳”. ׳׳—׳¨ ׳‘׳•׳§׳¨ ׳׳×׳—׳™׳׳™׳ ׳׳—׳“׳© ג€” ׳׳ ׳׳₪׳¦׳•׳× ׳‘׳“׳™׳׳˜׳” ׳§׳™׳¦׳•׳ ׳™׳×.`],
+    [/זללתי|אכלתי יותר מדי.*ערב|אכלתי.*סוף היום/, () =>
+      `זה קורה. מחר בוקר מתחילים מחדש — לא לפצות בדיאטה קיצונית.`],
 
-    [/׳”׳×׳׳׳ ׳×׳™|׳¢׳©׳™׳×׳™ ׳׳™׳׳•׳|׳׳—׳¨׳™ ׳׳™׳׳•׳/, () =>
+    [/התאמנתי|עשיתי אימון|אחרי אימון/, () =>
       rem.protein > 0
-        ? `׳›׳ ׳”׳›׳‘׳•׳“! ׳—׳׳‘׳•׳ ׳×׳•׳ 60 ׳“׳§׳•׳× ג€” ׳ ׳©׳׳¨ ${rem.protein}g.`
-        : `׳›׳‘׳¨ ׳”׳’׳¢׳× ׳׳—׳׳‘׳•׳ ג€” ׳׳¦׳•׳™׳! ׳©׳׳•׳¨ ׳¢׳ ׳ ׳•׳–׳׳™׳.`],
+        ? `כל הכבוד! חלבון תוך 60 דקות — נשאר ${rem.protein}g.`
+        : `כבר הגעת לחלבון — מצוין! שמור על נוזלים.`],
 
-    [/׳—׳׳‘׳•׳ ׳׳׳™׳׳•׳|׳—׳׳‘׳•׳ ׳׳‘׳ ׳™׳™׳× ׳©׳¨׳™׳¨׳™׳|׳›׳׳” ׳—׳׳‘׳•׳.*׳¡׳₪׳•׳¨׳˜׳׳™/, () =>
-      `׳׳‘׳ ׳™׳™׳× ׳©׳¨׳™׳¨׳™׳: 1.6-2.2g ׳׳›׳ ׳§"׳’ ׳’׳•׳£ ׳‘׳™׳•׳. ׳™׳¢׳“ ׳©׳׳: ${GOALS.protein}g.`],
+    [/חלבון לאימון|חלבון לבניית שרירים|כמה חלבון.*ספורטאי/, () =>
+      `לבניית שרירים: 1.6-2.2g לכל ק"ג גוף ביום. יעד שלך: ${GOALS.protein}g.`],
 
-    [/׳׳›׳׳×׳™ ׳‘׳—׳•׳¥|׳׳¡׳¢׳“׳”|׳׳¨׳•׳—׳” ׳—׳‘׳¨׳×׳™׳×/, () =>
-      `׳‘׳—׳•׳¥ ג€” ׳‘׳—׳¨ ׳—׳׳‘׳•׳ ׳¨׳–׳” + ׳™׳¨׳§׳•׳× + ׳›׳׳•׳× ׳׳“׳•׳“׳” ׳©׳ ׳₪׳—׳׳™׳׳•׳×. ׳׳ ׳׳”׳¨׳’׳™׳© ׳׳©׳.`],
+    [/אכלתי בחוץ|מסעדה|ארוחה חברתית/, () =>
+      `בחוץ — בחר חלבון רזה + ירקות + כמות מדודה של פחמימות. לא להרגיש אשם.`],
 
-    [/׳—׳×׳•׳ ׳”|׳׳™׳¨׳•׳¢|׳©׳‘׳×|׳—׳’/, () =>
-      `׳‘׳׳¨׳•׳—׳•׳× ׳—׳’׳™׳’׳™׳•׳× ג€” ׳×׳”׳ ׳”! ׳”׳×׳׳§׳“ ׳‘׳—׳׳‘׳•׳, ׳”׳’׳‘׳ ׳׳—׳ ׳•׳§׳™׳ ׳•׳—, ׳©׳×׳” ׳׳™׳ ׳‘׳™׳ ׳׳ ׳•׳×.`],
+    [/חתונה|אירוע|שבת|חג/, () =>
+      `בארוחות חגיגיות — תהנה! התמקד בחלבון, הגבל לחם וקינוח, שתה מים בין מנות.`],
 
-    [/׳©׳׳•׳|׳”׳™׳™|׳”׳™\b|׳‘׳•׳§׳¨ ׳˜׳•׳‘|׳¢׳¨׳‘ ׳˜׳•׳‘|׳׳” ׳©׳׳•׳/, () => {
+    [/שלום|היי|הי\b|בוקר טוב|ערב טוב|מה שלומ/, () => {
       const coach = _coachLine(rem, over, pct, t);
-      let msg = `${timeGreet} ${name}! נ˜ `;
-      if (pct.cal === 0) msg += `׳¢׳“׳™׳™׳ ׳׳ ׳¨׳©׳׳× ׳›׳׳•׳ ׳”׳™׳•׳ ג€” ׳‘׳•׳ ׳ ׳×׳—׳™׳!`;
+      let msg = `${timeGreet} ${name}! 😊 `;
+      if (pct.cal === 0) msg += `עדיין לא רשמת כלום היום — בוא נתחיל!`;
       else if (coach) msg += coach;
-      else msg += `׳׳×׳” ׳‘-${pct.cal}% ׳׳”׳™׳¢׳“ ׳”׳™׳•׳׳™. ׳׳™׳ ׳׳ ׳™ ׳™׳›׳•׳׳” ׳׳¢׳–׳•׳¨?`;
+      else msg += `אתה ב-${pct.cal}% מהיעד היומי. איך אני יכולה לעזור?`;
       return msg;
     }],
 
-    [/׳×׳•׳“׳”|׳×׳•׳“׳” ׳¨׳‘׳”/, () =>
-      `׳‘׳©׳׳—׳” ${name}! נ’ ׳׳ ׳™ ׳›׳׳ ׳׳ ׳×׳¦׳˜׳¨׳ ׳¢׳•׳“.`],
+    [/תודה|תודה רבה/, () =>
+      `בשמחה ${name}! 💚 אני כאן אם תצטרך עוד.`],
 
-    [/׳׳™׳ ׳׳ ׳™ ׳¡׳•׳’׳¨.*׳—׳׳‘׳•׳|׳׳” ׳׳•׳›׳.*׳׳¡׳’׳•׳¨|׳׳” ׳׳›׳•׳.*׳—׳׳‘׳•׳|׳׳” ׳¢׳•׳“.*׳—׳׳‘׳•׳/, () =>
+    [/איך אני סוגר.*חלבון|מה אוכל.*לסגור|מה אכול.*חלבון|מה עוד.*חלבון/, () =>
       rem.protein <= 0
-        ? `׳›׳‘׳¨ ׳¡׳’׳¨׳× ׳׳× ׳”׳—׳׳‘׳•׳! ג… ${Math.round(t.protein)}g ג€” ׳™׳•׳₪׳™!`
-        : `׳ ׳©׳׳¨ ${rem.protein}g ג€” ${_proteinFoodSuggest(rem.protein)}`],
+        ? `כבר סגרת את החלבון! ✅ ${Math.round(t.protein)}g — יופי!`
+        : `נשאר ${rem.protein}g — ${_proteinFoodSuggest(rem.protein)}`],
 
-    [/׳›׳׳” ׳¢׳•׳“.*׳—׳׳‘׳•׳|׳¢׳•׳“ ׳›׳׳”.*׳—׳׳‘׳•׳/, () =>
+    [/כמה עוד.*חלבון|עוד כמה.*חלבון/, () =>
       rem.protein <= 0
-        ? `׳¡׳™׳™׳׳× ׳׳× ׳”׳—׳׳‘׳•׳! ג… ׳›׳ ׳”׳›׳‘׳•׳“!`
-        : `׳ ׳©׳׳¨ ${rem.protein}g ׳—׳׳‘׳•׳ ג€” ${_proteinFoodSuggest(rem.protein)}`],
+        ? `סיימת את החלבון! ✅ כל הכבוד!`
+        : `נשאר ${rem.protein}g חלבון — ${_proteinFoodSuggest(rem.protein)}`],
 
-    [/׳¢׳׳“׳×׳™ ׳‘׳™׳¢׳“|׳”׳’׳¢׳×׳™ ׳׳™׳¢׳“/, () =>
+    [/עמדתי ביעד|הגעתי ליעד/, () =>
       rem.cal === 0
-        ? `׳›׳!! ׳¢׳׳“׳× ׳‘׳™׳¢׳“ ׳”׳™׳•׳! ננ‰ ${Math.round(t.cal)} ׳§׳׳³ ג€” ׳׳“׳”׳™׳ ׳׳×׳”!`
+        ? `כן!! עמדת ביעד היום! 🌟🎉 ${Math.round(t.cal)} קל׳ — מדהים אתה!`
         : over.cal > 0
-          ? `׳›׳׳¢׳˜ ג€” ׳¢׳‘׳¨׳× ׳‘-${over.cal} ׳§׳׳³ ׳‘׳׳‘׳“. ׳‘׳₪׳¢׳ ׳”׳‘׳׳” ׳×׳”׳™׳” ׳׳“׳•׳™׳§ נ¯`
-          : `׳¢׳•׳“ ׳׳ ג€” ׳ ׳©׳׳¨ ${rem.cal} ׳§׳׳³. ׳›׳׳¢׳˜ ׳©׳! נ’×`],
+          ? `כמעט — עברת ב-${over.cal} קל׳ בלבד. בפעם הבאה תהיה מדויק 🎯`
+          : `עוד לא — נשאר ${rem.cal} קל׳. כמעט שם! 💪`],
 
-    [/׳”׳׳ ׳׳ ׳™ ׳‘׳›׳™׳•׳•׳|׳׳ ׳™ ׳‘׳¡׳“׳¨.*׳×׳–׳•׳ ׳”|׳¢׳•׳©׳”.*׳˜׳•׳‘.*׳”׳™׳•׳/, () => {
+    [/האם אני בכיוון|אני בסדר.*תזונה|עושה.*טוב.*היום/, () => {
       const ok = pct.cal <= 105 && t.protein >= GOALS.protein * 0.7;
       const coach = _coachLine(rem, over, pct, t);
       let msg = ok
-        ? `׳›׳, ׳‘׳›׳™׳•׳•׳ ׳׳¦׳•׳™׳! ג… ${pct.cal}% ׳§׳׳•׳¨׳™׳•׳×, ${Math.round(t.protein)}g ׳—׳׳‘׳•׳.`
+        ? `כן, בכיוון מצוין! ✅ ${pct.cal}% קלוריות, ${Math.round(t.protein)}g חלבון.`
         : pct.cal > 105
-          ? `׳¢׳‘׳¨׳× ׳׳¢׳˜ (${pct.cal}%). ׳׳ ׳ ׳•׳¨׳ ג€” ׳׳—׳¨ ׳×׳₪׳¦׳” נ˜`
-          : `׳§׳׳•׳¨׳™׳•׳× ׳‘׳¡׳“׳¨, ׳—׳–׳§ ׳׳× ׳”׳—׳׳‘׳•׳ ג€” ׳¢׳•׳“ ${rem.protein}g.`;
+          ? `עברת מעט (${pct.cal}%). לא נורא — מחר תפצה 😊`
+          : `קלוריות בסדר, חזק את החלבון — עוד ${rem.protein}g.`;
       if (coach) msg += `\n${coach}`;
       return msg;
     }],
 
-    [/׳›׳\b|׳׳•׳§׳™|׳׳¢׳•׳׳”|׳׳׳©׳™׳›|׳‘׳¡׳“׳¨ ׳’׳׳•׳¨/, () =>
-      `׳׳¦׳•׳™׳! ${rem.cal > 0 ? `׳ ׳©׳׳¨ ׳׳ ${rem.cal} ׳§׳׳³ ׳׳”׳™׳•׳.` : `׳”׳’׳¢׳× ׳׳™׳¢׳“! נ‘`}`],
+    [/כן\b|אוקי|מעולה|ממשיכ|בסדר גמור/, () =>
+      `מצוין! ${rem.cal > 0 ? `נשאר לך ${rem.cal} קל׳ להיום.` : `הגעת ליעד! 👏`}`],
   ];
 
   for (const [re, fn] of Q) {
@@ -2385,15 +2305,15 @@ let _miriIntroShown = false;
 
 function getUserGender() {
   const d = _safeDietData();
-  return d.gender === '׳ ׳§׳‘׳”' ? '׳ ׳§׳‘׳”' : '׳–׳›׳¨';
+  return d.gender === 'נקבה' ? 'נקבה' : 'זכר';
 }
 
 function setMiriGenderUi() {
-  const isFemale = getUserGender() === '׳ ׳§׳‘׳”';
+  const isFemale = getUserGender() === 'נקבה';
   const sendBtn = document.querySelector('.miri-chat-send');
   const input = document.querySelector('.miri-chat-input');
-  if (sendBtn) sendBtn.textContent = isFemale ? '׳©׳׳—׳™' : '׳©׳׳—';
-  if (input) input.placeholder = isFemale ? '׳›׳×׳‘׳™ ׳”׳•׳“׳¢׳”ג€¦' : '׳›׳×׳•׳‘ ׳”׳•׳“׳¢׳”ג€¦';
+  if (sendBtn) sendBtn.textContent = isFemale ? 'שלחי' : 'שלח';
+  if (input) input.placeholder = isFemale ? 'כתבי הודעה…' : 'כתוב הודעה…';
 }
 
 function openMiriChat() {
@@ -2412,21 +2332,21 @@ function openMiriChat() {
 function showMiriIntro() {
   const msgs = document.getElementById('miri-chat-msgs');
   const name = ((_currentUser.fullName || '').trim().split(/\s+/)[0] || '');
-  const isFemale = getUserGender() === '׳ ׳§׳‘׳”';
+  const isFemale = getUserGender() === 'נקבה';
   const text = isFemale
-    ? `׳”׳™׳™, ${name}, ׳›׳׳ ׳׳™׳¨׳™ ׳”׳“׳™׳׳˜׳ ׳™׳×. ׳‘׳¨׳•׳›׳” ׳”׳‘׳׳” ׳׳׳₪׳׳™׳§׳¦׳™׳” ׳©׳׳™, ׳×׳•׳›׳׳™ ׳׳”׳×׳™׳™׳¢׳¥ ׳׳™׳×׳™ ׳׳×׳™ ׳©׳¨׳§ ׳×׳¨׳¦׳™.\n׳×׳•׳›׳׳™ ׳׳©׳׳•׳ ׳׳•׳×׳™ ׳©׳׳׳•׳× ׳›׳׳•: ׳׳” ׳”׳׳¦׳‘ ׳©׳׳™ ׳ ׳›׳•׳ ׳׳¢׳›׳©׳™׳•? ׳׳” ׳׳₪׳©׳¨ ׳׳׳›׳•׳? ׳׳” ׳—׳¡׳¨ ׳׳™? ׳׳” ׳׳× ׳׳׳׳™׳¦׳”? ׳•׳›׳• ׳•׳›׳•.\n׳ ׳¡׳™ ׳׳•׳×׳™ ׳¢׳›׳©׳™׳•`
-    : `׳”׳™׳™, ${name}, ׳›׳׳ ׳׳™׳¨׳™ ׳”׳“׳™׳׳˜׳ ׳™׳×. ׳‘׳¨׳•׳›׳™׳ ׳”׳‘׳׳™׳ ׳׳׳₪׳׳™׳§׳¦׳™׳” ׳©׳׳™, ׳×׳•׳›׳ ׳׳”׳×׳™׳™׳¢׳¥ ׳׳™׳×׳™ ׳׳×׳™ ׳©׳¨׳§ ׳×׳¨׳¦׳”.\n׳×׳•׳›׳ ׳׳©׳׳•׳ ׳׳•׳×׳™ ׳©׳׳׳•׳× ׳›׳׳•: ׳׳” ׳”׳׳¦׳‘ ׳©׳׳™ ׳ ׳›׳•׳ ׳׳¢׳›׳©׳™׳•? ׳׳” ׳׳₪׳©׳¨ ׳׳׳›׳•׳? ׳׳” ׳—׳¡׳¨ ׳׳™? ׳׳” ׳׳× ׳׳׳׳™׳¦׳”? ׳•׳›׳• ׳•׳›׳•.\n׳ ׳¡׳” ׳׳•׳×׳™ ׳¢׳›׳©׳™׳•`;
+    ? `היי, ${name}, כאן מירי הדיאטנית. ברוכה הבאה לאפליקציה שלי, תוכלי להתייעץ איתי מתי שרק תרצי.\nתוכלי לשאול אותי שאלות כמו: מה המצב שלי נכון לעכשיו? מה אפשר לאכול? מה חסר לי? מה את ממליצה? וכו וכו.\nנסי אותי עכשיו`
+    : `היי, ${name}, כאן מירי הדיאטנית. ברוכים הבאים לאפליקציה שלי, תוכל להתייעץ איתי מתי שרק תרצה.\nתוכל לשאול אותי שאלות כמו: מה המצב שלי נכון לעכשיו? מה אפשר לאכול? מה חסר לי? מה את ממליצה? וכו וכו.\nנסה אותי עכשיו`;
   const typingDiv = document.createElement('div');
   typingDiv.className = 'miri-msg miri-msg-bot';
-  typingDiv.innerHTML = '<div class="miri-msg-bot-inner"><span class="miri-msg-name-row"><img class="miri-msg-avatar" src="images/miri-fab.webp"><span class="miri-msg-label">׳׳™׳¨׳™:</span></span><span class="miri-dots"><span>.</span><span>.</span><span>.</span></span></div>';
+  typingDiv.innerHTML = '<div class="miri-msg-bot-inner"><span class="miri-msg-name-row"><img class="miri-msg-avatar" src="images/miri-fab.webp"><span class="miri-msg-label">מירי:</span></span><span class="miri-dots"><span>.</span><span>.</span><span>.</span></span></div>';
   msgs.appendChild(typingDiv);
   msgs.scrollTop = msgs.scrollHeight;
   setTimeout(() => {
-    typingDiv.innerHTML = `<div class="miri-msg-bot-inner"><span class="miri-msg-name-row"><img class="miri-msg-avatar" src="images/miri-fab.webp"><span class="miri-msg-label">׳׳™׳¨׳™:</span></span><span class="miri-msg-text"></span><div class="miri-quick-actions">
-      <button class="miri-quick-btn" onclick="miriSend('׳׳” ׳”׳׳¦׳‘ ׳©׳׳™ ׳ ׳›׳•׳ ׳׳¢׳›׳©׳™׳•?')">׳׳” ׳”׳׳¦׳‘ ׳©׳׳™?</button>
-      <button class="miri-quick-btn" onclick="miriSend('׳׳” ׳׳₪׳©׳¨ ׳׳׳›׳•׳?')">׳׳” ׳׳₪׳©׳¨ ׳׳׳›׳•׳?</button>
-      <button class="miri-quick-btn" onclick="miriSend('׳׳” ׳—׳¡׳¨ ׳׳™?')">׳׳” ׳—׳¡׳¨ ׳׳™?</button>
-      <button class="miri-quick-btn" onclick="miriSend('׳׳” ׳׳× ׳׳׳׳™׳¦׳”?')">׳׳” ׳׳× ׳׳׳׳™׳¦׳”?</button>
+    typingDiv.innerHTML = `<div class="miri-msg-bot-inner"><span class="miri-msg-name-row"><img class="miri-msg-avatar" src="images/miri-fab.webp"><span class="miri-msg-label">מירי:</span></span><span class="miri-msg-text"></span><div class="miri-quick-actions">
+      <button class="miri-quick-btn" onclick="miriSend('מה המצב שלי נכון לעכשיו?')">מה המצב שלי?</button>
+      <button class="miri-quick-btn" onclick="miriSend('מה אפשר לאכול?')">מה אפשר לאכול?</button>
+      <button class="miri-quick-btn" onclick="miriSend('מה חסר לי?')">מה חסר לי?</button>
+      <button class="miri-quick-btn" onclick="miriSend('מה את ממליצה?')">מה את ממליצה?</button>
     </div></div>`;
     typingDiv.querySelector('.miri-msg-text').textContent = text;
     msgs.scrollTop = msgs.scrollHeight;
@@ -2445,7 +2365,7 @@ function miriSend(forcedText) {
 
   const userDiv = document.createElement('div');
   userDiv.className = 'miri-msg miri-msg-user';
-  userDiv.innerHTML = `<span class="miri-msg-label">${getUserGender() === '׳ ׳§׳‘׳”' ? '׳׳×:' : '׳׳×׳”:'}</span><span class="miri-msg-text"></span>`;
+  userDiv.innerHTML = `<span class="miri-msg-label">${getUserGender() === 'נקבה' ? 'את:' : 'אתה:'}</span><span class="miri-msg-text"></span>`;
   userDiv.querySelector('.miri-msg-text').textContent = text;
   msgs.appendChild(userDiv);
 
@@ -2455,14 +2375,14 @@ function miriSend(forcedText) {
 
   const typingDiv = document.createElement('div');
   typingDiv.className = 'miri-msg miri-msg-bot';
-  typingDiv.innerHTML = '<div class="miri-msg-bot-inner"><span class="miri-msg-name-row"><img class="miri-msg-avatar" src="images/miri-fab.webp"><span class="miri-msg-label">׳׳™׳¨׳™:</span></span><span class="miri-dots"><span>.</span><span>.</span><span>.</span></span></div>';
+  typingDiv.innerHTML = '<div class="miri-msg-bot-inner"><span class="miri-msg-name-row"><img class="miri-msg-avatar" src="images/miri-fab.webp"><span class="miri-msg-label">מירי:</span></span><span class="miri-dots"><span>.</span><span>.</span><span>.</span></span></div>';
   msgs.appendChild(typingDiv);
 
   msgs.scrollTop = msgs.scrollHeight;
   if (!forcedText) input.value = '';
 
-  const isRejection = /׳׳ ׳‘׳ ׳׳™|׳׳ ׳¨׳•׳¦׳”|׳׳ ׳׳•׳”׳‘|׳׳™׳ ׳׳™|׳×׳—׳׳™׳£|׳‘׳׳™/.test(text);
-  const isRecommendRequest = /׳”׳׳׳¦|׳׳” ׳׳׳›׳•׳|׳׳” ׳›׳“׳׳™|׳×׳׳׳™׳¦|׳׳” ׳׳₪׳©׳¨|׳×׳¦׳™׳¢׳™|׳×׳¦׳™׳¢|׳׳” ׳¢׳•׳“/.test(text);
+  const isRejection = /לא בא לי|לא רוצה|לא אוהב|אין לי|תחליף|בלי/.test(text);
+  const isRecommendRequest = /המלצ|מה לאכול|מה כדאי|תמליצ|מה אפשר|תציעי|תציע|מה עוד/.test(text);
 
   let replyText;
   if (isRejection && _lastRecommendedFoods.length > 0) {
@@ -2492,11 +2412,11 @@ function miriSend(forcedText) {
           fat: Math.max(0, Math.round(_t.fat - GOALS.fat)),
         };
         const _pct = { cal: Math.round(_t.cal / GOALS.cal * 100), protein: Math.round(_t.protein / GOALS.protein * 100) };
-        let reply = `׳”׳ ׳” ׳”׳¡׳™׳›׳•׳ ׳©׳׳ ${_currentUser.fullName.split(' ')[0]} נ“\n`;
-        reply += `ג€¢ ׳§׳׳•׳¨׳™׳•׳×: ${Math.round(_t.cal)} / ${GOALS.cal} ׳§׳׳³\n`;
-        reply += `ג€¢ ׳—׳׳‘׳•׳: ${Math.round(_t.protein)}g / ${GOALS.protein}g\n`;
-        reply += `ג€¢ ׳₪׳—׳׳™׳׳•׳×: ${Math.round(_t.carbs)}g / ${GOALS.carbs}g\n`;
-        reply += `ג€¢ ׳©׳•׳׳: ${Math.round(_t.fat)}g / ${GOALS.fat}g`;
+        let reply = `הנה הסיכום שלך ${_currentUser.fullName.split(' ')[0]} 📊\n`;
+        reply += `• קלוריות: ${Math.round(_t.cal)} / ${GOALS.cal} קל׳\n`;
+        reply += `• חלבון: ${Math.round(_t.protein)}g / ${GOALS.protein}g\n`;
+        reply += `• פחמימות: ${Math.round(_t.carbs)}g / ${GOALS.carbs}g\n`;
+        reply += `• שומן: ${Math.round(_t.fat)}g / ${GOALS.fat}g`;
         const coach = _coachLine(_rem, _over, _pct, _t);
         if (coach) reply += `\n\n${coach}`;
         replyText = reply;
@@ -2505,7 +2425,7 @@ function miriSend(forcedText) {
   }
 
   setTimeout(() => {
-    typingDiv.innerHTML = '<div class="miri-msg-bot-inner"><span class="miri-msg-name-row"><img class="miri-msg-avatar" src="images/miri-fab.webp"><span class="miri-msg-label">׳׳™׳¨׳™:</span></span><span class="miri-msg-text"></span></div>';
+    typingDiv.innerHTML = '<div class="miri-msg-bot-inner"><span class="miri-msg-name-row"><img class="miri-msg-avatar" src="images/miri-fab.webp"><span class="miri-msg-label">מירי:</span></span><span class="miri-msg-text"></span></div>';
     typingDiv.querySelector('.miri-msg-text').textContent = replyText;
     msgs.scrollTop = msgs.scrollHeight;
   }, 3000);
@@ -2529,9 +2449,9 @@ function bindPressEffect(selector, cls) {
 bindPressEffect('.bn-tab', 'nav-press');
 bindPressEffect('.profile-row', 'row-press');
 
-/* ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€
-   ONBOARDING ג€” GOAL SELECTION
-   ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ */
+/* ─────────────────────────────────────────────────────────
+   ONBOARDING — GOAL SELECTION
+   ─────────────────────────────────────────────────────── */
 function selectGoal(goal) {
   const d = JSON.parse(localStorage.getItem(_DIET_KEY) || '{}');
   d.goal = goal;
@@ -2547,9 +2467,9 @@ function showWeeklyGoalStep() {
     step.id = 'weekly-goal-step';
     step.className = 'onb-step';
     step.innerHTML = `
-      <div class="onb-q">׳׳” ׳”׳™׳¢׳“ ׳”׳©׳‘׳•׳¢׳™ ׳©׳׳?</div>
-      <input type="number" id="weekly-goal-input" min="0.1" max="2" step="0.1" placeholder="׳§׳´׳’ ׳‘׳©׳‘׳•׳¢">
-      <button class="onb-btn" onclick="submitWeeklyGoal()">׳”׳׳©׳</button>`;
+      <div class="onb-q">מה היעד השבועי שלך?</div>
+      <input type="number" id="weekly-goal-input" min="0.1" max="2" step="0.1" placeholder="ק״ג בשבוע">
+      <button class="onb-btn" onclick="submitWeeklyGoal()">המשך</button>`;
     document.body.appendChild(step);
   }
   step.style.display = '';
@@ -2569,9 +2489,9 @@ function saveMealTimes(selected) {
   localStorage.setItem('mealTimes', JSON.stringify(times));
 }
 
-/* ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€
+/* ─────────────────────────────────────────────────────────
    FOOD PREFERENCES
-   ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ */
+   ─────────────────────────────────────────────────────── */
 function saveFoodPreferences(selected) {
   const d = JSON.parse(localStorage.getItem('foodPreferences') || '{}');
   d.selected = Array.isArray(selected) ? selected : [];
@@ -2582,7 +2502,7 @@ function saveFoodPreferences(selected) {
 function submitFoodFreeText() {
   const inp = document.getElementById('food-pref-text');
   if (!inp) return;
-  const items = inp.value.split(/[,״\n״]+/).map(s => s.trim()).filter(Boolean);
+  const items = inp.value.split(/[,،\n،]+/).map(s => s.trim()).filter(Boolean);
   const d = JSON.parse(localStorage.getItem('foodPreferences') || '{}');
   d.freeText = items;
   d.all = [...(d.selected || []), ...items];
@@ -2599,69 +2519,109 @@ function showFoodFreeTextPrompt() {
     box.id = 'food-pref-box';
     box.style.cssText = 'background:#fff;border-radius:14px;padding:14px;margin:10px 0;box-shadow:0 2px 10px rgba(0,0,0,.1);direction:rtl';
     box.innerHTML = `
-      <div style="font-weight:700;margin-bottom:8px">׳™׳© ׳¢׳•׳“ ׳“׳‘׳¨׳™׳ ׳©׳׳×׳” ׳׳•׳”׳‘?</div>
-      <textarea id="food-pref-text" rows="2" placeholder="׳׳“׳•׳’׳׳”: ׳×׳₪׳•׳—, ׳’׳‘׳™׳ ׳”, ׳׳•׳¨׳–" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px;font-size:1rem;font-family:inherit;box-sizing:border-box;resize:none"></textarea>
-      <button onclick="submitFoodFreeText()" style="margin-top:8px;padding:8px 18px;background:#4caf50;color:#fff;border:none;border-radius:8px;font-size:.95rem;cursor:pointer;font-family:inherit;font-weight:600">׳©׳׳•׳¨</button>`;
+      <div style="font-weight:700;margin-bottom:8px">יש עוד דברים שאתה אוהב?</div>
+      <textarea id="food-pref-text" rows="2" placeholder="לדוגמה: תפוח, גבינה, אורז" style="width:100%;border:1.5px solid #e0e0e0;border-radius:8px;padding:8px;font-size:1rem;font-family:inherit;box-sizing:border-box;resize:none"></textarea>
+      <button onclick="submitFoodFreeText()" style="margin-top:8px;padding:8px 18px;background:#4caf50;color:#fff;border:none;border-radius:8px;font-size:.95rem;cursor:pointer;font-family:inherit;font-weight:600">שמור</button>`;
     document.body.appendChild(box);
   }
   box.style.display = '';
 }
 
-/* ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€
+/* ─────────────────────────────────────────────────────────
    DAILY MENUS GENERATOR
-   ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ */
+   ─────────────────────────────────────────────────────── */
 function generateDailyMenus() {
-  const mealLabel = { breakfast:'׳׳¨׳•׳—׳× ׳‘׳•׳§׳¨', lunch:'׳׳¨׳•׳—׳× ׳¦׳”׳¨׳™׳™׳', snack:'׳׳¨׳•׳—׳× ׳‘׳™׳ ׳™׳™׳', dinner:'׳׳¨׳•׳—׳× ׳¢׳¨׳‘', night:'׳׳¨׳•׳—׳× ׳׳™׳׳”' };
-  const shares = { breakfast:.24, lunch:.34, snack:.12, dinner:.22, night:.08 };
-  const templates = [
-    {
-      breakfast:{ protein:'׳‘׳™׳¦׳” ׳§׳©׳”', carb:'׳׳—׳ ׳—׳™׳˜׳”', fat:'׳׳‘׳•׳§׳“׳•', extras:['׳¢׳’׳‘׳ ׳™׳™׳”','׳׳׳₪׳₪׳•׳'] },
-      lunch:{ protein:'׳—׳–׳” ׳¢׳•׳£', carb:'׳׳•׳¨׳– ׳‘׳¡׳׳˜׳™', fat:'׳׳‘׳•׳§׳“׳•', extras:['׳¡׳׳˜ ׳¢׳’׳‘׳ ׳™׳•׳× ׳•׳׳׳₪׳₪׳•׳ ׳™׳'] },
-      snack:{ protein:'׳™׳•׳’׳•׳¨׳˜', carb:'׳‘׳ ׳ ׳”', fat:'׳—׳•׳׳•׳¡ ׳׳׳¨׳—', extras:[] },
-      dinner:{ protein:'׳˜׳•׳ ׳” ׳‘׳׳™׳', carb:'׳₪׳™׳×׳” ׳׳׳׳”', fat:'׳׳‘׳•׳§׳“׳•', extras:['׳׳׳₪׳₪׳•׳','׳¢׳’׳‘׳ ׳™׳™׳”'] },
-      night:{ protein:'׳™׳•׳’׳•׳¨׳˜', carb:'׳׳—׳ ׳₪׳¨׳™׳', fat:'׳’׳‘׳™׳ ׳” ׳׳‘׳ ׳”', extras:[] }
-    },
-    {
-      breakfast:{ protein:'׳˜׳•׳ ׳” ׳‘׳׳™׳', carb:'׳₪׳™׳×׳”', fat:'׳—׳•׳׳•׳¡ ׳׳׳¨׳—', extras:['׳¢׳’׳‘׳ ׳™׳™׳”','׳׳׳₪׳₪׳•׳'] },
-      lunch:{ protein:'׳©׳ ׳™׳¦׳', carb:'׳₪׳×׳™׳×׳™׳', fat:'׳׳‘׳•׳§׳“׳•', extras:['׳¡׳׳˜ ׳¢׳’׳‘׳ ׳™׳•׳× ׳•׳׳׳₪׳₪׳•׳ ׳™׳'] },
-      snack:{ protein:'׳™׳•׳’׳•׳¨׳˜ ׳¢׳ ׳₪׳™׳¨׳•׳×', carb:'׳×׳₪׳•׳—', fat:'׳—׳•׳׳•׳¡ ׳׳׳¨׳—', extras:[] },
-      dinner:{ protein:'׳§׳•׳˜׳’', carb:'׳׳—׳ ׳©׳™׳₪׳•׳', fat:'׳׳‘׳•׳§׳“׳•', extras:['׳׳׳₪׳₪׳•׳','׳¢׳’׳‘׳ ׳™׳™׳”'] },
-      night:{ protein:'׳’׳‘׳™׳ ׳” ׳׳‘׳ ׳”', carb:'׳׳—׳ ׳₪׳¨׳™׳', fat:'׳׳‘׳•׳§׳“׳•', extras:[] }
-    },
-    {
-      breakfast:{ protein:'׳—׳‘׳™׳×׳” ׳׳׳׳”', carb:'׳׳—׳', fat:'׳׳‘׳•׳§׳“׳•', extras:['׳¢׳’׳‘׳ ׳™׳™׳”','׳׳׳₪׳₪׳•׳'] },
-      lunch:{ protein:'׳§׳‘׳‘', carb:'׳§׳•׳¡׳§׳•׳¡', fat:'׳׳‘׳•׳§׳“׳•', extras:['׳¡׳׳˜ ׳¢׳’׳‘׳ ׳™׳•׳× ׳•׳׳׳₪׳₪׳•׳ ׳™׳'] },
-      snack:{ protein:'׳™׳•׳’׳•׳¨׳˜', carb:'׳׳₪׳¨׳¡׳§', fat:'׳—׳•׳׳•׳¡ ׳׳׳¨׳—', extras:[] },
-      dinner:{ protein:'׳‘׳™׳¦׳” ׳§׳©׳”', carb:'׳₪׳™׳×׳” ׳׳׳׳”', fat:'׳’׳‘׳™׳ ׳” ׳׳‘׳ ׳”', extras:['׳׳׳₪׳₪׳•׳','׳¢׳’׳‘׳ ׳™׳™׳”'] },
-      night:{ protein:'׳§׳•׳˜׳’', carb:'׳׳—׳ ׳₪׳¨׳™׳', fat:'׳׳‘׳•׳§׳“׳•', extras:[] }
-    }
-  ];
-  const find = name => DB.find(f => f.n && f.n.some(n => n === name || n.includes(name) || name.includes(n)));
-  const calc = (food, grams) => {
-    const r = grams / 100;
-    return { name: food.n[0], grams: Math.max(5, Math.round(grams)), cal: Math.round(food.cal * r), protein: round1(food.p * r), carbs: round1(food.c * r), fat: round1(food.f * r) };
+  const mealTimes = ['breakfast','lunch','snack','dinner','night'];
+  const prefData  = (() => { try { return JSON.parse(localStorage.getItem('foodPreferences') || '{}'); } catch { return {}; } })();
+  const prefs = (prefData.all || []).map(s => s.toLowerCase());
+
+  const calShareBase = { breakfast:0.25, lunch:0.40, snack:0.10, dinner:0.30, night:0.05 };
+  const mealLabel = { breakfast:'ארוחת בוקר', lunch:'ארוחת צהריים', snack:'ארוחת ביניים', dinner:'ארוחת ערב', night:'ארוחת לילה' };
+
+  const totalShare = mealTimes.reduce((s, t) => s + (calShareBase[t] || 0.2), 0);
+  const calShare = {};
+  mealTimes.forEach(t => { calShare[t] = (calShareBase[t] || 0.2) / totalShare; });
+
+  function macroRole(f) {
+    const cal = f.cal || 1;
+    const cat = (f.cat || '').toLowerCase();
+    if (/ירק/.test(cat)) return 'vegetable';
+    if ((f.p * 4) / cal >= 0.30) return 'protein';
+    if ((f.c * 4) / cal >= 0.50) return 'carbs';
+    if ((f.f * 9) / cal >= 0.40) return 'fat';
+    return 'other';
+  }
+
+  function isPreferred(f) {
+    const name = (f.n[0] || '').toLowerCase();
+    return prefs.some(p => name.includes(p) || p.includes(name));
+  }
+
+  function sortedByPref(foods) {
+    return [...foods].sort((a, b) => (isPreferred(b) ? 1 : 0) - (isPreferred(a) ? 1 : 0));
+  }
+
+  const proteins = sortedByPref(DB.filter(f => macroRole(f) === 'protein' && f.cal > 0));
+  const carbs    = sortedByPref(DB.filter(f => macroRole(f) === 'carbs'   && f.cal > 0));
+  const fats     = sortedByPref(DB.filter(f => macroRole(f) === 'fat'     && f.cal > 0));
+  const mealProteinHints = {
+    breakfast: ['גבינה','קוטג','טונה','ביצה','חביתה','מקושקשת','יוגורט'],
+    lunch: ['עוף','חזה עוף','בשר','קציצה','קבב','הודו','דג'],
+    snack: ['יוגורט','גבינה','קוטג','טונה','ביצה'],
+    dinner: ['ביצה','חביתה','טונה','גבינה','קוטג','יוגורט'],
+    night: ['יוגורט','גבינה','קוטג','ביצה']
   };
-  const sum = items => items.reduce((s, it) => ({ cal:s.cal+it.cal, protein:s.protein+it.protein, carbs:s.carbs+it.carbs, fat:s.fat+it.fat }), { cal:0, protein:0, carbs:0, fat:0 });
-  return templates.map((tpl, idx) => {
+  function mealFoods(list, type) {
+    const hints = mealProteinHints[type] || [];
+    const filtered = list.filter(f => hints.some(h => (f.n || []).some(n => n.includes(h))));
+    return filtered.length ? filtered : list;
+  }
+
+  const menus = [];
+  for (let m = 0; m < 3; m++) {
+    let pi = m, ci = m, fi = m;
     const meals = [];
-    for (const type of ['breakfast','lunch','snack','dinner','night']) {
-      const targetP = GOALS.protein * shares[type];
-      const targetC = GOALS.carbs * shares[type];
-      const targetF = GOALS.fat * shares[type];
-      const plan = tpl[type];
+    let menuTotCal = 0, menuTotProt = 0, menuTotCarbs = 0, menuTotFat = 0;
+    for (const type of mealTimes) {
+      const share = calShare[type];
+      const protTarget = Math.round(GOALS.protein * share);
+      const carbTarget = Math.round(GOALS.carbs   * share);
+      const fatTarget  = Math.round(GOALS.fat     * share);
+
+      const mealProteins = mealFoods(proteins, type);
+      const pf = mealProteins[pi % mealProteins.length];
+      const cf = carbs[ci % carbs.length];
+      const ff = fats[fi % fats.length];
+      pi++; ci++; fi++;
+
       const items = [];
-      (plan.extras || []).forEach(x => { const f = find(x); if (f) items.push(calc(f, x.includes('׳¡׳׳˜') ? 100 : 80)); });
-      const pf = find(plan.protein), cf = find(plan.carb), ff = find(plan.fat);
-      let current = sum(items);
-      if (pf && pf.p > 0) items.push(calc(pf, Math.min(260, Math.max(40, (Math.max(3, targetP - current.protein) * 100) / pf.p))));
-      current = sum(items);
-      if (cf && cf.c > 0) items.push(calc(cf, Math.min(320, Math.max(20, (Math.max(4, targetC - current.carbs) * 100) / cf.c))));
-      current = sum(items);
-      if (ff && ff.f > 0) items.push(calc(ff, Math.min(120, Math.max(10, (Math.max(2, targetF - current.fat) * 100) / ff.f))));
-      meals.push({ type, label: mealLabel[type], items });
+      if (pf && pf.p > 0) {
+        const grams = Math.max(30, Math.min(250, Math.round(protTarget * 100 / pf.p)));
+        const r = grams / 100;
+        items.push({ name: pf.n[0], grams, cal: Math.round(pf.cal * r), protein: Math.round(pf.p * r), carbs: Math.round(pf.c * r), fat: Math.round(pf.f * r) });
+      }
+      if (cf && cf.c > 0) {
+        const grams = Math.max(30, Math.min(300, Math.round(carbTarget * 100 / cf.c)));
+        const r = grams / 100;
+        items.push({ name: cf.n[0], grams, cal: Math.round(cf.cal * r), protein: Math.round(cf.p * r), carbs: Math.round(cf.c * r), fat: Math.round(cf.f * r) });
+      }
+      if (ff && ff.f > 0) {
+        const grams = Math.max(10, Math.min(100, Math.round(fatTarget * 100 / ff.f)));
+        const r = grams / 100;
+        items.push({ name: ff.n[0], grams, cal: Math.round(ff.cal * r), protein: Math.round(ff.p * r), carbs: Math.round(ff.c * r), fat: Math.round(ff.f * r) });
+      }
+
+      const mealCal   = items.reduce((s, it) => s + it.cal,     0);
+      const mealProt  = items.reduce((s, it) => s + it.protein,  0);
+      const mealCarbs = items.reduce((s, it) => s + it.carbs,    0);
+      const mealFat   = items.reduce((s, it) => s + it.fat,      0);
+      menuTotCal += mealCal; menuTotProt += mealProt; menuTotCarbs += mealCarbs; menuTotFat += mealFat;
+
+      meals.push({ type, label: mealLabel[type] || type, items });
     }
-    return { index: idx + 1, meals, total: { cal: Math.round(GOALS.cal), protein: round1(GOALS.protein), carbs: round1(GOALS.carbs), fat: round1(GOALS.fat) } };
-  });
+    menus.push({ index: m + 1, meals, total: { cal: menuTotCal, protein: menuTotProt, carbs: menuTotCarbs, fat: menuTotFat } });
+  }
+  return menus;
 }
 
 let _currentMenuData = null;
@@ -2683,10 +2643,10 @@ function showMenuPage(idx) {
     const mealFat   = meal.items.reduce((s, it) => s + it.fat,      0);
     return `<div class="menu-meal">
       <div class="menu-meal-label">${escHtml(meal.label)}</div>
-      ${meal.items.map(it => `<div class="menu-meal-item">ג€¢ ${escHtml(it.name)} - ${it.grams}g (${it.cal} ׳§׳׳³, ׳—׳׳‘׳•׳ ${it.protein}g, ׳₪׳—׳׳³ ${it.carbs}g, ׳©׳•׳׳ ${it.fat}g)</div>`).join('')}
-      <div class="menu-meal-total">׳¡׳”׳´׳›: ${mealCal} ׳§׳׳³ | ׳—׳׳‘׳•׳ ${mealProt}g | ׳₪׳—׳׳³ ${mealCarbs}g | ׳©׳•׳׳ ${mealFat}g</div>
+      ${meal.items.map(it => `<div class="menu-meal-item">• ${escHtml(it.name)} - ${it.grams}g (${it.cal} קל׳, חלבון ${it.protein}g, פחמ׳ ${it.carbs}g, שומן ${it.fat}g)</div>`).join('')}
+      <div class="menu-meal-total">סה״כ: ${mealCal} קל׳ | חלבון ${mealProt}g | פחמ׳ ${mealCarbs}g | שומן ${mealFat}g</div>
     </div>`;
-  }).join('') + (menu.total ? `<div class="menu-meal menu-day-total"><div class="menu-meal-label">׳¡׳”׳´׳› ׳™׳•׳׳™</div><div class="menu-meal-total">${menu.total.cal} ׳§׳׳³ | ׳—׳׳‘׳•׳ ${menu.total.protein}g | ׳₪׳—׳׳³ ${menu.total.carbs}g | ׳©׳•׳׳ ${menu.total.fat}g</div></div>` : '');
+  }).join('') + (menu.total ? `<div class="menu-meal menu-day-total"><div class="menu-meal-label">סה״כ יומי</div><div class="menu-meal-total">${menu.total.cal} קל׳ | חלבון ${menu.total.protein}g | פחמ׳ ${menu.total.carbs}g | שומן ${menu.total.fat}g</div></div>` : '');
 }
 
 function openMenuModal(idx) {
@@ -2694,7 +2654,7 @@ function openMenuModal(idx) {
   const menu = menus[idx];
   if (!menu) return;
   _currentMenuData = menu;
-  document.getElementById('menu-modal-title').textContent = '׳×׳₪׳¨׳™׳˜ ' + menu.index;
+  document.getElementById('menu-modal-title').textContent = 'תפריט ' + menu.index;
   const body = document.getElementById('menu-modal-body');
   body.innerHTML = menu.meals.map(meal => {
     const mealCal   = meal.items.reduce((s, it) => s + it.cal,     0);
@@ -2703,10 +2663,10 @@ function openMenuModal(idx) {
     const mealFat   = meal.items.reduce((s, it) => s + it.fat,      0);
     return `<div class="menu-meal">
       <div class="menu-meal-label">${escHtml(meal.label)}</div>
-      ${meal.items.map(it => `<div class="menu-meal-item">ג€¢ ${escHtml(it.name)} ג€” ${it.grams}g (${it.cal} ׳§׳׳³, ׳—׳׳‘׳•׳ ${it.protein}g, ׳₪׳—׳׳³ ${it.carbs}g, ׳©׳•׳׳ ${it.fat}g)</div>`).join('')}
-      <div class="menu-meal-total">׳¡׳”"׳›: ${mealCal} ׳§׳׳³ | ׳—׳׳‘׳•׳ ${mealProt}g | ׳₪׳—׳׳³ ${mealCarbs}g | ׳©׳•׳׳ ${mealFat}g</div>
+      ${meal.items.map(it => `<div class="menu-meal-item">• ${escHtml(it.name)} — ${it.grams}g (${it.cal} קל׳, חלבון ${it.protein}g, פחמ׳ ${it.carbs}g, שומן ${it.fat}g)</div>`).join('')}
+      <div class="menu-meal-total">סה"כ: ${mealCal} קל׳ | חלבון ${mealProt}g | פחמ׳ ${mealCarbs}g | שומן ${mealFat}g</div>
     </div>`;
-  }).join('') + (menu.total ? `<div class="menu-meal" style="background:#f0f0ff"><div class="menu-meal-label">׳¡׳”׳´׳› ׳™׳•׳׳™</div><div class="menu-meal-total">${menu.total.cal} ׳§׳׳³ | ׳—׳׳‘׳•׳ ${menu.total.protein}g | ׳₪׳—׳׳³ ${menu.total.carbs}g | ׳©׳•׳׳ ${menu.total.fat}g</div></div>` : '');
+  }).join('') + (menu.total ? `<div class="menu-meal" style="background:#f0f0ff"><div class="menu-meal-label">סה״כ יומי</div><div class="menu-meal-total">${menu.total.cal} קל׳ | חלבון ${menu.total.protein}g | פחמ׳ ${menu.total.carbs}g | שומן ${menu.total.fat}g</div></div>` : '');
   document.getElementById('menu-modal-overlay').hidden = false;
 }
 
@@ -2717,7 +2677,7 @@ function closeMenuModal() {
 function downloadMenuPDF() {
   if (!_currentMenuData) return;
   const menu = _currentMenuData;
-  const html = `<!DOCTYPE html><html dir="rtl" lang="he"><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;direction:rtl;padding:24px;color:#333}.pdf-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}.pdf-head img{width:54px;height:54px;border-radius:50%;object-fit:cover}h2{color:#4a9b7f;margin:0;font-size:1.35rem}.meal{margin-bottom:12px;border:1px solid #ddd;border-radius:10px;padding:10px 14px;box-shadow:0 12px 18px -16px rgba(0,0,0,.35)}.meal-lbl{font-weight:700;color:#4a9b7f;margin-bottom:6px;font-size:.95rem}.meal-item{font-size:.88rem;color:#333;padding:3px 0;border-bottom:1px solid #f0f0f0}.meal-item:last-child{border:none}.meal-total{font-size:.78rem;color:#777;margin-top:6px;padding-top:4px;border-top:1px solid #f0f0f0}.footer{font-size:.78rem;color:#aaa;text-align:center;margin-top:16px}</style></head><body><div class="pdf-head"><img src="images/miri-fab.webp"><h2>׳×׳₪׳¨׳™׳˜ ׳׳¡ ${menu.index}</h2></div>${menu.meals.map(meal=>{const t=meal.items.reduce((s,it)=>s+it.cal,0);return`<div class="meal"><div class="meal-lbl">${meal.label}</div>${meal.items.map(it=>`<div class="meal-item">ג€¢ ${it.name} ג€” ${it.grams}g (${it.cal} ׳§׳׳³, ׳—׳׳‘׳•׳ ${it.protein}g, ׳₪׳—׳׳³ ${it.carbs}g, ׳©׳•׳׳ ${it.fat}g)</div>`).join('')}<div class="meal-total">׳¡׳”"׳›: ${t} ׳§׳׳³</div></div>`}).join('')}<div class="footer">׳™׳¢׳“ ׳™׳•׳׳™: ${GOALS.cal} ׳§׳׳³ | ׳—׳׳‘׳•׳ ${GOALS.protein}g | ׳₪׳—׳׳³ ${GOALS.carbs}g | ׳©׳•׳׳ ${GOALS.fat}g</div></body></html>`;
+  const html = `<!DOCTYPE html><html dir="rtl" lang="he"><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;direction:rtl;padding:24px;color:#333}.pdf-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}.pdf-head img{width:54px;height:54px;border-radius:50%;object-fit:cover}h2{color:#4a9b7f;margin:0;font-size:1.35rem}.meal{margin-bottom:12px;border:1px solid #ddd;border-radius:10px;padding:10px 14px;box-shadow:0 12px 18px -16px rgba(0,0,0,.35)}.meal-lbl{font-weight:700;color:#4a9b7f;margin-bottom:6px;font-size:.95rem}.meal-item{font-size:.88rem;color:#333;padding:3px 0;border-bottom:1px solid #f0f0f0}.meal-item:last-child{border:none}.meal-total{font-size:.78rem;color:#777;margin-top:6px;padding-top:4px;border-top:1px solid #f0f0f0}.footer{font-size:.78rem;color:#aaa;text-align:center;margin-top:16px}</style></head><body><div class="pdf-head"><img src="images/miri-fab.webp"><h2>תפריט מס ${menu.index}</h2></div>${menu.meals.map(meal=>{const t=meal.items.reduce((s,it)=>s+it.cal,0);return`<div class="meal"><div class="meal-lbl">${meal.label}</div>${meal.items.map(it=>`<div class="meal-item">• ${it.name} — ${it.grams}g (${it.cal} קל׳, חלבון ${it.protein}g, פחמ׳ ${it.carbs}g, שומן ${it.fat}g)</div>`).join('')}<div class="meal-total">סה"כ: ${t} קל׳</div></div>`}).join('')}<div class="footer">יעד יומי: ${GOALS.cal} קל׳ | חלבון ${GOALS.protein}g | פחמ׳ ${GOALS.carbs}g | שומן ${GOALS.fat}g</div></body></html>`;
   const w = window.open('', '_blank', 'width=620,height=780');
   w.document.write(html);
   w.document.close();
@@ -2736,22 +2696,22 @@ function addManualFood() {
   const qtyNum = parseFloat(document.getElementById('qty-num').value);
   const unit = document.getElementById('qty-sel').value;
   if (!isPlateUnit(unit) && (!qtyNum || qtyNum <= 0)) {
-    showAutoMissingQty(aiMsg, aiText, document.getElementById('warn-box'), '׳™׳© ׳׳”׳–׳™׳ ׳›׳׳•׳× ׳׳₪׳ ׳™ ׳”׳•׳¡׳₪׳× ׳”׳׳׳›׳. ׳׳׳©׳: 100 ׳’׳¨׳ ׳׳•׳¨׳– ׳׳• ׳—׳¦׳™ ׳¦׳׳—׳× ׳׳•׳¨׳–');
+    showAutoMissingQty(aiMsg, aiText, document.getElementById('warn-box'), 'יש להזין כמות לפני הוספת המאכל. למשל: 100 גרם אורז או חצי צלחת אורז');
     return;
   }
   const food = selectedManualFood || manualFindFood(raw);
   if (!food) {
     aiMsg.classList.add('show');
-    aiText.textContent = '׳”׳׳׳›׳ ׳׳ ׳ ׳׳¦׳ ׳‘׳׳׳’׳¨';
+    aiText.textContent = 'המאכל לא נמצא במאגר';
     return;
   }
   let grams;
-  if (unit === '׳’׳¨׳') grams = qtyNum;
-  else if (unit === '׳"׳' || unit === '׳׳™׳׳™׳׳™׳˜׳¨') grams = qtyNum;
-  else if (unit === '׳™׳—׳™׳“׳•׳×' || unit === '׳™׳—׳™׳“׳”' || unit === '׳₪׳¨׳•׳¡׳•׳×' || unit === '׳₪׳¨׳•׳¡׳”') grams = qtyNum * (food.dw || 100);
-  else if (unit === '׳›׳•׳¡' || unit === '׳›׳•׳¡׳•׳×') grams = qtyNum * 240;
-  else if (unit === '׳›׳£' || unit === '׳›׳₪׳•׳×') grams = qtyNum * 15;
-  else if (unit === '׳›׳₪׳™׳×' || unit === '׳›׳₪׳™׳•׳×') grams = qtyNum * 5;
+  if (unit === 'גרם') grams = qtyNum;
+  else if (unit === 'מ"ל' || unit === 'מיליליטר') grams = qtyNum;
+  else if (unit === 'יחידות' || unit === 'יחידה' || unit === 'פרוסות' || unit === 'פרוסה') grams = qtyNum * (food.dw || 100);
+  else if (unit === 'כוס' || unit === 'כוסות') grams = qtyNum * 240;
+  else if (unit === 'כף' || unit === 'כפות') grams = qtyNum * 15;
+  else if (unit === 'כפית' || unit === 'כפיות') grams = qtyNum * 5;
   else if (isPlateUnit(unit)) {
     const fullPlateGrams = getFullPlateGrams(food);
     const fraction = document.getElementById('plate-fraction') ? document.getElementById('plate-fraction').value : '1';
@@ -2767,7 +2727,7 @@ function addManualFood() {
     protein: Math.round(food.p   * multiplier * 10) / 10,
     fat:     Math.round(food.f   * multiplier * 10) / 10,
     raw,
-    quantityDisplay: isPlateUnit(unit) ? document.getElementById('plate-fraction').selectedOptions[0].text + " ׳¦׳׳—׳×" : formatQuantityDisplay(qtyNum, unit),
+    quantityDisplay: isPlateUnit(unit) ? document.getElementById('plate-fraction').selectedOptions[0].text + " צלחת" : formatQuantityDisplay(qtyNum, unit),
   };
   selectedManualFood = null;
   _acSelected = false;
@@ -2779,9 +2739,9 @@ function addManualFood() {
   _commitFoodEntry(entry);
 }
 
-/* ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€
+/* ─────────────────────────────────────────────────────────
    INIT
-   ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ג”€ */
+   ─────────────────────────────────────────────────────── */
 render();
 initVoice();
 updateProfileView();
@@ -2801,7 +2761,7 @@ updateProfileView();
   const _mbtn = document.querySelector('#manual-section .btn-go');
   if (_mbtn && !_mbtn.dataset.bound) {
     _mbtn.dataset.bound = '1';
-    _mbtn.textContent = '׳”׳•׳¡׳₪׳”';
+    _mbtn.textContent = 'הוספה';
     _mbtn.removeAttribute('onclick');
     _mbtn.addEventListener('click', addFood);
   }
@@ -2810,7 +2770,7 @@ updateProfileView();
   const _autoMic = document.getElementById('auto-mic-btn');
   if (_autoBtn && !_autoBtn.dataset.bound) {
     _autoBtn.dataset.bound = '1';
-    _autoBtn.textContent = '׳”׳•׳¡׳₪׳”';
+    _autoBtn.textContent = 'הוספה';
     _autoBtn.addEventListener('click', addAutoFood);
   }
   if (_autoMic && !_autoMic.dataset.bound) {
@@ -2822,4 +2782,3 @@ updateProfileView();
     _autoInp.addEventListener('keydown', e => { if (e.key === 'Enter') addAutoFood(); });
   }
 })();
-
