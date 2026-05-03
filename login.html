@@ -205,6 +205,9 @@ body{
   var loginLinks    = document.querySelectorAll('.forgot-link-row, .auth-link');
 
   var resetSection = document.getElementById('reset-screen');
+  if (params.get('forgot') === '1') {
+    setTimeout(function(){ showForgot(null); }, 0);
+  }
 
   function showForgot(e) {
     if (e) e.preventDefault();

@@ -152,7 +152,7 @@ body {
   box-shadow: 0 8px 32px rgba(74,155,127,.28);
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 18px;
   color: white;
   position: relative;
   overflow: hidden;
@@ -175,7 +175,7 @@ body {
 }
 .avatar-wrap {
   flex-shrink: 0;
-  width: 82px; height: 82px;
+  width: 90px; height: 90px;
   border-radius: 50%;
   overflow: hidden;
   border: 3px solid rgba(255,255,255,.5);
@@ -184,12 +184,12 @@ body {
   order: 0;
 }
 .avatar-wrap svg { width: 100%; height: 100%; }
-.hdr-text { position: relative; z-index: 1; flex: 1; order: 1; min-width: 0; text-align: right; transform: translateX(4px); }
+.hdr-text { position: relative; z-index: 1; flex: 1; order: 1; min-width: 0; text-align: right; transform: translateX(0); }
 .hdr-text h1 {
-  font-size: 1.48rem;
+  font-size: 1.62rem;
   font-weight: 900;
   color: white;
-  line-height: 1.08;
+  line-height: 1.18;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -212,10 +212,10 @@ body {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 8px;
   padding-right: 20px;
 }
-.user-name { font-size: 1.2rem; color: white; font-weight: 900; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.user-name { font-size: 1.74rem; color: white; font-weight: 900; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .calorie-goal {
   font-size: .78rem;
   color: rgba(255,255,255,.85);
@@ -420,6 +420,31 @@ body {
   border-radius: inherit;
   background: linear-gradient(90deg,#73d2f3,#39aee2);
   transition: width .45s ease;
+  position: relative;
+}
+.water-meter span::after {
+  content:"";
+  position:absolute;
+  inset:-6px 0 0;
+  background: radial-gradient(circle at 20% 40%, rgba(255,255,255,.55) 0 16%, transparent 17% 100%);
+  animation: waterWave 1.1s linear infinite;
+}
+@keyframes waterWave { to { transform: translateX(-18px); } }
+.single-popup-action {
+  width: min(190px, 62%);
+  min-height: 46px;
+  align-self: center;
+  font-size: .98rem !important;
+  padding: 11px 18px !important;
+}
+.btn-go,
+.custom-food-save,
+.custom-food-cancel,
+.custom-food-open,
+.menu-pdf-btn,
+.stgl-btn,
+.tracker-toggle {
+  font-size: .98rem;
 }
 .menu-pdf-btn {
   border: none;
@@ -536,13 +561,13 @@ body {
   border: 1px solid var(--bdr2);
   border-radius: 22px;
   box-shadow: var(--sh2);
-  padding: 20px;
+  padding: 18px 20px 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
 }
 .profile-modal h3,
-.water-modal h3 { margin: 0; text-align: center; color: var(--txt); font-size: 1.15rem; }
+.water-modal h3 { margin: 2px 36px 4px; text-align: center; color: var(--txt); font-size: 1.32rem; font-weight:900; }
 .profile-modal-close {
   align-self: flex-start;
   border: none;
@@ -554,6 +579,27 @@ body {
   cursor: pointer;
 }
 .profile-modal-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.profile-modal .custom-food-field,
+.water-modal .custom-food-field { margin-bottom: 8px; }
+.profile-modal .custom-food-field + .custom-food-field { margin-top: 4px; }
+.forgot-password-btn {
+  border: none;
+  background: transparent;
+  color: var(--green);
+  font-family: 'Heebo', sans-serif;
+  font-weight: 900;
+  cursor: pointer;
+  margin: -2px 0 4px;
+}
+.field-row {
+  display:grid;
+  grid-template-columns:86px minmax(0,1fr);
+  align-items:center;
+  gap:8px;
+  margin-bottom: 4px;
+}
+.field-row label { color: var(--txt2); font-weight:900; font-size:.9rem; }
+.water-modal-question { text-align:center; font-size:1.04rem; font-weight:800; color:var(--txt2); margin: 2px 0 8px; }
 
 .input-row { display: flex; gap: 8px; }
 .food-input {
@@ -1604,8 +1650,8 @@ body {
   direction: rtl;
 }
 .miri-chat-input:focus { border-color: var(--green); box-shadow: 0 0 0 2px rgba(74,155,127,.12); }
-.miri-chat-voice { padding: 0; font-size: 1.05rem; border-radius: 10px; height: 44px; width: 48px; min-width: 48px; display:flex; align-items:center; justify-content:center; }
-.miri-chat-send { padding: 0; font-size: .86rem; border-radius: 10px; height: 44px; width: 48px; min-width: 48px; display:flex; align-items:center; justify-content:center; }
+.miri-chat-voice { padding: 0; font-size: 1.05rem; border-radius: 10px; height: 46px; width: 56px; min-width: 56px; display:flex; align-items:center; justify-content:center; }
+.miri-chat-send { padding: 0; font-size: .95rem; border-radius: 10px; height: 46px; width: 56px; min-width: 56px; display:flex; align-items:center; justify-content:center; }
 .miri-quick-actions { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:8px; }
 .miri-quick-btn {
   border: 1px solid rgba(74,155,127,.26);
@@ -1724,9 +1770,9 @@ body {
   content: '';
   position: absolute;
   left: 50%;
-  bottom: -52px;
-  width: 100%;
-  height: 112px;
+  bottom: -46px;
+  width: 104%;
+  height: 126px;
   border-radius: 112px 112px 0 0;
   background: rgba(74,155,127,.15);
   transform: translateX(-50%) scaleX(0);
@@ -1974,11 +2020,11 @@ body {
   .stats { grid-template-columns: repeat(2, 1fr); }
   .header { text-align: right; padding: 20px 14px; gap: 10px; }
   .fi-nutrients { flex-wrap: wrap; }
-  .avatar-wrap { width: 74px; height: 74px; }
+  .avatar-wrap { width: 82px; height: 82px; }
   .hdr-text { transform: translateX(2px); }
-  .hdr-text h1 { font-size: 1.12rem; padding-right: 16px; }
+  .hdr-text h1 { font-size: 1.24rem; padding-right: 16px; }
   .hdr-bottom { gap: 8px; grid-template-columns: minmax(0, 1fr) auto; }
-  .user-name { font-size: 1.1rem; line-height: 1.15; }
+  .user-name { font-size: 1.34rem; line-height: 1.15; }
   .miri-status-dot { width: 9px; height: 9px; flex-basis: 9px; right: 0; }
   .btn-logout { font-size: .74rem; min-width: 78px; padding: 7px 13px; }
   .sc-val { font-size: 1.4rem; }
